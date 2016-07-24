@@ -4,6 +4,8 @@
 package es.um.josecefe.rueda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IntSummaryStatistics;
@@ -27,6 +29,17 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import org.apache.commons.math3.optim.InitialGuess;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.OptimizationData;
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
+import org.apache.commons.math3.optim.SimpleValueChecker;
+import org.apache.commons.math3.optim.SimpleVectorValueChecker;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
+import org.apache.commons.math3.random.Well44497b;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -37,10 +50,12 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorDS implements Resolutor {
 
+    // Depuración y estadisticas
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
     private final static int IMP_CADA_CUANTAS_GEN = 100;
 
+    // Algoritmo genetico
     private final static int TAM_POBLACION_DEF = 1000;
     private final static double PROB_MUTACION_DEF = 0.015;
     private final static int TAM_TORNEO_DEF = 5;
@@ -51,6 +66,14 @@ public class ResolutorDS implements Resolutor {
     private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
+    // Optimizador local
+    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 300; //Multiplicar por nº de dias
+    final private static double STOP_FITNESS_DEF = 0;
+    final private static boolean ACTIVE_CMA_DEF = true;
+    final private static int DIAGONAL_ONLY_DEF = 0;
+    final private static int CHECK_FEASABLE_COUNT_DEF = 1;
+
+    // Variables del algoritmo
     private final Set<Horario> horarios;
     private final Dia[] dias;
     private final Participante[] participantes;
@@ -211,10 +234,10 @@ public class ResolutorDS implements Resolutor {
             }
             return solucionesDia;
         }));
-        
+
         //Convertir el mapa de solucionesCandidatasDiarias en un array multidimensional
         solCanDiaMatrix = new AsignacionDiaV5[dias.length][];
-        IntStream.of(dias.length).parallel().forEach(i -> solCanDiaMatrix[i]=solCandidatasDiarias.get(dias[i]).toArray(new AsignacionDiaV5[0]));
+        IntStream.range(0, dias.length).forEach(i -> solCanDiaMatrix[i] = solCandidatasDiarias.get(dias[i]).toArray(new AsignacionDiaV5[0]));
 
         if (ESTADISTICAS) {
             tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
@@ -257,13 +280,34 @@ public class ResolutorDS implements Resolutor {
             estGlobal = new EstadisticasGA(numGeneraciones);
         }
 
+        //Podemos intentar obtener una mejora de los individuos mediante la busqueda directa con optimizador directo
+        CMAESOptimizer optimizadorLocal
+                = new CMAESOptimizer(MAX_ITER_LOCAL_SEARCH_DEF * dias.length, STOP_FITNESS_DEF, ACTIVE_CMA_DEF, DIAGONAL_ONLY_DEF, CHECK_FEASABLE_COUNT_DEF, new Well44497b(), ESTADISTICAS, new SimpleValueChecker(Double.NEGATIVE_INFINITY, 0.0001));
+
+        double[] range = new double[dias.length]; // Para el parámetro sigma
+        double[] lB = new double[dias.length]; // Lo dejamos a 0, indice minimo del array
+        double[] uB = new double[dias.length]; //Este hay que inicializarlo al tamaño máximo del array de suluciones - 1
+        for (int i = 0; i < dias.length; i++) {
+            uB[i] = solCanDiaMatrix[i].length - 1; // Limite superior (la variable va ser el indice del array)
+            range[i] = uB[i] / 3; // El parametro sigma debe ser 1/3 del espacio de busqueda
+        }
+
+        OptimizationData sigma = new CMAESOptimizer.Sigma(range);
+        OptimizationData popSize = new CMAESOptimizer.PopulationSize((int) (4 + Math.floor(3 * Math.log(dias.length))));
+        SimpleBounds bounds = new SimpleBounds(new double[dias.length], uB);
+        ObjectiveFunction objective = new ObjectiveFunction(this::calculaAptitud);
+        final MaxEval maxEvaluations = new MaxEval(MAX_ITER_LOCAL_SEARCH_DEF * dias.length);
+
         List<Individuo> poblacion = Stream.generate(Individuo::new).limit(tamPoblacion).collect(toList());
-        //Podemos intentar obtener una mejora de los individuos mediante la busqueda directa...
-        
         Individuo mejor = poblacion.stream().min(Individuo::compareTo).orElseGet(Individuo::new);
 
+        List<PointValuePair> poblacionOptimizada = poblacion.stream().map(i -> optimizadorLocal.optimize(new InitialGuess(i.getGenes()), objective,
+                GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations)).collect(toList());
+        Optional<PointValuePair> mejorOptimizado = poblacionOptimizada.stream().min((a, b) -> a.getSecond().compareTo(b.getSecond()));
+
         if (DEBUG) {
-            System.out.println("Mejor Población Inicial: " + mejor);
+            System.out.println("Mejor Población Inicial antes de optimizacion local: " + mejor);
+            System.out.println("Mejor Población Inicial despues de optimizacion local: " + mejorOptimizado);
             System.out.println("Est. Población Inicial: " + poblacion.stream().mapToInt(ind -> ind.getAptitud()).summaryStatistics());
         }
         int nGen = 0, estancado = 0;
@@ -332,7 +376,7 @@ public class ResolutorDS implements Resolutor {
             System.out.println("Solución final=" + mejor);
             System.out.println("-----------------------------------------------");
         }
-        solucionFinal = mejor.getGenes();
+        solucionFinal = mejor.getSolucion();
         return solucionFinal;
     }
 
@@ -346,27 +390,30 @@ public class ResolutorDS implements Resolutor {
         return Optional.ofNullable(estGlobal);
     }
 
+    int calculaAptitud(double[] genes) {
+        Map<Participante, Integer> vecesCoche
+                = IntStream.range(0, genes.length).mapToObj(d -> solCanDiaMatrix[d][(int) genes[d]].getConductores()).flatMap(Collection::stream).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
+        IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i])).summaryStatistics();
+        return est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + IntStream.range(0, genes.length).mapToObj(d -> solCanDiaMatrix[d][(int) genes[d]]).mapToInt(AsignacionDia::getCoste).sum();
+    }
+
     final private class Individuo implements Comparable<Individuo> {
 
-        private final Map<Dia, AsignacionDia> genes;
+        private final double[] genes;
         private final int aptitud;
 
         Individuo() {
-            genes = Stream.of(dias).collect(toMap(Function.identity(),
-                    d -> solCandidatasDiarias.get(d).get(ThreadLocalRandom.current().nextInt(solCandidatasDiarias.get(d).size()))));
+            genes = new double[dias.length];
+            for (int i = 0; i < dias.length; i++) {
+                genes[i] = ThreadLocalRandom.current().nextInt(solCanDiaMatrix[i].length);
+            }
             aptitud = calculaAptitud(genes);
         }
 
         //Creamos un individuo con estos genes
-        Individuo(Map<Dia, AsignacionDia> genes) {
+        Individuo(double[] genes) {
             this.genes = genes;
             aptitud = calculaAptitud(genes);
-        }
-
-        private int calculaAptitud(Map<Dia, AsignacionDia> genes) {
-            Map<Participante, Integer> vecesCoche = genes.values().stream().flatMap(a -> a.getConductores().stream()).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
-            IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i])).summaryStatistics();
-            return est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
         }
 
         /**
@@ -379,8 +426,7 @@ public class ResolutorDS implements Resolutor {
          * progenitores
          */
         Individuo cruze(Individuo otroPadre) {
-            Map<Dia, AsignacionDia> genesHijo = Stream.of(dias).collect(toMap(Function.identity(),
-                    d -> ThreadLocalRandom.current().nextBoolean() ? genes.get(d) : otroPadre.getGenes().get(d)));
+            double[] genesHijo = IntStream.range(0, genes.length).mapToDouble(d -> ThreadLocalRandom.current().nextBoolean() ? genes[d] : otroPadre.genes[d]).toArray();
 
             return new Individuo(genesHijo);
         }
@@ -393,16 +439,24 @@ public class ResolutorDS implements Resolutor {
          * @return
          */
         Individuo mutacion(double probMutacionGen) {
-            Map<Dia, AsignacionDia> genesHijo = Stream.of(dias).collect(toMap(Function.identity(),
+            double[] genesHijo = IntStream.range(0, genes.length).mapToDouble(
                     d -> ThreadLocalRandom.current().nextDouble() < probMutacionGen
-                            ? solCandidatasDiarias.get(d).get(ThreadLocalRandom.current().nextInt(solCandidatasDiarias.get(d).size()))
-                            : genes.get(d)));
+                            ? ThreadLocalRandom.current().nextInt(solCanDiaMatrix[d].length)
+                            : genes[d]).toArray();
 
             return new Individuo(genesHijo);
         }
 
-        public Map<Dia, AsignacionDia> getGenes() {
+        public double[] getGenes() {
             return genes;
+        }
+
+        public Map<Dia, AsignacionDia> getSolucion() {
+            Map<Dia, AsignacionDia> sol = new HashMap<>(genes.length);
+            for (int dia = 0; dia < dias.length; dia++) {
+                sol.put(dias[dia], solCanDiaMatrix[dia][(int) genes[dia]]);
+            }
+            return sol;
         }
 
         int getAptitud() {
@@ -412,7 +466,7 @@ public class ResolutorDS implements Resolutor {
         @Override
         public int compareTo(Individuo o) {
             //return Double.compare(getCosteEstimado(), o.getCosteEstimado());
-            return Integer.compare(getAptitud(), o.getAptitud());
+            return Double.compare(getAptitud(), o.getAptitud());
         }
 
         @Override
@@ -439,7 +493,7 @@ public class ResolutorDS implements Resolutor {
 
         @Override
         public String toString() {
-            return String.format("Individuo{aptitud=%,d, genes=%s}", getAptitud(), getGenes());
+            return String.format("Individuo{aptitud=%,d, genes=%s}", getAptitud(), Arrays.toString(getGenes()));
         }
 
     }

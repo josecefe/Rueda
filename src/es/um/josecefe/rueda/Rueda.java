@@ -23,7 +23,7 @@ public class Rueda {
 
     private static final String RUEDABD = "ruedaalberca.db";
     private static final boolean COMPARANDO = false;
-    private static final boolean AMPLIADO = true;
+    private static final boolean AMPLIADO = false;
 
     /**
      * @param args
@@ -56,7 +56,8 @@ public class Rueda {
                 new ResolutorV6(horarios),
                 new ResolutorV7(horarios),
                 new ResolutorV8(horarios),
-                new ResolutorGA(horarios));
+                new ResolutorGA(horarios),
+                new ResolutorDS(horarios));
         if (COMPARANDO) {
             resolutores.forEach(r -> {
                 System.out.println("\n**********************************\n");
