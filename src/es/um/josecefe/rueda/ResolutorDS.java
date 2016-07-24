@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toMap;
  * @author josec
  *
  */
-public class ResolutorGA implements Resolutor {
+public class ResolutorDS implements Resolutor {
 
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
@@ -70,12 +70,13 @@ public class ResolutorGA implements Resolutor {
     private int tamElite;
     private int tamExtranjero;
     private int maxEstancado;
+    private AsignacionDiaV5[][] solCanDiaMatrix;
 
-    public ResolutorGA(Set<Horario> horarios) {
+    public ResolutorDS(Set<Horario> horarios) {
         this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, TAM_EXTRANJERO_DEF, MAX_ESTANCADO_DEF);
     }
 
-    public ResolutorGA(Set<Horario> horarios, int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
+    public ResolutorDS(Set<Horario> horarios, int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
         this.horarios = horarios;
         this.tamPoblacion = tamPoblacion;
         this.probMutacion = probMutacion;
@@ -210,6 +211,10 @@ public class ResolutorGA implements Resolutor {
             }
             return solucionesDia;
         }));
+        
+        //Convertir el mapa de solucionesCandidatasDiarias en un array multidimensional
+        solCanDiaMatrix = new AsignacionDiaV5[dias.length][];
+        IntStream.of(dias.length).parallel().forEach(i -> solCanDiaMatrix[i]=solCandidatasDiarias.get(dias[i]).toArray(new AsignacionDiaV5[0]));
 
         if (ESTADISTICAS) {
             tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
@@ -253,6 +258,8 @@ public class ResolutorGA implements Resolutor {
         }
 
         List<Individuo> poblacion = Stream.generate(Individuo::new).limit(tamPoblacion).collect(toList());
+        //Podemos intentar obtener una mejora de los individuos mediante la busqueda directa...
+        
         Individuo mejor = poblacion.stream().min(Individuo::compareTo).orElseGet(Individuo::new);
 
         if (DEBUG) {
