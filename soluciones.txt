@@ -1,3 +1,4 @@
+
 Normal v2: {
 Lunes=[Pedro, Jose PT, Natalia, Elia, Ana Luz, Loli, Maria Jose], 
 Martes=[Luis, Cefe, Marisa], 
@@ -156,3 +157,91 @@ conductores=[Pedro, Jose PT, Maria Jose],
 peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
 peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}
 }}
+
+--
+
+ResolutorSD: {
+Lunes=AsignacionDia{ coste=0, 
+conductores=[Pedro, Natalia, Elia, Ana Luz, Loli], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, 
+
+Martes=AsignacionDia{ coste=6, 
+conductores=[Luis, Cefe, Marisa], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}}, 
+
+Miercoles=AsignacionDia{ coste=0, conductores=[Jose PT, Luis, Ana Luz, Loli], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+Jueves=AsignacionDia{ coste=3, 
+conductores=[Natalia, Elia, Cefe, Marisa, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Molina, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+Viernes=AsignacionDia{ coste=6, 
+conductores=[Pedro, Jose PT, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}
+}
+
+---
+ResolutorDS a 14 días = { Individuo{aptitud=4.032, genes={
+Lunes=AsignacionDia{ coste=4, 
+conductores=[Jose PT, Natalia, Ana Luz, Loli], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, 
+
+Martes=AsignacionDia{ coste=6, 
+conductores=[Pedro, Cefe, Marisa], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}}, 
+
+Miercoles=AsignacionDia{ coste=0, 
+conductores=[Jose PT, Luis, Ana Luz, Loli], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+Jueves=AsignacionDia{ coste=6, 
+conductores=[Jose PT, Luis, Natalia, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+Viernes=AsignacionDia{ coste=5, 
+conductores=[Pedro, Luis, Cefe, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Molina, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+LunesEx=AsignacionDia{ coste=0, 
+conductores=[Natalia, Elia, Ana Luz, Loli, Marisa], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, 
+
+MartesEx=AsignacionDia{ coste=6, 
+conductores=[Luis, Cefe, Marisa], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}}, 
+
+MiercolesEx=AsignacionDia{ coste=0, 
+conductores=[Pedro, Elia, Ana Luz, Marisa], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+JuevesEx=AsignacionDia{ coste=5, 
+conductores=[Natalia, Elia, Cefe, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, 
+
+ViernesEx=AsignacionDia{ coste=0, 
+conductores=[Pedro, Jose PT, Elia, Loli, Maria Jose], 
+peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, 
+peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}
+}}
+
+---
+
+Individuo{aptitud=4.031, genes={
+Lunes=AsignacionDia{ coste=4, conductores=[Natalia, Ana Luz, Loli, Marisa], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, 
+
+Martes=AsignacionDia{ coste=2, conductores=[Luis, Elia, Cefe, Marisa], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, Miercoles=AsignacionDia{ coste=0, conductores=[Pedro, Luis, Ana Luz, Loli], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}, Jueves=AsignacionDia{ coste=5, conductores=[Natalia, Elia, Cefe, Maria Jose], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, Viernes=AsignacionDia{ coste=6, conductores=[Pedro, Jose PT, Maria Jose], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, LunesEx=AsignacionDia{ coste=0, conductores=[Pedro, Natalia, Elia, Ana Luz, Loli], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca}}, MartesEx=AsignacionDia{ coste=6, conductores=[Luis, Cefe, Marisa], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca}}, MiercolesEx=AsignacionDia{ coste=0, conductores=[Jose PT, Luis, Elia, Ana Luz], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Molina, Cefe=Molina, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}, JuevesEx=AsignacionDia{ coste=4, conductores=[Jose PT, Natalia, Cefe, Marisa, Maria Jose], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Molina, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Molina, Ana Luz=Alberca, Loli=Alberca, Marisa=Alberca, Maria Jose=Alberca}}, ViernesEx=AsignacionDia{ coste=4, conductores=[Pedro, Jose PT, Loli, Maria Jose], peIda={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}, peVuelta={Pedro=Alberca, Jose PT=Alberca, Luis=Alberca, Natalia=Alberca, Elia=Alberca, Cefe=Alberca, Ana Luz=Alberca, Loli=Molina, Marisa=Alberca, Maria Jose=Alberca}}}}

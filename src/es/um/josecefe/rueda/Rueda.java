@@ -23,7 +23,7 @@ public class Rueda {
 
     private static final String RUEDABD = "ruedaalberca.db";
     private static final boolean COMPARANDO = false;
-    private static final boolean AMPLIADO = false;
+    private static final boolean AMPLIADO = true;
 
     /**
      * @param args
@@ -79,7 +79,7 @@ public class Rueda {
         }
         if (AMPLIADO) {
             Set<Horario> horariosAmpliado = duplicarHorario(horarios);
-            Resolutor r = new ResolutorGA(horariosAmpliado);
+            Resolutor r = new ResolutorDS(horariosAmpliado);
             ResolutorV8 r2 = new ResolutorV8(horariosAmpliado);
             
             System.out.println("\n**********************************\n");
