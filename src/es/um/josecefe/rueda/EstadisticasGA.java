@@ -67,4 +67,8 @@ public final class EstadisticasGA implements Estadisticas {
     void addGenerados(double nGenerados) {
         generados.add(nGenerados);
     }
+
+    void setGeneracion(long generation) {
+        generaciones.set(generation);
+    }
 }

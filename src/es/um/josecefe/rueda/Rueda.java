@@ -57,7 +57,7 @@ public class Rueda {
                 new ResolutorV7(horarios),
                 new ResolutorV8(horarios),
                 new ResolutorGA(horarios),
-                new ResolutorDS(horarios));
+                new ResolutorJE(horarios));
         if (COMPARANDO) {
             resolutores.forEach(r -> {
                 System.out.println("\n**********************************\n");
@@ -79,7 +79,7 @@ public class Rueda {
         }
         if (AMPLIADO) {
             Set<Horario> horariosAmpliado = duplicarHorario(horarios);
-            Resolutor r = new ResolutorDS(horariosAmpliado);
+            Resolutor r = new ResolutorJE(horariosAmpliado);
             ResolutorV8 r2 = new ResolutorV8(horariosAmpliado);
             
             System.out.println("\n**********************************\n");
