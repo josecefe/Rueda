@@ -26,14 +26,22 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import org.jenetics.Crossover;
+import org.jenetics.GaussianMutator;
 import org.jenetics.Genotype;
 import org.jenetics.IntegerChromosome;
 import org.jenetics.IntegerGene;
+import org.jenetics.MeanAlterer;
+import org.jenetics.MonteCarloSelector;
+import org.jenetics.Mutator;
+import org.jenetics.Optimize;
 import org.jenetics.Phenotype;
+import org.jenetics.RouletteWheelSelector;
 import org.jenetics.TournamentSelector;
 import org.jenetics.engine.Codec;
 import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionResult;
+import org.jenetics.engine.EvolutionStatistics;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -49,7 +57,7 @@ public class ResolutorJE implements Resolutor {
     private final static boolean ESTADISTICAS = true;
 
     // Algoritmo genetico
-    private final static int TAM_POBLACION_DEF = 1000;
+    private final static int TAM_POBLACION_DEF = 200;
     private final static double PROB_MUTACION_DEF = 0.015;
     private final static int TAM_TORNEO_DEF = 2;
     private final static int N_GENERACIONES_DEF = 10000;
@@ -58,7 +66,6 @@ public class ResolutorJE implements Resolutor {
     private final static int TAM_ELITE_DEF = 100;
     private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
-
 
     // Variables del algoritmo
     private final Set<Horario> horarios;
@@ -258,25 +265,36 @@ public class ResolutorJE implements Resolutor {
                 gt -> gt.stream().mapToInt(g -> g.getGene().intValue()).toArray()
         );
 
+        final EvolutionStatistics<Integer, ?> statistics = EvolutionStatistics.ofNumber();
+
         final Engine<IntegerGene, Integer> engine = Engine
                 .builder(this::calculaAptitud, codec)
+                .alterers(
+                        new MeanAlterer<>(0.25),
+                        new Mutator<>(0.1))
                 .populationSize(tamPoblacion)
-                .selector(new TournamentSelector<>(tamPoblacion*3/50))
+                //.selector(new MonteCarloSelector<>())
+                .selector(new RouletteWheelSelector<>())
+                .optimize(Optimize.MINIMUM)
+                //.offspringSelector(new RouletteWheelSelector<>())
+                //.survivorsSelector(new TournamentSelector<>(3))
                 .minimizing()
                 .build();
 
         final Phenotype<IntegerGene, Integer> pt = engine.stream()
                 .limit(numGeneraciones)
+                .peek(statistics)
                 .collect(EvolutionResult.toBestPhenotype());
 
         final int[] mejor = codec.decoder().apply(pt.getGenotype());
         solucionFinal = getSolucion(mejor);
+        System.out.println(statistics);
         System.out.format("Resultado fitness=%d, genes=%s\n", pt.getFitness(), solucionFinal);
 
         //Estadisticas finales
         if (ESTADISTICAS && DEBUG) {
             estGlobal.setGeneracion(pt.getGeneration());
-            estGlobal.addGenerados((engine.getOffspringCount()+engine.getSurvivorsCount())*pt.getGeneration());
+            estGlobal.addGenerados((engine.getOffspringCount() + engine.getSurvivorsCount()) * pt.getGeneration());
             estGlobal.setFitness((int) pt.getFitness()).updateTime();
             System.out.println("====================");
             System.out.println("Estadísticas finales");
@@ -285,7 +303,7 @@ public class ResolutorJE implements Resolutor {
             System.out.println("Solución final=" + solucionFinal);
             System.out.println("-----------------------------------------------");
         }
-        
+
         return solucionFinal;
     }
 
