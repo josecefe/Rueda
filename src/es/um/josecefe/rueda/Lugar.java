@@ -12,15 +12,25 @@ package es.um.josecefe.rueda;
  */
 public class Lugar {
 
-    private final int id;
-    private final String nombre;
-    private final Double latitud;
-    private final Double longitud;
-    private final String direccion;
-    private final String poblacion;
-    private final String cp;
+    private int id;
+    private String nombre;
+    private Double latitud;
+    private Double longitud;
+    private String direccion;
+    private String poblacion;
+    private String cp;
 
     /**
+     * Constructor por defecto para la persistencia
+     */
+    public Lugar() {
+    }
+
+    /**
+     * Crea un lugar. Este construtor es el que debe usarse para crear un nuevo
+     * objeto del tipo Lugar. Se debe reservar el constructor por defecto para
+     * labores de persistencia.
+     *
      * @param id
      * @param nombre
      * @param latitud
@@ -46,6 +56,37 @@ public class Lugar {
      */
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        // Solo se puede establecer el id en un objeto nuevo
+        if (this.id == 0) {
+            this.id = id;
+        }
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public void setPoblacion(String poblacion) {
+        this.poblacion = poblacion;
+    }
+
+    public void setCp(String cp) {
+        this.cp = cp;
     }
 
     /**

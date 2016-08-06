@@ -20,16 +20,19 @@ import static java.util.stream.Collectors.toMap;
  *
  */
 public class Rueda {
-
-    private static final String RUEDABD = "ruedaalberca.db";
+//    private static final String RUEDA_BASE = "ruedamurcia";
+    private static final String RUEDA_BASE = "ruedaalberca";
+    private static final String RUEDABD = RUEDA_BASE+".db";
+    private static final String RUEDAXML_HORARIOS = RUEDA_BASE+"_horarios.xml";
+    private static final String RUEDAXML_ASIGNACION = RUEDA_BASE+"_asignacion.xml";
     private static final boolean COMPARANDO = false;
-    private static final boolean AMPLIADO = true;
+    private static final boolean AMPLIADO = false;
 
     /**
      * @param args
      */
     public static void main(String[] args) {
-        new Rueda().pruebaResolutorSQL();
+        new Rueda().pruebaResolutor();
 
         //pruebaCombinatoria();
     }
@@ -44,38 +47,43 @@ public class Rueda {
         return nHorarios;
     }
 
-    private void pruebaResolutorSQL() {
-        //PersistenciaSQL.creaBD("prueba.db");
-        Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
+    private void pruebaResolutor() {
+        //Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
+        Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
+        // Vamos a guardarlo en XML
+        //PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
+        
         List<? extends Resolutor> resolutores = Arrays.asList(
-                new ResolutorV1(horarios),
-                new ResolutorV2(horarios),
-                new ResolutorV3(horarios),
-                new ResolutorV4(horarios),
-                new ResolutorV5(horarios),
-                new ResolutorV6(horarios),
+//                new ResolutorV1(horarios),
+//                new ResolutorV2(horarios),
+//                new ResolutorV3(horarios),
+//                new ResolutorV4(horarios),
+//                new ResolutorV5(horarios),
+//                new ResolutorV6(horarios),
                 new ResolutorV7(horarios),
-                new ResolutorV8(horarios),
-                new ResolutorGA(horarios),
-                new ResolutorJE(horarios));
+                new ResolutorV8(horarios)
+//                new ResolutorGA(horarios),
+//                new ResolutorJE(horarios)
+                );
         if (COMPARANDO) {
             resolutores.forEach(r -> {
                 System.out.println("\n**********************************\n");
-                System.out.format("Resolvemos el problema normal con %s:\n", r.getClass().getName());
+                System.out.format("Resolvemos el problema normal con %s:\n", r.getClass().getSimpleName());
                 r.resolver();
                 System.out.println("\n**********************************\n");
             });
             resolutores.forEach(r -> {
-                System.out.format("Resolutor %s:\n->sol=%s\n->%s\n", r.getClass().getName(), r.getSolucionFinal(), r.getEstadisticas());
+                System.out.format("Resolutor %s:\n->sol=%s\n->%s\n", r.getClass().getSimpleName(), r.getSolucionFinal(), r.getEstadisticas());
             });
         } else {
             Resolutor r = resolutores.get(resolutores.size() - 1);
             System.out.println("\n**********************************\n");
-            System.out.format("Resolvemos el problema normal con %s:\n", r.getClass().getName());
+            System.out.format("Resolvemos el problema normal con %s:\n", r.getClass().getSimpleName());
             r.resolver();
             System.out.println("\n**********************************\n");
-            System.out.format("Resolutor %s:\n=%s\n->%s\n", r.getClass().getName(), r.getSolucionFinal(), r.getEstadisticas());
-            PersistenciaSQL.guardaAsignacionRueda(RUEDABD, r.getSolucionFinal());
+            System.out.format("Resolutor %s:\n=%s\n->%s\n", r.getClass().getSimpleName(), r.getSolucionFinal(), r.getEstadisticas());
+            //PersistenciaSQL.guardaAsignacionRueda(RUEDABD, r.getSolucionFinal());
+            PersistenciaXML.guardaAsignacionRueda(RUEDAXML_ASIGNACION, r.getSolucionFinal());
         }
         if (AMPLIADO) {
             Set<Horario> horariosAmpliado = duplicarHorario(horarios);
@@ -84,15 +92,15 @@ public class Rueda {
             
             System.out.println("\n**********************************\n");
             System.out.format("Resolvemos el problema Ampliado con %s y %s:\n", r.getClass().getName(), r2.getClass().getName());
-            System.out.format("Fase 1: Ampliado %s:\n", r.getClass().getName());
+            System.out.format("Fase 1: Ampliado %s:\n", r.getClass().getSimpleName());
             System.out.println(r.resolver());
             System.out.format("->Est: %s\n", r.getEstadisticas());
             if (r.getEstadisticas().isPresent()) {
                 int C = r.getEstadisticas().get().getFitness() + 1; //Uno más para que encuentre la misma solución por lo menos...
-                System.out.format("Fase 2: Ampliado %s tomando como entrada %,d como mejor coste máximo:\n", r2.getClass().getName(), C);
+                System.out.format("Fase 2: Ampliado %s tomando como entrada %,d como mejor coste máximo:\n", r2.getClass().getSimpleName(), C);
                 System.out.println(r2.resolver(C, 0.5));
             } else {
-                System.out.format("Fase 2: Ampliado %s sin tener información adicional:\n", r2.getClass().getName());
+                System.out.format("Fase 2: Ampliado %s sin tener información adicional:\n", r2.getClass().getSimpleName());
                 System.out.println(r2.resolver());
             }
             System.out.format("->Est: %s\n", r2.getEstadisticas());

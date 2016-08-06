@@ -74,23 +74,23 @@ public class ResolutorJE implements Resolutor {
     private final static boolean ESTADISTICAS = true;
 
     // Algoritmo genetico
-    private final static int TAM_POBLACION_DEF = 20;
-    private final static double PROB_MUTACION_DEF = 0.25;
-    private final static double PROB_MEJORA_DEF = 0.1;
-    private final static int TAM_TORNEO_DEF = 2;
+    private final static int TAM_POBLACION_DEF = 100;
+    private final static double PROB_MUTACION_DEF = 0.6;
+    private final static double PROB_MEJORA_DEF = 0.01;
+    private final static int TAM_TORNEO_DEF = 4;
     private final static int N_GENERACIONES_DEF = 200;
     private final static int TIEMPO_MAXIMO_DEF = 500;
     private final static int OBJ_APTITUD_DEF = 0;
     private final static int TAM_ELITE_DEF = 4;
-    private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 5;
+    private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 2;
 
     // Optimizador por busqueda local
-    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 100; //Multiplicar por nº de dias, originalmente 300
+    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 300; //Multiplicar por nº de dias, originalmente 300
     final private static double STOP_FITNESS_DEF = 0;
     final private static boolean ACTIVE_CMA_DEF = true;
     final private static int DIAGONAL_ONLY_DEF = 0;
     final private static int CHECK_FEASABLE_COUNT_DEF = 1;
-    private final static boolean ESTADISTICAS_OPT_LOCAL_DEF = true;
+    private final static boolean ESTADISTICAS_OPT_LOCAL_DEF = false;
 
     // Variables del algoritmo
     private final Set<Horario> horarios;
@@ -316,9 +316,9 @@ public class ResolutorJE implements Resolutor {
                 .builder(this::calculaAptitud, codec)
                 .offspringFraction(1.0 - (double) tamElite / tamPoblacion)
                 .alterers(
-                        new MeanAlterer<>(probMutacion),
                         new Mutator<>(probMutacion),
-                        new GaussianMutator<>(probMutacion),
+                        new GaussianMutator<>(probMutacion/5),
+                        new MeanAlterer<>(probMutacion/10),
                         new MejoraPorBusqueda((double[] genes) -> optimizadorLocal.optimize(new InitialGuess(genes), objective, GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations).getPoint(), probMejora)
                 )
                 .populationSize(tamPoblacion)

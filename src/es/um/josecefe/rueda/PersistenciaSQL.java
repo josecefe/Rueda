@@ -10,9 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author josec
@@ -24,7 +24,7 @@ public class PersistenciaSQL {
     private static final String FECHA_VERSION = "2016-07-14";
 
     public static Set<Horario> cargaHorarios(String db) {
-        Set<Horario> horarios = new TreeSet<>();
+        Set<Horario> horarios = new HashSet<>();
         Map<Integer, Participante> participantes = new HashMap<>();
         Map<Integer, Dia> dias = new HashMap<>();
         Map<Integer, Lugar> lugares = new HashMap<>();

@@ -16,11 +16,26 @@ import java.util.stream.IntStream;
  * @author josec
  */
 public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionDia {
-    private final Participante[] participantes;
-    private final boolean[] conductores;
-    private final Map<Participante, Lugar> peIda, peVuelta;
-    private final int coste;
+    private Participante[] participantes;
+    private boolean[] conductores;
+    private Map<Participante, Lugar> peIda, peVuelta;
+    private int coste;
+
+    /**
+     * Constructor pensado para la persistencia
+     */
+    public AsignacionDiaV5() {
+    }
     
+    /**
+     * Constructor normal
+     * 
+     * @param participantes
+     * @param conductores
+     * @param puntoEncuentroIda
+     * @param puntoEncuentroVuelta
+     * @param coste 
+     */
     public AsignacionDiaV5(Participante[] participantes, Set<Participante> conductores, Map<Participante, Lugar> puntoEncuentroIda, Map<Participante, Lugar> puntoEncuentroVuelta, int coste) {
         this.participantes=participantes;
         this.conductores = new boolean[participantes.length];
@@ -102,4 +117,26 @@ public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionD
     public String toString() {
         return "AsignacionDia{ coste=" + coste + ", conductores=" + getConductores() + ", peIda=" + peIda + ", peVuelta=" + peVuelta +  '}';
     }
+
+    public void setParticipantes(Participante[] participantes) {
+        this.participantes = participantes;
+    }
+
+    public void setConductoresArray(boolean[] conductores) {
+        this.conductores = conductores;
+    }
+
+    public void setPeIda(Map<Participante, Lugar> peIda) {
+        this.peIda = peIda;
+    }
+
+    public void setPeVuelta(Map<Participante, Lugar> peVuelta) {
+        this.peVuelta = peVuelta;
+    }
+
+    public void setCoste(int coste) {
+        this.coste = coste;
+    }
+    
+    
 }

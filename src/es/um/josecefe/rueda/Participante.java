@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class Participante implements Comparable<Participante> {
 
-    private final int id;
-    private final String nombre;
-    private final int plazasCoche;
-    private final Lugar residencia;
+    private int id;
+    private String nombre;
+    private int plazasCoche;
+    private Lugar residencia;
     /*
 	 * SQL: CREATE TABLE punto_encuentro ( "participante" INTEGER NOT
 	 * NULL REFERENCES participante(id) ON DELETE CASCADE, "lugar" INTEGER NOT
@@ -25,14 +25,24 @@ public class Participante implements Comparable<Participante> {
 	 * PRIMARY KEY (participante, lugar, orden) );
 	 * 
      */
-    private final List<Lugar> puntosEncuentro;
+    private List<Lugar> puntosEncuentro;
 
     /**
-     * @param id
-     * @param nombre
+     * Constructor por defecto para labores de peristencia
+     */
+    public Participante() {
+    }
+
+    /**
+     * Constructor de la clase que debe usarse cuando se crea un objeto de este
+     * tipo, reservando el constructor por defecto para labores de persistencia
+     *
+     * @param id Identificador del participante, un número único a partir de 1
+     * @param nombre Nombre a mostrar del participante
      * @param plazasCoche Nº de ocupantes del vehículo, incluido el conductor
-     * @param residencia
-     * @param puntosEncuentro
+     * @param residencia (Opcional) Lugar de residencia
+     * @param puntosEncuentro Lista con orden que contiene los lugares admitidos
+     * por el participante por orden de preferencia
      */
     public Participante(int id, String nombre, int plazasCoche, Lugar residencia, List<Lugar> puntosEncuentro) {
         this.id = id;
@@ -79,6 +89,29 @@ public class Participante implements Comparable<Participante> {
         return puntosEncuentro;
     }
 
+    public void setId(int id) {
+        // Solo se puede establecer el id en un objeto nuevo
+        if (this.id == 0) {
+            this.id = id;
+        }
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setPlazasCoche(int plazasCoche) {
+        this.plazasCoche = plazasCoche;
+    }
+
+    public void setResidencia(Lugar residencia) {
+        this.residencia = residencia;
+    }
+
+    public void setPuntosEncuentro(List<Lugar> puntosEncuentro) {
+        this.puntosEncuentro = puntosEncuentro;
+    }
+
     /* (non-Javadoc)
 	 * @see java.lang.Object#toString()
      */
@@ -117,4 +150,5 @@ public class Participante implements Comparable<Participante> {
     public int compareTo(Participante o) {
         return Integer.compare(id, o.getId());
     }
+
 }

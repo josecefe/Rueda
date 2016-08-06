@@ -13,12 +13,21 @@ package es.um.josecefe.rueda;
  */
 public class Dia implements Comparable<Dia> {
 
-    private final int id;
-    private final String descripcion;
+    private int id;
+    private String descripcion;
 
     /**
-     * @param id
-     * @param descripcion
+     * Constructor por defecto para la persistencia
+     */
+    public Dia() {
+    }
+    
+    /**
+     * Constructor preferido. El Identificador debe ser un número único a partir
+     * de 1
+     *
+     * @param id Número único de identificación a partir del 1
+     * @param descripcion Descripción del día en texto
      */
     public Dia(int id, String descripcion) {
         this.id = id;
@@ -37,6 +46,21 @@ public class Dia implements Comparable<Dia> {
      */
     public String getDescripcion() {
         return descripcion;
+    }
+
+    /**
+     * El 0 no es un valor valido de ID
+     *
+     * @param id Valor de Identificación del día, empezando por el 1
+     */
+    public void setId(int id) {
+        if (this.id == 0) {
+            this.id = id;
+        }
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     /*
