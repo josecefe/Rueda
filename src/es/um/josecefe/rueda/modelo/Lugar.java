@@ -1,4 +1,4 @@
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.modelo;
 
 /**
  * Representa un lugar

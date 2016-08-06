@@ -1,8 +1,14 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.Lugar;
+import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,40 +33,29 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
- * algoritmo de busqueda dispersa (Scatter Search).
+ * algoritmo genético.
  *
  * @author josec
  *
  */
-public class ResolutorSS implements Resolutor {
+public class ResolutorGA implements Resolutor {
 
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
     private final static int IMP_CADA_CUANTAS_GEN = 100;
 
-    private final static int TAM_CONJ_Q_DEF = 10;
-    private final static int TAM_CONJ_D_DEF = 10;
     private final static int TAM_POBLACION_DEF = 1000;
+    private final static double PROB_MUTACION_DEF = 0.015;
+    private final static int TAM_TORNEO_DEF = 5;
     private final static int N_GENERACIONES_DEF = 1000;
     private final static int TIEMPO_MAXIMO_DEF = Integer.MAX_VALUE;
     private final static int OBJ_APTITUD_DEF = 0;
-    private final static int MAX_STALL_GEN_DEF = N_GENERACIONES_DEF / 10;
-    private final static int MAX_STALL_TIME_DEF = Integer.MAX_VALUE;
+    private final static int TAM_ELITE_DEF = 5;
+    private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
+    private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
     private final Set<Horario> horarios;
     private final Dia[] dias;
@@ -72,31 +67,31 @@ public class ResolutorSS implements Resolutor {
     private double totalPosiblesSoluciones;
     private final boolean[] participantesConCoche;
     private int tamPoblacion;
+    private double probMutacion;
     private int numGeneraciones;
     private long tiempoMaximo;
     private int objAptitud;
+    private EstadisticasGA estGlobal;
     private int tournamentSize;
     private int tamElite;
-    private int maxStallTime;
-    private int maxStallGen;
-    private final int sizeQSet;
-    private final int sizeDSet;
-    private EstadisticasGA estGlobal;
+    private int tamExtranjero;
+    private int maxEstancado;
 
-    public ResolutorSS(Set<Horario> horarios) {
-        this(horarios, TAM_CONJ_Q_DEF, TAM_CONJ_D_DEF, TAM_POBLACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, MAX_STALL_GEN_DEF, MAX_STALL_TIME_DEF);
+    public ResolutorGA(Set<Horario> horarios) {
+        this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, TAM_EXTRANJERO_DEF, MAX_ESTANCADO_DEF);
     }
 
-    public ResolutorSS(Set<Horario> horarios, int sizeQSet, int sizeDSet, int tamPoblacion, int nGeneraciones, long maxTime, int objAptitud, int maxStallGen, int maxStallTime) {
+    public ResolutorGA(Set<Horario> horarios, int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
         this.horarios = horarios;
-        this.sizeQSet = sizeQSet;
-        this.sizeDSet = sizeDSet;
         this.tamPoblacion = tamPoblacion;
+        this.probMutacion = probMutacion;
         this.numGeneraciones = nGeneraciones;
         this.tiempoMaximo = maxTime;
         this.objAptitud = objAptitud;
-        this.maxStallTime = maxStallTime;
-        this.maxStallGen = maxStallGen;
+        this.tournamentSize = tamTorneo;
+        this.tamElite = tamElite;
+        this.tamExtranjero = tamExtranjero;
+        this.maxEstancado = maxEstancado;
 
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
         participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
@@ -112,6 +107,10 @@ public class ResolutorSS implements Resolutor {
         for (int i = 0; i < coefConduccion.length; i++) {
             coefConduccion[i] = (float) (maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
         }
+    }
+
+    public void setProbMutacion(double probMutacion) {
+        this.probMutacion = probMutacion;
     }
 
     public void setTamPoblacion(int tamPoblacion) {
@@ -276,7 +275,7 @@ public class ResolutorSS implements Resolutor {
                 elite = poblacion.subList(0, tamElite); // Creamos el grupo de elite
             }
             final List<Individuo> antPoblacion = poblacion;
-            //poblacion = poblacion.parallelStream().map(ind -> ind.cruze(tournamentSelection(antPoblacion, tournamentSize))).map(ind -> ind.mutacion(probMutacion)).collect(toList());
+            poblacion = poblacion.parallelStream().map(ind -> ind.cruze(tournamentSelection(antPoblacion, tournamentSize))).map(ind -> ind.mutacion(probMutacion)).collect(toList());
 
             if (ESTADISTICAS) {
                 estGlobal.incGeneracion();
@@ -296,17 +295,20 @@ public class ResolutorSS implements Resolutor {
                 }
             }
 
+            if (tamExtranjero > 0) {
+                poblacion.addAll(Stream.generate(Individuo::new).limit(tamExtranjero).collect(toList()));
+            }
             // Paso 3: Elegir al mejor y TODO: actualizar estadisticas
             Individuo nuevoMejor = poblacion.stream().min(Individuo::compareTo).orElseGet(Individuo::new);
 
             if (nuevoMejor.compareTo(mejor) < 0) {
                 mejor = nuevoMejor;
                 estancado = 0;
-            } else if (++estancado >= maxStallGen) {
+            } else if (++estancado >= maxEstancado) {
                 System.out.format("******Estamos estancados durante %,d generaciones, vamos a regenerar la población conservando solo el mejor****\n", estancado);
                 poblacion = Stream.generate(Individuo::new).limit(tamPoblacion - 1).collect(toList());
                 poblacion.add(mejor);
-                maxStallGen += estancado; // Subimos el umbral para no regenerar en exceso
+                maxEstancado += estancado; // Subimos el umbral para no regenerar en exceso
                 estancado = 0;
             }
 

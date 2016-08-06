@@ -1,12 +1,15 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
-import java.util.ArrayDeque;
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.Lugar;
+import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +22,6 @@ import java.util.OptionalLong;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.mapping;
@@ -60,11 +62,9 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Resolutor
  */
-public class ResolutorV7 implements Resolutor {
+public class ResolutorV6 implements Resolutor {
 
-    private final static boolean DEBUG = true;
-    private final static boolean ESTADISTICAS = true;
-    private final static long CADA_EXPANDIDOS = 100000L;
+    final static long CADA_EXPANDIDOS = 100000L;
     private Set<Horario> horarios;
     private Dia[] dias;
     private Participante[] participantes;
@@ -81,15 +81,22 @@ public class ResolutorV7 implements Resolutor {
     private int[] mejorCosteDia;
     private boolean[] participantesConCoche;
     private double pesoCotaInferior;
-    private double cotaInferiorCorte;
-    private final Nodo RAIZ;
-    private EstadisticasV1 estGlobal;
+    private EstadisticasV1 estadisticas;
 
-    public ResolutorV7(Set<Horario> horarios) {
+    @Override
+    public Optional<Estadisticas> getEstadisticas() {
+        return Optional.ofNullable(estadisticas);
+    }
+
+    public ResolutorV6(Set<Horario> horarios) {
         this.horarios = horarios;
+    }
+
+    private void inicializa() {
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
+
         participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
-        RAIZ = new Nodo();
+
         participantesConCoche = new boolean[participantes.length];
         for (int i = 0; i < participantes.length; i++) {
             participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
@@ -98,14 +105,12 @@ public class ResolutorV7 implements Resolutor {
         Map<Participante, Long> vecesParticipa = horarios.stream().collect(groupingBy(Horario::getParticipante, counting()));
         OptionalLong maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max();
 
-        coefConduccion = Stream.of(participantes).mapToDouble(p -> (double) maxVecesParticipa.getAsLong() / vecesParticipa.get(p) - 0.001).toArray(); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
-    }
-
-    private void inicializa() {
+        coefConduccion = Stream.of(participantes).mapToDouble(p -> (double) maxVecesParticipa.getAsLong() / vecesParticipa.get(p)).toArray();
 
         maxVecesCondDia = new int[dias.length][participantes.length];
         minVecesCondDia = new int[dias.length][participantes.length];
 
+        //solucionesCandidatas = new HashMap<>(dias.length);
         peorCosteDia = new int[dias.length];
 
         mejorCosteDia = new int[dias.length];
@@ -220,18 +225,16 @@ public class ResolutorV7 implements Resolutor {
             return solucionesDia;
         }));
 
-        if (ESTADISTICAS) {
-            tamanosNivel = solucionesCandidatas.keySet().stream().mapToInt(k -> solucionesCandidatas.get(k).size()).toArray();
-            totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
-            System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
-                    + totalPosiblesSoluciones);
-            double acum = 1.0;
-            nPosiblesSoluciones = new double[tamanosNivel.length];
+        tamanosNivel = solucionesCandidatas.keySet().stream().mapToInt(k -> solucionesCandidatas.get(k).size()).toArray();
+        totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
+        System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
+                + totalPosiblesSoluciones);
+        double acum = 1.0;
+        nPosiblesSoluciones = new double[tamanosNivel.length];
 
-            for (int i = tamanosNivel.length - 1; i >= 0; i--) {
-                nPosiblesSoluciones[i] = acum;
-                acum = acum * tamanosNivel[i];
-            }
+        for (int i = tamanosNivel.length - 1; i >= 0; i--) {
+            nPosiblesSoluciones[i] = acum;
+            acum = acum * tamanosNivel[i];
         }
 
         for (int i = peorCosteDia.length - 2; i >= 0; i--) {
@@ -242,6 +245,8 @@ public class ResolutorV7 implements Resolutor {
                 maxVecesCondDia[i][j] += maxVecesCondDia[i + 1][j];
             }
         }
+
+        //TODO: Acumular el minVecesConductorDia y el max como el peorCosteDia
     }
 
     @Override
@@ -250,127 +255,94 @@ public class ResolutorV7 implements Resolutor {
     }
 
     public Map<Dia, AsignacionDiaV5> resolver(double pesoCotaInf) {
-        return resolver(RAIZ.getCotaSuperior(), Math.min(1, Math.max(0, pesoCotaInf)));
+        return resolver(Integer.MAX_VALUE, pesoCotaInf);
     }
 
-    public Map<Dia, AsignacionDiaV5> resolver(double cotaInfCorte, double pesoCotaInf) {
+    public Map<Dia, AsignacionDiaV5> resolver(int maxVecesCoche, double pesoCotaInf) {
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        long ti;
-        if (ESTADISTICAS) {
-            ti = System.currentTimeMillis();
-        }
-
+        long ti = System.currentTimeMillis();
         inicializa();
-
-        if (ESTADISTICAS && DEBUG) {
-            System.out.format("Tiempo inicializar =%,.3f s\n", (System.currentTimeMillis() - ti) / 1000.0);
-            estGlobal = new EstadisticasV1(totalPosiblesSoluciones);
-        }
+        System.out.format("Tiempo inicializar =%,.3f s\n", (System.currentTimeMillis() - ti) / 1000.0);
+        estadisticas = new EstadisticasV1(totalPosiblesSoluciones);
+        
         // Preparamos el algoritmo
         pesoCotaInferior = pesoCotaInf;
+        final Nodo RAIZ = new Nodo();
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = cotaInfCorte; //Lo tomamos como cota superior
-        ArrayDeque<Nodo> pilaNodosVivos = new ArrayDeque<>(); // Inicialmente es una cola LIFO (pila)
-        Collection<Nodo> LNV = pilaNodosVivos;
-        Supplier<Nodo> opPull = pilaNodosVivos::removeLast; //Para controlar si es pila o cola, inicialmente pila
-        LNV.add(actual);
+        double C = maxVecesCoche + 0.999; //Lo tomamos como cota superior
+        PriorityQueue<Nodo> listaNodosVivos = new PriorityQueue<>();
+        listaNodosVivos.offer(actual);
 
         // Bucle principal
-        do {
-            actual = opPull.get();
-            if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L) {
-                if (DEBUG) {
-                    System.out.format("> LNV=%,d, ", LNV.size());
-                    System.out.println(estGlobal.setFitness((int) (cotaInferiorCorte * 1000)).updateTime());
+        long expandidos = 0, generados = 0;
+        double descartados = 0, terminales = 0; //
+        //long ti = System.currentTimeMillis();
 
+        do {
+            actual = listaNodosVivos.poll();
+            if (estadisticas.incExpandidos() % CADA_EXPANDIDOS == 0L) {
+                    System.out.format("> LNV=%,d, ", listaNodosVivos.size());
+                    System.out.println(estadisticas.setFitness((int) (C * 1000)).updateTime());
                     System.out.println("-- Trabajando con " + actual);
-                }
             }
-            if (actual.getCotaInferior() < cotaInferiorCorte) { //Estrategia de poda: si la cotaInferior >= C no seguimos
-                if (ESTADISTICAS) {
-                    estGlobal.addGenerados(tamanosNivel[actual.getIndiceDia() + 1]);
-                }
+            if (actual.getCotaInferior() < C) { //Estrategia de poda: si la cotaInferior >= C no seguimos
+                estadisticas.addGenerados(tamanosNivel[actual.getIndiceDia() + 1]);
                 if (actual.getIndiceDia() + 2 == dias.length) { // Los hijos son terminales
-                    if (ESTADISTICAS) {
-                        estGlobal.addTerminales(tamanosNivel[actual.getIndiceDia() + 1]);
-                    }
+                    estadisticas.addTerminales(tamanosNivel[actual.getIndiceDia() + 1]);
                     Optional<Nodo> mejorHijo = actual.generaHijos(true).min(Nodo::compareTo); //true para paralelo
                     if (mejorHijo.isPresent() && mejorHijo.get().compareTo(mejor) < 0) {
-                        if (mejor == RAIZ) {
-                            PriorityQueue<Nodo> colaNodosVivos = new PriorityQueue<>(LNV);
-                            LNV = colaNodosVivos;
-                            opPull = colaNodosVivos::poll;
-                            if (DEBUG) {
-                                System.out.println("---- CAMBIANDO A COLA DE PRIORIDAD");
-                            }
-                        }
-
                         mejor = mejorHijo.get();
-                        if (DEBUG) {
-                            System.out.format("$$$$ A partir del padre=%s\n    -> mejoramos con el hijo=%s\n", actual, mejor);
-                        }
-                        if (mejor.getCosteEstimado() < cotaInferiorCorte) {
-                            if (DEBUG) {
-                                System.out.format("** Nuevo C: Anterior=%,.3f, Nuevo=%,.3f\n", cotaInferiorCorte, mejor.getCosteEstimado());
-                            }
-                            final double fC = cotaInferiorCorte = mejor.getCosteEstimado();
-                            // Limpiamos la lista de nodos vivos de los que no cumplan... ç
-                            int antes;
-                            if (ESTADISTICAS) {
-                                estGlobal.addDescartados(LNV.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getIndiceDia()]).sum());
-                                antes = LNV.size();
-                            }
-                            boolean removeIf = LNV.removeIf(n -> n.getCotaInferior() >= fC);
-                            if (ESTADISTICAS && DEBUG && removeIf) {
-                                System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size());
+                        System.out.format("$$$$ A partir del padre=%s\n    -> mejoramos con el hijo=%s\n", actual, mejor);
+                        if (mejor.getCosteEstimado() < C) {
+                            System.out.format("** Nuevo C: Anterior=%,.3f, Nuevo=%,.3f\n", C, mejor.getCosteEstimado());
+                            final double fC = C = mejor.getCosteEstimado();
+                            // Limpiamos la lista de nodos vivos de los que no cumplan... //TODO: No contados en estadisticas
+                            estadisticas.addDescartados(listaNodosVivos.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getIndiceDia()]).sum());
+                            int antes = listaNodosVivos.size();
+                            boolean removeIf = listaNodosVivos.removeIf(n -> n.getCotaInferior() >= fC);
+                            if (removeIf) {
+                                System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - listaNodosVivos.size());
                             }
                         }
                     }
                 } else { // Es un nodo intermedio
-                    final double Corte = cotaInferiorCorte;
+                    final double Corte = C;
                     List<Nodo> lNF = actual.generaHijos(true).filter(n -> n.getCotaInferior() < Corte).collect(toList()); //PARALELO poner true
                     OptionalDouble menorCotaSuperior = lNF.stream().mapToDouble(Nodo::getCotaSuperior).min();
-                    if (menorCotaSuperior.isPresent() && menorCotaSuperior.getAsDouble() < cotaInferiorCorte) { // Mejora de C
-                        if (DEBUG) {
-                            System.out.format("** Nuevo C: Anterior=%,.3f, Nuevo=%,.3f\n", cotaInferiorCorte, menorCotaSuperior.getAsDouble());
-                        }
-                        cotaInferiorCorte = menorCotaSuperior.getAsDouble(); //Actualizamos C
-                        final double fC = cotaInferiorCorte;
+                    if (menorCotaSuperior.isPresent() && menorCotaSuperior.getAsDouble() < C) { // Mejora de C
+                        System.out.format("** Nuevo C: Anterior=%,.3f, Nuevo=%,.3f\n", C, menorCotaSuperior.getAsDouble());
+                        C = menorCotaSuperior.getAsDouble(); //Actualizamos C
+                        final double fC = C;
                         lNF.removeIf(n -> n.getCotaInferior() >= fC); //Recalculamos lNF
                         // Limpiamos la LNV
-                        int antes;
-                        if (ESTADISTICAS) {
-                            estGlobal.addDescartados(LNV.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getIndiceDia()]).sum());
-                            antes = LNV.size();
-                        }
-                        boolean removeIf = LNV.removeIf(n -> n.getCotaInferior() >= fC);
-                        if (ESTADISTICAS && DEBUG && removeIf) {
-                            System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size());
+                        estadisticas.addDescartados(listaNodosVivos.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getIndiceDia()]).sum());
+                        int antes = listaNodosVivos.size();
+                        boolean removeIf = listaNodosVivos.removeIf(n -> n.getCotaInferior() >= fC);
+                        if (removeIf) {
+                            System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - listaNodosVivos.size());
                         }
                     }
-                    if (ESTADISTICAS) {
-                        estGlobal.addDescartados((tamanosNivel[actual.getIndiceDia() + 1] - lNF.size()) * nPosiblesSoluciones[actual.getIndiceDia() + 1]);
-                    }
-                    LNV.addAll(lNF);
+                    estadisticas.addDescartados((tamanosNivel[actual.getIndiceDia() + 1] - lNF.size()) * nPosiblesSoluciones[actual.getIndiceDia() + 1]);
+                    listaNodosVivos.addAll(lNF);
                 }
-            } else if (ESTADISTICAS) {
-                estGlobal.addDescartados(nPosiblesSoluciones[actual.getIndiceDia()]);
+            } else {
+                estadisticas.addDescartados(nPosiblesSoluciones[actual.getIndiceDia()]);
             }
-        } while (!LNV.isEmpty());
+        } while (!listaNodosVivos.isEmpty());
 
         //Estadisticas finales
-        if (ESTADISTICAS && DEBUG) {
-            System.out.println("====================");
-            System.out.println("Estadísticas finales");
-            System.out.println("====================");
-            System.out.println(estGlobal.setFitness((int) (cotaInferiorCorte * 1000)).updateTime());
-            System.out.println("Solución final=" + mejor);
-            System.out.println("-----------------------------------------------");
-        }
+        estadisticas.setFitness((int) (C * 1000)).updateTime();
+
+        System.out.println("====================");
+        System.out.println("Estadísticas finales");
+        System.out.println("====================");
+        System.out.println(estadisticas);
+        System.out.println("----------------------------------------------------");
+
         // Construimos la solución final
         if (mejor.compareTo(RAIZ) < 0) {
             Iterator<AsignacionDiaV5> i = mejor.getEleccion().iterator();
@@ -383,11 +355,6 @@ public class ResolutorV7 implements Resolutor {
     @Override
     public Map<Dia, AsignacionDiaV5> getSolucionFinal() {
         return solucionFinal;
-    }
-
-    @Override
-    public Optional<Estadisticas> getEstadisticas() {
-        return Optional.ofNullable(estGlobal);
     }
 
     //Function<Nodo, Double> funcionCoste;
@@ -461,14 +428,14 @@ public class ResolutorV7 implements Resolutor {
                 }
             }
             if (terminal) { //Es terminal
-                costeEstimado = cotaSuperior = cotaInferior = maximo + (maximo - minimo) / 10.0 + costeAcumulado / 1000.0;
+                costeEstimado = cotaSuperior = cotaInferior = 2 * maximo - minimo + costeAcumulado / 1000.0;
                 //valida = (minimo == maximo);
             } else {
                 //cotaInferior = 2 * maxCI - minCS;
                 //cotaSuperior = 2 * maxCS - minCI;
 
-                cotaInferior = maxCI + (maxCI - minCS) / 10.0 + (costeAcumulado + mejorCosteDia[indiceDia + 1]) / 1000.0;
-                cotaSuperior = maxCS + (maxCS - minCI) / 10.0 + (costeAcumulado + peorCosteDia[indiceDia + 1]) / 1000.0;
+                cotaInferior = 2 * maxCI - minCS + (costeAcumulado + mejorCosteDia[indiceDia + 1]) / 1000.0;
+                cotaSuperior = 2 * maxCS - minCI + (costeAcumulado + peorCosteDia[indiceDia + 1]) / 1000.0;
                 costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior * (1 - pesoCotaInferior);
 //                costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior*(1-pesoCotaInferior)
 //                        + (costeAcumulado + mejorCosteDia[indiceDia + 1] * pesoCotaInferior 

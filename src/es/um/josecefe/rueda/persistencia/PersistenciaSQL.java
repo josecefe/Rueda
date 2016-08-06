@@ -1,8 +1,13 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.persistencia;
 
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.Lugar;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;

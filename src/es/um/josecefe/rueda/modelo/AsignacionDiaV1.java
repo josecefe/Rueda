@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.modelo;
 
 import java.util.Map;
 import java.util.Objects;

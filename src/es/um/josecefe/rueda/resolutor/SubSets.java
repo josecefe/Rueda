@@ -1,7 +1,7 @@
 /**
  * (C) 2016 José Ceferino Ortega Carretero
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
 import java.util.HashSet;
 import java.util.Iterator;

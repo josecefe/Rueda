@@ -1,8 +1,13 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.AsignacionDiaV1;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.persistencia;
 
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
@@ -56,7 +59,7 @@ public class PersistenciaXML {
         return horarios;
     }
 
-    static void guardaAsignacionRueda(String xmlfile, Map<Dia, ? extends AsignacionDia> solucionFinal) {
+    public static void guardaAsignacionRueda(String xmlfile, Map<Dia, ? extends AsignacionDia> solucionFinal) {
         try (XMLEncoder encoder = new XMLEncoder(
                 new BufferedOutputStream(
                         new FileOutputStream(xmlfile)))) {

@@ -3,6 +3,13 @@
  */
 package es.um.josecefe.rueda;
 
+import es.um.josecefe.rueda.persistencia.PersistenciaXML;
+import es.um.josecefe.rueda.resolutor.ResolutorJE;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.resolutor.ResolutorV8;
+import es.um.josecefe.rueda.resolutor.Resolutor;
+import es.um.josecefe.rueda.modelo.Horario;
+import es.um.josecefe.rueda.resolutor.ResolutorV7;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;

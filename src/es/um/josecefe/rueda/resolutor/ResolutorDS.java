@@ -1,11 +1,16 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
-import static java.lang.String.format;
-import java.time.Duration;
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.Lugar;
+import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.counting;
@@ -28,37 +34,21 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.OptimizationData;
-import org.apache.commons.math3.optim.SimpleBounds;
+import org.apache.commons.math3.exception.MathIllegalArgumentException;
+import org.apache.commons.math3.genetics.AbstractListChromosome;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.ElitisticListPopulation;
+import org.apache.commons.math3.genetics.FixedGenerationCount;
+import org.apache.commons.math3.genetics.GeneticAlgorithm;
+import org.apache.commons.math3.genetics.InvalidRepresentationException;
+import org.apache.commons.math3.genetics.MutationPolicy;
+import org.apache.commons.math3.genetics.OnePointCrossover;
+import org.apache.commons.math3.genetics.Population;
+import org.apache.commons.math3.genetics.StoppingCondition;
+import org.apache.commons.math3.genetics.TournamentSelection;
 import org.apache.commons.math3.optim.SimpleValueChecker;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.Well44497b;
-import org.jenetics.Alterer;
-import org.jenetics.GaussianMutator;
-import org.jenetics.Genotype;
-import org.jenetics.IntegerChromosome;
-import org.jenetics.IntegerGene;
-import org.jenetics.MeanAlterer;
-import org.jenetics.Mutator;
-import org.jenetics.Optimize;
-import org.jenetics.Phenotype;
-import org.jenetics.Population;
-import org.jenetics.RouletteWheelSelector;
-import org.jenetics.TournamentSelector;
-import org.jenetics.engine.Codec;
-import org.jenetics.engine.Engine;
-import org.jenetics.engine.EvolutionResult;
-import org.jenetics.engine.EvolutionStatistics;
-import org.jenetics.engine.limit;
-import static org.jenetics.internal.math.random.indexes;
-import org.jenetics.internal.util.Equality;
-import org.jenetics.internal.util.Hash;
-import org.jenetics.internal.util.IntRef;
-import org.jenetics.util.RandomRegistry;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -67,25 +57,26 @@ import org.jenetics.util.RandomRegistry;
  * @author josec
  *
  */
-public class ResolutorJE implements Resolutor {
+public class ResolutorDS implements Resolutor {
 
     // Depuración y estadisticas
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
+    private final static int IMP_CADA_CUANTAS_GEN = 100;
 
     // Algoritmo genetico
-    private final static int TAM_POBLACION_DEF = 100;
-    private final static double PROB_MUTACION_DEF = 0.6;
-    private final static double PROB_MEJORA_DEF = 0.01;
-    private final static int TAM_TORNEO_DEF = 4;
-    private final static int N_GENERACIONES_DEF = 200;
-    private final static int TIEMPO_MAXIMO_DEF = 500;
+    private final static int TAM_POBLACION_DEF = 1000;
+    private final static double PROB_MUTACION_DEF = 0.015;
+    private final static int TAM_TORNEO_DEF = 2;
+    private final static int N_GENERACIONES_DEF = 10000;
+    private final static int TIEMPO_MAXIMO_DEF = Integer.MAX_VALUE;
     private final static int OBJ_APTITUD_DEF = 0;
-    private final static int TAM_ELITE_DEF = 4;
-    private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 2;
+    private final static int TAM_ELITE_DEF = 100;
+    private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
+    private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
-    // Optimizador por busqueda local
-    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 300; //Multiplicar por nº de dias, originalmente 300
+    // Optimizador local
+    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 300; //Multiplicar por nº de dias
     final private static double STOP_FITNESS_DEF = 0;
     final private static boolean ACTIVE_CMA_DEF = true;
     final private static int DIAGONAL_ONLY_DEF = 0;
@@ -104,37 +95,34 @@ public class ResolutorJE implements Resolutor {
     private final boolean[] participantesConCoche;
     private int tamPoblacion;
     private double probMutacion;
-    private double probMejora;
     private int numGeneraciones;
     private long tiempoMaximo;
     private int objAptitud;
     private EstadisticasGA estGlobal;
-    private int tamTorneo;
+    private int tournamentSize;
     private int tamElite;
+    private int tamExtranjero;
     private int maxEstancado;
     private AsignacionDiaV5[][] solCanDiaMatrix;
 
-    public ResolutorJE(Set<Horario> horarios) {
-        this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, PROB_MEJORA_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, MAX_ESTANCADO_DEF);
+    public ResolutorDS(Set<Horario> horarios) {
+        this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, TAM_EXTRANJERO_DEF, MAX_ESTANCADO_DEF);
     }
 
-    public ResolutorJE(Set<Horario> horarios, int tamPoblacion, double probMutacion, double probMejora, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int maxEstancado) {
+    public ResolutorDS(Set<Horario> horarios, int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
         this.horarios = horarios;
+        this.tamPoblacion = tamPoblacion;
+        this.probMutacion = probMutacion;
+        this.numGeneraciones = nGeneraciones;
+        this.tiempoMaximo = maxTime;
+        this.objAptitud = objAptitud;
+        this.tournamentSize = tamTorneo;
+        this.tamElite = tamElite;
+        this.tamExtranjero = tamExtranjero;
+        this.maxEstancado = maxEstancado;
 
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
         participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
-        
-        
-        this.tamPoblacion = tamPoblacion * dias.length;
-        this.probMutacion = probMutacion;
-        this.probMejora = probMejora;
-        this.numGeneraciones = nGeneraciones * dias.length;
-        this.tiempoMaximo = maxTime * dias.length;
-        this.objAptitud = objAptitud;
-        this.tamTorneo = tamTorneo;
-        this.tamElite = tamElite * dias.length;
-        this.maxEstancado = maxEstancado * dias.length;
-        
         participantesConCoche = new boolean[participantes.length];
         for (int i = 0; i < participantes.length; i++) {
             participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
@@ -145,8 +133,24 @@ public class ResolutorJE implements Resolutor {
 
         coefConduccion = new float[participantes.length];
         for (int i = 0; i < coefConduccion.length; i++) {
-            coefConduccion[i] = (float) maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001f; // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+            coefConduccion[i] = (float) (float) maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001f; // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
         }
+    }
+
+    public void setProbMutacion(double probMutacion) {
+        this.probMutacion = probMutacion;
+    }
+
+    public void setTamPoblacion(int tamPoblacion) {
+        this.tamPoblacion = tamPoblacion;
+    }
+
+    public void setTiempoMaximo(long tiempoMaximo) {
+        this.tiempoMaximo = tiempoMaximo;
+    }
+
+    public void setNumGeneraciones(int numGeneraciones) {
+        this.numGeneraciones = numGeneraciones;
     }
 
     private void inicializa() {
@@ -253,20 +257,20 @@ public class ResolutorJE implements Resolutor {
         }
     }
 
-    public void setProbMutacion(double probMutacion) {
-        this.probMutacion = probMutacion;
-    }
-
-    public void setTamPoblacion(int tamPoblacion) {
-        this.tamPoblacion = tamPoblacion;
-    }
-
-    public void setTiempoMaximo(long tiempoMaximo) {
-        this.tiempoMaximo = tiempoMaximo;
-    }
-
-    public void setNumGeneraciones(int numGeneraciones) {
-        this.numGeneraciones = numGeneraciones;
+    private Individuo tournamentSelection(List<Individuo> pop, int tamTorneo) {
+        // Create a tournament population
+        Individuo ind, mejor = null;
+        int mejorAdaptacion = Integer.MAX_VALUE;
+        // For each place in the tournament get a random individual
+        for (int i = 0; i < tamTorneo; i++) {
+            ind = pop.get(ThreadLocalRandom.current().nextInt(pop.size()));
+            if (ind.getAptitud() < mejorAdaptacion) {
+                mejorAdaptacion = ind.getAptitud();
+                mejor = ind;
+            }
+        }
+        // Get the fittest
+        return mejor;
     }
 
     @Override
@@ -293,68 +297,52 @@ public class ResolutorJE implements Resolutor {
         double[] range = new double[dias.length]; // Para el parámetro sigma
         double[] lB = new double[dias.length]; // Lo dejamos a 0, indice minimo del array
         double[] uB = new double[dias.length]; //Este hay que inicializarlo al tamaño máximo del array de suluciones - 1
-        for (int i = 0; i < dias.length; i++) {
-            uB[i] = Math.nextDown(solCanDiaMatrix[i].length); // Limite superior (la variable va ser el indice del array)
-            range[i] = uB[i] / 3; // El parametro sigma debe ser 1/3 del espacio de busqueda
+        Arrays.fill(uB, Math.nextDown(1.0)); // Rellenamos con el nº más cercano a 1 por debajo
+        Arrays.fill(range, 1.0 / 3.0); // El parametro sigma debe ser 1/3 del espacio de busqueda
+//        for (int i = 0; i < dias.length; i++) {
+//            uB[i] = solCanDiaMatrix[i].length - 1; // Limite superior (la variable va ser el indice del array)
+//            range[i] = uB[i] / 3; // El parametro sigma debe ser 1/3 del espacio de busqueda
+//        }
+
+//        OptimizationData sigma = new CMAESOptimizer.Sigma(range);
+//        OptimizationData popSize = new CMAESOptimizer.PopulationSize((int) (4 + Math.floor(3 * Math.log(dias.length))));
+//        SimpleBounds bounds = new SimpleBounds(new double[dias.length], uB);
+//        ObjectiveFunction objective = new ObjectiveFunction(this::calculaAptitud);
+//        final MaxEval maxEvaluations = new MaxEval(MAX_ITER_LOCAL_SEARCH_DEF * dias.length);
+        // El genetico de Apache Commons Math
+        GeneticAlgorithm ga = new GeneticAlgorithm(new OnePointCrossover<>(), 1, new RandomMutation(), probMutacion, new TournamentSelection(TAM_TORNEO_DEF));
+
+// stopping condition
+        StoppingCondition stopCond = new FixedGenerationCount(numGeneraciones);
+
+        List<Chromosome> poblacion = Stream.generate(this::nuevoIndividuo).limit(tamPoblacion).collect(toList());
+//        poblacion = poblacion.stream().map(i -> optimizadorLocal.optimize(new InitialGuess(i.getGenes()), objective,
+//                GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations)).map(p -> new Individuo(p.getPoint())).collect(toList());
+
+        // initial population
+        Population initial = new ElitisticListPopulation(poblacion, tamPoblacion, (double) tamElite / tamPoblacion);
+
+        if (DEBUG) {
+            System.out.println("Mejor Población Inicial después inicializar: " + initial.getFittestChromosome());
         }
-        OptimizationData sigma = new CMAESOptimizer.Sigma(range);
-        OptimizationData popSize = new CMAESOptimizer.PopulationSize((int) (4 + Math.floor(3 * Math.log(dias.length))));
-        SimpleBounds bounds = new SimpleBounds(lB, uB);
-        ObjectiveFunction objective = new ObjectiveFunction(this::calculaAptitudBL);
-        final MaxEval maxEvaluations = new MaxEval(MAX_ITER_LOCAL_SEARCH_DEF * dias.length);
 
-        // Algoritmo GENETICO de JENETICS
-        // The problem domain encoder/decoder.
-        final Codec<int[], IntegerGene> codec = Codec.of(
-                Genotype.of(IntStream.range(0, dias.length).mapToObj(d -> IntegerChromosome.of(0, solCanDiaMatrix[d].length - 1)).collect(toList())),
-                gt -> gt.toSeq().stream().mapToInt(g -> g.getGene().intValue()).toArray()
-        );
+        // run the algorithm
+        Population finalPopulation = ga.evolve(initial, stopCond);
 
-        final EvolutionStatistics<Integer, ?> statistics = EvolutionStatistics.ofNumber();
-
-        final Engine<IntegerGene, Integer> engine = Engine
-                .builder(this::calculaAptitud, codec)
-                .offspringFraction(1.0 - (double) tamElite / tamPoblacion)
-                .alterers(
-                        new Mutator<>(probMutacion),
-                        new GaussianMutator<>(probMutacion/5),
-                        new MeanAlterer<>(probMutacion/10),
-                        new MejoraPorBusqueda((double[] genes) -> optimizadorLocal.optimize(new InitialGuess(genes), objective, GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations).getPoint(), probMejora)
-                )
-                .populationSize(tamPoblacion)
-                //.selector(new MonteCarloSelector<>())
-                //.selector(new RouletteWheelSelector<>())
-                .optimize(Optimize.MINIMUM)
-                .offspringSelector(new RouletteWheelSelector<>())
-                .survivorsSelector(new TournamentSelector<>(tamTorneo))
-                .minimizing()
-                .build();
-
-        final Phenotype<IntegerGene, Integer> pt = engine.stream()
-                .limit(limit.bySteadyFitness(maxEstancado))
-                .limit(limit.byExecutionTime(Duration.ofSeconds(tiempoMaximo)))
-                .limit(numGeneraciones)
-                .peek(statistics)
-                .collect(EvolutionResult.toBestPhenotype());
-
-        final int[] mejor = codec.decoder().apply(pt.getGenotype());
-        solucionFinal = getSolucion(mejor);
-        System.out.println(statistics);
-        System.out.format("Resultado fitness=%d, genes=%s\n", pt.getFitness(), solucionFinal);
+        // best chromosome from the final population
+        Chromosome mejor = finalPopulation.getFittestChromosome();
 
         //Estadisticas finales
         if (ESTADISTICAS && DEBUG) {
-            estGlobal.setGeneracion(pt.getGeneration());
-            estGlobal.addGenerados((engine.getOffspringCount() + engine.getSurvivorsCount()) * pt.getGeneration());
-            estGlobal.setFitness((int) pt.getFitness()).updateTime();
+            estGlobal.setFitness((int) mejor.getFitness()).updateTime();
             System.out.println("====================");
             System.out.println("Estadísticas finales");
             System.out.println("====================");
             System.out.println(estGlobal);
-            System.out.println("Solución final=" + solucionFinal);
+            System.out.println("Solución final=" + mejor);
             System.out.println("-----------------------------------------------");
         }
-
+        solucionFinal = ((Individuo) mejor).getSolucion();
         return solucionFinal;
     }
 
@@ -368,95 +356,108 @@ public class ResolutorJE implements Resolutor {
         return Optional.ofNullable(estGlobal);
     }
 
-    int calculaAptitud(int[] genes) {
+    int calculaAptitud(List<Double> genes) {
         Map<Participante, Integer> vecesCoche
-                = IntStream.range(0, genes.length).mapToObj(d -> solCanDiaMatrix[d][genes[d]].getConductores()).flatMap(Collection::stream).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
+                = IntStream.range(0, genes.size()).mapToObj(d -> solCanDiaMatrix[d][(int) (genes.get(d) * solCanDiaMatrix[d].length)].getConductores()).flatMap(Collection::stream).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
         IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> {
             final int vecesCorregido = Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i]);
             return vecesCorregido;
         }).summaryStatistics();
-        return (est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + IntStream.range(0, genes.length).mapToObj(d -> getAsignacionDia(d, genes[d])).mapToInt(AsignacionDia::getCoste).sum());
+        return -(est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + IntStream.range(0, genes.size()).mapToObj(d -> getAsignacionDia(d, genes)).mapToInt(AsignacionDia::getCoste).sum());
     }
 
-    int calculaAptitudBL(double[] genes) {
-        Map<Participante, Integer> vecesCoche
-                = IntStream.range(0, genes.length).mapToObj(d -> solCanDiaMatrix[d][(int) genes[d]].getConductores()).flatMap(Collection::stream).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
-        IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> {
-            final int vecesCorregido = Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i]);
-            return vecesCorregido;
-        }).summaryStatistics();
-        return (est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + IntStream.range(0, genes.length).mapToObj(d -> getAsignacionDia(d, (int) genes[d])).mapToInt(AsignacionDia::getCoste).sum());
+    AsignacionDiaV5 getAsignacionDia(int dia, List<Double> genes) {
+        return solCanDiaMatrix[dia][(int) (genes.get(dia) * solCanDiaMatrix[dia].length)];
     }
 
-    AsignacionDiaV5 getAsignacionDia(int dia, int valGen) {
-        return solCanDiaMatrix[dia][valGen];
-    }
-//
-//    AsignacionDiaV5 getAsignacionDia(int dia, double[] genes) {
-//        return solCanDiaMatrix[dia][(int)genes[dia]];
-//    }
-
-    Map<Dia, AsignacionDia> getSolucion(int[] genes) {
-        Map<Dia, AsignacionDia> sol = new HashMap<>(genes.length);
-        for (int d = 0; d < dias.length; d++) {
-            sol.put(dias[d], getAsignacionDia(d, genes[d]));
+    Individuo nuevoIndividuo() {
+        Double[] genes = new Double[dias.length];
+        for (int i = 0; i < dias.length; i++) {
+            genes[i] = ThreadLocalRandom.current().nextDouble();
         }
-        return sol;
+        return new Individuo(genes);
     }
 
-    public static class MejoraPorBusqueda implements Alterer<IntegerGene, Integer> {
+    final private class Individuo extends AbstractListChromosome<Double> {
 
-        private static final double PROB_MEJORA_DEF = 0.01;
-
-        private final double _probability;
-        private final Function<double[], double[]> optimizador;
-
-        public MejoraPorBusqueda(Function<double[], double[]> optimizador) {
-            this._probability = PROB_MEJORA_DEF;
-            this.optimizador = optimizador;
+        //Creamos un individuo con estos genes
+        Individuo(Double[] genes) {
+            super(genes);
         }
 
-        public MejoraPorBusqueda(Function<double[], double[]> optimizador, double probMejora) {
-            this._probability = probMejora;
-            this.optimizador = optimizador;
+        private Individuo(List<Double> genes) {
+            super(genes);
+        }
+
+        public Map<Dia, AsignacionDia> getSolucion() {
+            Map<Dia, AsignacionDia> sol = new HashMap<>(getRepresentation().size());
+            for (int d = 0; d < dias.length; d++) {
+                sol.put(dias[d], getAsignacionDia(d, getRepresentation()));
+            }
+            return sol;
         }
 
         @Override
-        public int alter(Population<IntegerGene, Integer> population, long generation) {
-            assert population != null : "Not null is guaranteed from base class.";
-
-            final IntRef alterations = new IntRef(0);
-
-            indexes(RandomRegistry.getRandom(), population.size(), _probability).forEach((int i) -> {
-                final Phenotype<IntegerGene, Integer> pt = population.get(i);
-
-                final Genotype<IntegerGene> gt = pt.getGenotype();
-                final double[] genesOriginal = gt.stream().mapToDouble(g -> g.getGene().doubleValue()).toArray();
-                double[] genes = optimizador.apply(genesOriginal);
-
-                List<IntegerChromosome> pepe = IntStream.range(0, genes.length).mapToObj(ind -> IntegerChromosome.of(gt.get(ind, 0).newInstance((int) genes[ind]))).collect(toList());
-                Genotype<IntegerGene> genotipo = Genotype.of(pepe);
-                final Phenotype<IntegerGene, Integer> mpt = pt.newInstance(genotipo, generation);
-                if (mpt.compareTo(pt) < 0) {
-                    population.set(i, mpt);
-                }
-            });
-            return alterations.value;
+        protected boolean isSame(Chromosome another) {
+            if (another == null) {
+                return false;
+            }
+            if (another.getClass() != this.getClass()) {
+                return false;
+            }
+            return this.getRepresentation().equals(((Individuo) another).getRepresentation());
         }
 
         @Override
-        public int hashCode() {
-            return Hash.of(getClass()).and(super.hashCode()).value();
+        public double fitness() {
+            return calculaAptitud(getRepresentation());
+        }
+
+        public int getAptitud() {
+            return (int) getFitness();
         }
 
         @Override
-        public boolean equals(final Object obj) {
-            return Equality.of(this, obj).test(super::equals);
+        protected void checkValidity(List<Double> chromosomeRepresentation) throws InvalidRepresentationException {
+            //Nada
         }
 
         @Override
-        public String toString() {
-            return format("%s[p=%f]", getClass().getSimpleName(), _probability);
+        public AbstractListChromosome<Double> newFixedLengthChromosome(List<Double> chromosomeRepresentation) {
+            return new Individuo(chromosomeRepresentation);
         }
+
+        @Override
+        public List<Double> getRepresentation() {
+            return super.getRepresentation();
+        }
+
     }
+
+    public class RandomMutation implements MutationPolicy {
+
+        /**
+         * {@inheritDoc}
+         *
+         * @throws MathIllegalArgumentException if <code>original</code> is not
+         * a {@link RandomKey} instance
+         */
+        @Override
+        public Chromosome mutate(final Chromosome original) throws MathIllegalArgumentException {
+            if (!(original instanceof Individuo)) {
+                throw new RuntimeException("Las clases no cuadran");
+            }
+
+            Individuo originalRk = (Individuo) original;
+            List<Double> repr = originalRk.getRepresentation();
+            int rInd = GeneticAlgorithm.getRandomGenerator().nextInt(repr.size());
+
+            List<Double> newRepr = new ArrayList<>(repr);
+            newRepr.set(rInd, GeneticAlgorithm.getRandomGenerator().nextDouble());
+
+            return originalRk.newFixedLengthChromosome(newRepr);
+        }
+
+    }
+
 }

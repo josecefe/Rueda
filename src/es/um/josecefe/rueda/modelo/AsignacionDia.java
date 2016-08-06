@@ -3,21 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.modelo;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
 /**
  *
  * @author josec
  */
-public interface Resolutor {
+public interface AsignacionDia {
 
-    Optional<Estadisticas> getEstadisticas();
+    Set<Participante> getConductores();
 
-    Map<Dia, ? extends AsignacionDia> getSolucionFinal();
+    int getCoste();
 
-    Map<Dia, ? extends AsignacionDia> resolver();
+    Map<Participante, Lugar> getPeIda();
+
+    Map<Participante, Lugar> getPeVuelta();
     
 }

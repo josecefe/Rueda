@@ -1,7 +1,7 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.modelo;
 
 /**
  * SQL: CREATE TABLE "horario" ( "participante" INTEGER NOT NULL REFERENCES

@@ -1,15 +1,19 @@
 /**
  *
  */
-package es.um.josecefe.rueda;
+package es.um.josecefe.rueda.resolutor;
 
+import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.AsignacionDiaV1;
+import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.Dia;
+import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.IntSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -23,8 +27,6 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -48,19 +50,15 @@ import static java.util.stream.Collectors.toMap;
  *
  */
 /**
- * Resolutor
+ * ResolutorV1
  */
-public class ResolutorV2 implements Resolutor {
+public class ResolutorV1 implements Resolutor {
 
-    final static long CADA_GENERADOS = 10000000L;
-    final static long CADA_EXPANDIDOS = 100000L;
     private Set<Horario> horarios;
     private Dia[] dias;
-    private Participante[] participantes;
+    //Participante[] participantes;
     private Map<Dia, List<Set<Participante>>> solucionesCandidatas;
     private Map<Dia, AsignacionDiaV1> solucionFinal;
-    private double[] tamanosNivel;
-    private double totalNodos;
     private EstadisticasV1 estadisticas;
 
     @Override
@@ -72,32 +70,24 @@ public class ResolutorV2 implements Resolutor {
     final private class Nodo implements Comparable<Nodo> {
 
         private final List<Set<Participante>> eleccion;
-        private final int vecesConductor[];
         private final int indiceDia;
+        private final int indiceCandidatoDia;
         private double costeEstimado;
         private double cotaInferior;
         private double cotaSuperior;
 
         Nodo() {
-            eleccion = Collections.emptyList();
-            vecesConductor = new int[participantes.length];
+            this.eleccion = Collections.emptyList();
             cotaInferior = 0;
             costeEstimado = cotaSuperior = Double.POSITIVE_INFINITY;
+            indiceCandidatoDia = -1;
             indiceDia = -1;
         }
 
-        Nodo(Nodo padre, Set<Participante> nuevaAsignacion) {
-            indiceDia = padre.indiceDia + 1;
-            eleccion = new ArrayList<>(padre.eleccion.size() + 1);
-            eleccion.addAll(padre.eleccion);
-            eleccion.add(nuevaAsignacion);
-            vecesConductor = Arrays.copyOf(padre.vecesConductor, padre.vecesConductor.length);
-            // Ahora actualizamos las veces que es conductor cada participantes
-            for (int i = 0; i < participantes.length; i++) {
-                if (nuevaAsignacion.contains(participantes[i])) {
-                    vecesConductor[i]++;
-                }
-            }
+        Nodo(List<Set<Participante>> eleccion, int indiceDia, int indiceCandidatoDia) {
+            this.eleccion = eleccion;
+            this.indiceDia = indiceDia;
+            this.indiceCandidatoDia = indiceCandidatoDia;
             calculaCostes();
         }
 
@@ -106,12 +96,14 @@ public class ResolutorV2 implements Resolutor {
          * estimado del nodo
          */
         private void calculaCostes() {
-            IntSummaryStatistics estadisticas = IntStream.of(vecesConductor).summaryStatistics();
+            Map<Participante, Long> vecesCoche = eleccion.stream().flatMap(Set::stream).collect(Collectors.groupingBy(Function.identity(), counting()));
+            //return vecesCoche.values().stream().mapToDouble(Long::doubleValue).max().orElse(Double.POSITIVE_INFINITY);
+            LongSummaryStatistics estadisticas = vecesCoche.values().stream().mapToLong(Long::longValue).summaryStatistics();
 
-            cotaInferior = Math.max(estadisticas.getMax(), 2 * estadisticas.getMax() - (estadisticas.getMin() + (dias.length - 1 - indiceDia)));
-            costeEstimado = cotaSuperior = 2 * (estadisticas.getMax() + (dias.length - 1 - indiceDia)) - estadisticas.getMin();
+            cotaInferior = estadisticas.getMax();
+            cotaSuperior = 2 * (estadisticas.getMax() + (dias.length - 1 - indiceDia)) - estadisticas.getMin();
             //cotaSuperior = cotaInferior + (dias.length - indiceDia - 1);
-            //costeEstimado = 2 * (estadisticas.getMax() + (dias.length - 1 - indiceDia) / 2.0) - estadisticas.getMin();
+            costeEstimado = 2 * (estadisticas.getMax() + (dias.length - 1 - indiceDia) / 2.0) - estadisticas.getMin();
         }
 
         double getCotaSuperior() {
@@ -130,15 +122,22 @@ public class ResolutorV2 implements Resolutor {
             return eleccion;
         }
 
-        int getIndiceDia() {
-            return indiceDia;
-        }
-
         List<Nodo> generaHijos() {
             if (esTerminal()) { //Es un nodo terminal
                 return Collections.emptyList();
             }
-            return solucionesCandidatas.get(dias[indiceDia + 1]).parallelStream().map((solDia) -> new Nodo(this, solDia)).collect(toList());
+            int id = indiceDia + 1;
+            List<Set<Participante>> candList = solucionesCandidatas.get(dias[id]);
+            ArrayList<Nodo> hijos = new ArrayList<>(candList.size());
+
+            int icd = 0;
+            for (Set<Participante> solDia : candList) {
+                List<Set<Participante>> nuevaEleccion = new ArrayList<>(eleccion.size() + 1);
+                nuevaEleccion.addAll(eleccion);
+                nuevaEleccion.add(solDia);
+                hijos.add(new Nodo(nuevaEleccion, id, icd++));
+            }
+            return hijos;
         }
 
         boolean esTerminal() {
@@ -156,6 +155,7 @@ public class ResolutorV2 implements Resolutor {
             int hash = 7;
             hash = 23 * hash + Objects.hashCode(this.eleccion);
             hash = 23 * hash + this.indiceDia;
+            hash = 23 * hash + this.indiceCandidatoDia;
             return hash;
         }
 
@@ -174,22 +174,25 @@ public class ResolutorV2 implements Resolutor {
             if (this.indiceDia != other.indiceDia) {
                 return false;
             }
+            if (this.indiceCandidatoDia != other.indiceCandidatoDia) {
+                return false;
+            }
             return Objects.equals(this.eleccion, other.eleccion);
         }
 
         @Override
         public String toString() {
-            return "Nodo{" + "indiceDia=" + indiceDia + ", costeEstimado=" + costeEstimado + ", cotaInferior=" + cotaInferior + ", cotaSuperior=" + cotaSuperior + ", eleccion=" + eleccion + '}';
+            return "Nodo{" + "eleccion=" + eleccion + ", indiceDia=" + indiceDia + ", indiceCandidatoDia=" + indiceCandidatoDia + ", costeEstimado=" + costeEstimado + ", cotaInferior=" + cotaInferior + ", cotaSuperior=" + cotaSuperior + '}';
         }
+
     }
 
-    public ResolutorV2(Set<Horario> horarios) {
+    public ResolutorV1(Set<Horario> horarios) {
         this.horarios = horarios;
     }
 
     private void inicializa() {
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
-        participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
         solucionesCandidatas = new HashMap<>(dias.length);
         solucionFinal = null;
 
@@ -245,23 +248,15 @@ public class ResolutorV2 implements Resolutor {
             }
         }
 
-        tamanosNivel = solucionesCandidatas.keySet().stream().mapToDouble(k -> Double.valueOf(solucionesCandidatas.get(k).size())).toArray();
-        totalNodos = DoubleStream.of(tamanosNivel).reduce(1.0, (a, b) -> a * b);
-        System.out.println("Potencialmente vamos a comprobar " + DoubleStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
-                + totalNodos);
-        double acum = 1.0, temp;
-        for (int i = tamanosNivel.length - 1; i >= 0; i--) {
-            temp = tamanosNivel[i];
-            tamanosNivel[i] = acum;
-            acum = acum * temp;
-        }
+        System.out.println("Potencialmente vamos a comprobar " + solucionesCandidatas.keySet().stream().map(k -> String.valueOf(solucionesCandidatas.get(k).size())).collect(Collectors.joining("*")) + "="
+                + solucionesCandidatas.keySet().stream().mapToDouble(k -> (double) solucionesCandidatas.get(k).size()).reduce(1.0, (a, b) -> a * b));
     }
 
     @Override
-    public Map<Dia, AsignacionDiaV1> resolver() {
+    public Map<Dia, ? extends AsignacionDia> resolver() {
         inicializa();
-        estadisticas = new EstadisticasV1(totalNodos);
         // Preparamos el algoritmo
+        estadisticas = new EstadisticasV1(0);
         Nodo actual = new Nodo();
         Nodo mejor = actual;
         double C = actual.getCotaSuperior();
@@ -269,53 +264,51 @@ public class ResolutorV2 implements Resolutor {
         listaNodosVivos.offer(actual);
 
         // Bucle principal
+        long expandidos = 0L, generados = 0L;
+        long ti = System.currentTimeMillis();
+
         do {
             actual = listaNodosVivos.poll();
-            if (estadisticas.incExpandidos() % CADA_EXPANDIDOS == 0L) {
-                System.out.format("> LNV=%,d, ", listaNodosVivos.size());
-                System.out.println(estadisticas.setFitness((int) (C * 1000)).updateTime());
-
-                System.out.println("-- Trabajando con " + actual);
+            if (++expandidos % 50000L == 0L) {
+                System.out.println("Total expandidos hasta ahora = " + expandidos + ", tamaño LNV = " + listaNodosVivos.size() + ", tiempo transcurrido (s) = " + (System.currentTimeMillis() - ti) / 1000.0 + ", velocidad (expandidos/s) = " + (expandidos * 1000.0 / (System.currentTimeMillis() - ti)));
+                System.out.println("Trabajando con " + actual);
             }
             if (actual.getCotaInferior() < C) { //Estrategia de poda: si la cotaInferior >= C no seguimos
-                for (Nodo n : actual.generaHijos()) { // TODO: ¿Y si convertimos la función para devuelva un stream y esto es un foreach?
+                for (Nodo n : actual.generaHijos()) {
+                    if (++generados % 5000000L == 0L) {
+                        System.out.println("Total generados hasta ahora: " + generados + ", tiempo transcurrido (s) = " + (System.currentTimeMillis() - ti) / 1000.0 + ", velocidad (generados/s) = " + (generados * 1000.0 / (System.currentTimeMillis() - ti)));
+                    }
+
                     //System.out.println("--> Hijo: "+n);
                     if (n.esTerminal()) { //Se trata de una solución completa, hay que valorarla
-                        estadisticas.addTerminales(1); // Los terminales los tratamos inmediatamente
                         if (n.getCosteEstimado() < mejor.getCosteEstimado()) { //Mejoramos
                             mejor = n;
-                            System.out.println("* Mejoramos: " + mejor);
-                            System.out.println("** Por nueva solución, nuevo corte: Anterior=" + C + ", Nuevo=" + mejor.getCosteEstimado());
+                            System.out.println("Mejoramos: " + mejor);
+                            System.out.println("Por nueva solución, nuevo corte: Anterior=" + C + ", Nuevo=" + mejor.getCosteEstimado());
                             C = mejor.getCosteEstimado();
                         }
                     } else //Es un nodo intermedio
-                    {
-                        estadisticas.addGenerados(1);
-                        if (n.getCotaInferior() < C) {
+                     if (n.getCotaInferior() < C) {
                             //System.out.println("<-- Entro a LNV");
                             listaNodosVivos.offer(n);
                             if (n.getCotaSuperior() < C) {
-                                System.out.println("# Nuevo corte: Anterior=" + C + ", Nuevo=" + n.getCotaSuperior());
+                                System.out.println("Nuevo corte: Anterior=" + C + ", Nuevo=" + n.getCotaSuperior());
                                 C = n.getCotaSuperior(); //Actualizamos C si es necesario
                             }
-                        } else {
-                            estadisticas.addDescartados(tamanosNivel[n.getIndiceDia()]);
                         }
-                    }
                 }
-            } else {
-                estadisticas.addDescartados(tamanosNivel[actual.getIndiceDia()]);
             }
         } while (!listaNodosVivos.isEmpty());
 
         //Estadisticas finales
+        estadisticas.expandidos = expandidos;
+        estadisticas.generados = generados;
         estadisticas.setFitness((int) (C * 1000)).updateTime();
-
-        System.out.println("====================");
         System.out.println("Estadísticas finales");
         System.out.println("====================");
-        System.out.println(estadisticas);
-        System.out.println("----------------------------------------------------");
+        System.out.println("Tiempo transcurrido (s) = " + (System.currentTimeMillis() - ti) / 1000.0);
+        System.out.println("Total expandidos: " + expandidos + ", velocidad (expandidos/s) = " + (expandidos * 1000.0 / (System.currentTimeMillis() - ti)));
+        System.out.println("Total generados: " + generados + ", velocidad (generados/s) = " + (generados * 1000.0 / (System.currentTimeMillis() - ti)));
 
         // Construimos la solución final
         if (mejor.getCosteEstimado() != Double.POSITIVE_INFINITY) {
@@ -327,8 +320,64 @@ public class ResolutorV2 implements Resolutor {
         return solucionFinal;
     }
 
+    /**
+     * Resuelve el problema de optimización por el metodo de fuerza bruta,
+     * probando todas las combinaciones posibles.
+     *
+     * @return la solución, si existe. <code>null</code> si no hay solución
+     * posible.
+     */
+    public Map<Dia, ? extends AsignacionDia> resolverCombinador() {
+        // Todas las soluciones posibles por día, para luego combinar...
+        List<Set<Participante>> mejorSolucion = null; //La no solución tiene el mayor coste posible
+        double costeMejor = Double.POSITIVE_INFINITY;
+
+        inicializa();
+        // Combinación final: todas las combinaciones posibles de todos los días entre si
+        // Vamos a usar fuerza bruta de momento, valorando cada solución y guardando solo la mejor hasta el momento
+
+        List<Iterable<Set<Participante>>> listaCandidatosDia = solucionesCandidatas.keySet().stream().sorted().map(d -> solucionesCandidatas.get(d)).collect(toList());
+
+        Combinador<Set<Participante>> combinarDias = new Combinador<>(listaCandidatosDia);
+        long procesadas = 0L;
+        long ti = System.currentTimeMillis();
+        for (List<Set<Participante>> solucionActual : combinarDias) {
+            double costeActual = costeSolucion(solucionActual);
+            if (costeActual < costeMejor) {
+                mejorSolucion = solucionActual;
+                costeMejor = costeActual;
+                System.out.println("Mejoramos solución = " + mejorSolucion + ", coste = " + costeMejor);
+            }
+            if (++procesadas % 10000000L == 0L) {
+                System.out.println("Total procesadas hasta ahora: " + procesadas + ", tiempo transcurrido (ms) = " + (System.currentTimeMillis() - ti) + ", velocidad (procesadas/s) = " + (procesadas * 1000L / (System.currentTimeMillis() - ti)));
+            }
+        }
+        if (mejorSolucion != null) {
+            Iterator<Set<Participante>> i = mejorSolucion.iterator();
+            solucionFinal = Stream.of(dias).collect(toMap(Function.identity(),
+                    d -> new AsignacionDiaV1(i.next(), null, null, 0)));
+        }
+
+        return solucionFinal;
+    }
+
+    /**
+     * Función de coste (a minimizar) para evaluar cada posible solución
+     *
+     * @param solucionActual
+     * @return
+     */
+    private double costeSolucion(List<Set<Participante>> solucionActual) {
+        Map<Participante, Long> vecesCoche = solucionActual.stream().flatMap(Set::stream).collect(Collectors.groupingBy(Function.identity(), counting()));
+        //return vecesCoche.values().stream().mapToDouble(Long::doubleValue).max().orElse(Double.POSITIVE_INFINITY);
+        LongSummaryStatistics est = vecesCoche.values().stream().mapToLong(Long::longValue).summaryStatistics();
+
+        return 2 * est.getMax() - est.getMin();
+        //return solucionActual.stream().flatMap(Set::stream).count();
+    }
+
     @Override
-    public Map<Dia, AsignacionDiaV1> getSolucionFinal() {
+    public Map<Dia, ? extends AsignacionDia> getSolucionFinal() {
         return solucionFinal;
     }
 }
