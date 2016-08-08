@@ -2,7 +2,7 @@
 <java version="1.8.0_102" class="java.beans.XMLDecoder">
  <object class="java.util.HashMap">
   <void method="put">
-   <object class="es.um.josecefe.rueda.Dia">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
     <void property="descripcion">
      <string>Lunes</string>
     </void>
@@ -10,11 +10,30 @@
      <int>1</int>
     </void>
    </object>
-   <object class="es.um.josecefe.rueda.AsignacionDiaV5">
-    <void property="participantes">
-     <array class="es.um.josecefe.rueda.Participante" length="10" id="ParticipanteArray0">
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
       <void index="0">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante0">
+       <boolean>true</boolean>
+      </void>
+      <void index="3">
+       <boolean>true</boolean>
+      </void>
+      <void index="4">
+       <boolean>true</boolean>
+      </void>
+      <void index="6">
+       <boolean>true</boolean>
+      </void>
+      <void index="7">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
+    <void property="participantes">
+     <array class="es.um.josecefe.rueda.modelo.Participante" length="10" id="ParticipanteArray0">
+      <void index="0">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante0">
         <void property="id">
          <int>1</int>
         </void>
@@ -27,7 +46,7 @@
         <void property="puntosEncuentro">
          <object class="java.util.ArrayList">
           <void method="add">
-           <object class="es.um.josecefe.rueda.Lugar" id="Lugar0">
+           <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar0">
             <void property="id">
              <int>1</int>
             </void>
@@ -47,7 +66,7 @@
        </object>
       </void>
       <void index="1">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante1">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante1">
         <void property="id">
          <int>2</int>
         </void>
@@ -67,7 +86,7 @@
        </object>
       </void>
       <void index="2">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante2">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante2">
         <void property="id">
          <int>3</int>
         </void>
@@ -87,7 +106,7 @@
        </object>
       </void>
       <void index="3">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante3">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante3">
         <void property="id">
          <int>4</int>
         </void>
@@ -107,7 +126,7 @@
        </object>
       </void>
       <void index="4">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante4">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante4">
         <void property="id">
          <int>5</int>
         </void>
@@ -120,7 +139,7 @@
         <void property="puntosEncuentro">
          <object class="java.util.ArrayList">
           <void method="add">
-           <object class="es.um.josecefe.rueda.Lugar" id="Lugar1">
+           <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar1">
             <void property="id">
              <int>2</int>
             </void>
@@ -143,7 +162,7 @@
        </object>
       </void>
       <void index="5">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante5">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante5">
         <void property="id">
          <int>6</int>
         </void>
@@ -166,7 +185,7 @@
        </object>
       </void>
       <void index="6">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante6">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante6">
         <void property="id">
          <int>7</int>
         </void>
@@ -186,7 +205,7 @@
        </object>
       </void>
       <void index="7">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante7">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante7">
         <void property="id">
          <int>8</int>
         </void>
@@ -209,7 +228,7 @@
        </object>
       </void>
       <void index="8">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante8">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante8">
         <void property="id">
          <int>9</int>
         </void>
@@ -229,7 +248,7 @@
        </object>
       </void>
       <void index="9">
-       <object class="es.um.josecefe.rueda.Participante" id="Participante9">
+       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante9">
         <void property="id">
          <int>10</int>
         </void>
@@ -333,7 +352,7 @@
    </object>
   </void>
   <void method="put">
-   <object class="es.um.josecefe.rueda.Dia">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
     <void property="descripcion">
      <string>Martes</string>
     </void>
@@ -341,7 +360,20 @@
      <int>2</int>
     </void>
    </object>
-   <object class="es.um.josecefe.rueda.AsignacionDiaV5">
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
+      <void index="1">
+       <boolean>true</boolean>
+      </void>
+      <void index="5">
+       <boolean>true</boolean>
+      </void>
+      <void index="8">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
     <void property="coste">
      <int>6</int>
     </void>
@@ -431,7 +463,7 @@
    </object>
   </void>
   <void method="put">
-   <object class="es.um.josecefe.rueda.Dia">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
     <void property="descripcion">
      <string>Miercoles</string>
     </void>
@@ -439,7 +471,23 @@
      <int>3</int>
     </void>
    </object>
-   <object class="es.um.josecefe.rueda.AsignacionDiaV5">
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
+      <void index="1">
+       <boolean>true</boolean>
+      </void>
+      <void index="2">
+       <boolean>true</boolean>
+      </void>
+      <void index="5">
+       <boolean>true</boolean>
+      </void>
+      <void index="6">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
     <void property="participantes">
      <object idref="ParticipanteArray0"/>
     </void>
@@ -534,7 +582,7 @@
    </object>
   </void>
   <void method="put">
-   <object class="es.um.josecefe.rueda.Dia">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
     <void property="descripcion">
      <string>Jueves</string>
     </void>
@@ -542,7 +590,23 @@
      <int>4</int>
     </void>
    </object>
-   <object class="es.um.josecefe.rueda.AsignacionDiaV5">
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
+      <void index="3">
+       <boolean>true</boolean>
+      </void>
+      <void index="4">
+       <boolean>true</boolean>
+      </void>
+      <void index="8">
+       <boolean>true</boolean>
+      </void>
+      <void index="9">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
     <void property="coste">
      <int>5</int>
     </void>
@@ -640,7 +704,7 @@
    </object>
   </void>
   <void method="put">
-   <object class="es.um.josecefe.rueda.Dia">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
     <void property="descripcion">
      <string>Viernes</string>
     </void>
@@ -648,7 +712,20 @@
      <int>5</int>
     </void>
    </object>
-   <object class="es.um.josecefe.rueda.AsignacionDiaV5">
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
+      <void index="0">
+       <boolean>true</boolean>
+      </void>
+      <void index="2">
+       <boolean>true</boolean>
+      </void>
+      <void index="7">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
     <void property="coste">
      <int>6</int>
     </void>

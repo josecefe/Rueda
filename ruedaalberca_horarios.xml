@@ -2,12 +2,12 @@
 <java version="1.8.0_102" class="java.beans.XMLDecoder">
  <object class="java.util.HashSet">
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
     <void property="dia">
-     <object class="es.um.josecefe.rueda.Dia" id="Dia0">
+     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia0">
       <void property="descripcion">
        <string>Martes</string>
       </void>
@@ -20,7 +20,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante0">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante0">
       <void property="id">
        <int>1</int>
       </void>
@@ -33,7 +33,7 @@
       <void property="puntosEncuentro">
        <object class="java.util.ArrayList">
         <void method="add">
-         <object class="es.um.josecefe.rueda.Lugar" id="Lugar0">
+         <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar0">
           <void property="id">
            <int>1</int>
           </void>
@@ -58,12 +58,12 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
     <void property="dia">
-     <object class="es.um.josecefe.rueda.Dia" id="Dia1">
+     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia1">
       <void property="descripcion">
        <string>Jueves</string>
       </void>
@@ -76,7 +76,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante1">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante1">
       <void property="id">
        <int>3</int>
       </void>
@@ -101,7 +101,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -112,7 +112,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante2">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante2">
       <void property="id">
        <int>2</int>
       </void>
@@ -137,7 +137,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -148,7 +148,7 @@
      <int>2</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante3">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante3">
       <void property="id">
        <int>4</int>
       </void>
@@ -173,7 +173,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -192,7 +192,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -203,7 +203,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante4">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante4">
       <void property="id">
        <int>5</int>
       </void>
@@ -216,7 +216,7 @@
       <void property="puntosEncuentro">
        <object class="java.util.ArrayList">
         <void method="add">
-         <object class="es.um.josecefe.rueda.Lugar" id="Lugar1">
+         <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar1">
           <void property="id">
            <int>2</int>
           </void>
@@ -244,7 +244,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -263,7 +263,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -274,7 +274,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante5">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante5">
       <void property="id">
        <int>6</int>
       </void>
@@ -302,7 +302,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -321,7 +321,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -332,7 +332,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante6">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante6">
       <void property="id">
        <int>7</int>
       </void>
@@ -357,7 +357,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -376,7 +376,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -387,7 +387,7 @@
      <int>2</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante7">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante7">
       <void property="id">
        <int>8</int>
       </void>
@@ -415,7 +415,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -434,7 +434,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -445,7 +445,7 @@
      <int>1</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante8">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante8">
       <void property="id">
        <int>9</int>
       </void>
@@ -470,7 +470,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -489,7 +489,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -500,7 +500,7 @@
      <int>3</int>
     </void>
     <void property="participante">
-     <object class="es.um.josecefe.rueda.Participante" id="Participante9">
+     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante9">
       <void property="id">
        <int>10</int>
       </void>
@@ -525,7 +525,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -544,12 +544,12 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
     <void property="dia">
-     <object class="es.um.josecefe.rueda.Dia" id="Dia2">
+     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia2">
       <void property="descripcion">
        <string>Viernes</string>
       </void>
@@ -570,7 +570,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -589,12 +589,12 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
     <void property="dia">
-     <object class="es.um.josecefe.rueda.Dia" id="Dia3">
+     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia3">
       <void property="descripcion">
        <string>Miercoles</string>
       </void>
@@ -615,7 +615,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -634,7 +634,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -653,7 +653,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -672,12 +672,12 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
     <void property="dia">
-     <object class="es.um.josecefe.rueda.Dia" id="Dia4">
+     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia4">
       <void property="descripcion">
        <string>Lunes</string>
       </void>
@@ -698,7 +698,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -717,7 +717,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -736,7 +736,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -755,7 +755,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -774,7 +774,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -793,7 +793,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -812,7 +812,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -831,7 +831,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -850,7 +850,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -869,7 +869,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -888,7 +888,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -907,7 +907,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -926,7 +926,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -945,7 +945,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -964,7 +964,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -983,7 +983,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1002,7 +1002,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1021,7 +1021,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1040,7 +1040,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1059,7 +1059,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1078,7 +1078,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1097,7 +1097,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1116,7 +1116,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>
@@ -1135,7 +1135,7 @@
    </object>
   </void>
   <void method="add">
-   <object class="es.um.josecefe.rueda.Horario">
+   <object class="es.um.josecefe.rueda.modelo.Horario">
     <void property="coche">
      <boolean>true</boolean>
     </void>

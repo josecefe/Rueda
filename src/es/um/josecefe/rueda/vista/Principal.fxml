@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.josecefe.rueda.vista.PrincipalController">
+   <center>
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+            <BorderPane>
+               <top>
+                  <ButtonBar prefHeight="40.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                    <buttons>
+                      <Button mnemonicParsing="false" text="Añadir Día" />
+                        <Button mnemonicParsing="false" text="Añadir Participante" />
+                        <Button mnemonicParsing="false" text="Añadir Horario" />
+                        <Button mnemonicParsing="false" text="Guardar Horario" />
+                        <Button mnemonicParsing="false" onAction="#cargarHorario" text="Cargar Horario" />
+                    </buttons>
+                  </ButtonBar>
+               </top>
+               <center>
+                  <TableView fx:id="tablaHorario" prefHeight="264.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                    <columns>
+                      <TableColumn fx:id="columnaHora" prefWidth="75.0" text="Hora" />
+                    </columns>
+                  </TableView>
+               </center>
+               <bottom>
+                  <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <buttons>
+                      <Button mnemonicParsing="false" text="Realizar asignación" />
+                        <Button mnemonicParsing="false" text="Guardar resultado" />
+                    </buttons>
+                  </ButtonBar>
+               </bottom>
+            </BorderPane>
+            <BorderPane>
+               <top>
+                  <Label text="Asignación (Resultado):" BorderPane.alignment="CENTER" />
+               </top>
+               <center>
+                  <TableView fx:id="tablaResultado" prefHeight="319.0" prefWidth="1279.0" BorderPane.alignment="CENTER">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="C1" />
+                      <TableColumn prefWidth="75.0" text="C2" />
+                    </columns>
+                  </TableView>
+               </center>
+            </BorderPane>
+        </items>
+      </SplitPane>
+   </center>
+   <bottom>
+      <HBox BorderPane.alignment="CENTER">
+         <children>
+            <ProgressIndicator fx:id="indicadorProgreso" focusTraversable="false" progress="0.0" />
+            <Label fx:id="barraEstado" text="Barra de estado" />
+         </children>
+      </HBox>
+   </bottom>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Archivo">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Salir" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Editar">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Añadir Día" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Ayuda">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Acerca de" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

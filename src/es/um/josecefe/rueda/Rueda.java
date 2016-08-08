@@ -9,6 +9,7 @@ import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import es.um.josecefe.rueda.resolutor.Resolutor;
 import es.um.josecefe.rueda.modelo.Horario;
+import es.um.josecefe.rueda.persistencia.PersistenciaSQL;
 import es.um.josecefe.rueda.resolutor.ResolutorV7;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,7 +30,7 @@ import static java.util.stream.Collectors.toMap;
 public class Rueda {
 //    private static final String RUEDA_BASE = "ruedamurcia";
     private static final String RUEDA_BASE = "ruedaalberca";
-    private static final String RUEDABD = RUEDA_BASE+".db";
+    private static final String RUEDABD = RUEDA_BASE+"_prueba.db";
     private static final String RUEDAXML_HORARIOS = RUEDA_BASE+"_horarios.xml";
     private static final String RUEDAXML_ASIGNACION = RUEDA_BASE+"_asignacion.xml";
     private static final boolean COMPARANDO = false;
@@ -55,10 +56,12 @@ public class Rueda {
     }
 
     private void pruebaResolutor() {
-        //Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
-        Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
+        Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
+        //Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
+        // Creando bd nueva y guardando
+        PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
         // Vamos a guardarlo en XML
-        //PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
+        PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
         
         List<? extends Resolutor> resolutores = Arrays.asList(
 //                new ResolutorV1(horarios),
