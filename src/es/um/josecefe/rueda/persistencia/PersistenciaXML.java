@@ -26,6 +26,8 @@ import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -48,11 +50,18 @@ public class PersistenciaXML {
     }
 
     public static Set<Horario> cargaHorarios(String xmlfile) {
-        Set<Horario> horarios = null;
+        Set<Horario> horarios = new HashSet<>();
         try (XMLDecoder decoder = new XMLDecoder(
                 new BufferedInputStream(
                         new FileInputStream(xmlfile)))) {
-            horarios = (Set<Horario>) decoder.readObject();
+            Object horariosObj = decoder.readObject();
+            if (horariosObj instanceof Collection<?>) {
+                for (Object h : (Collection<?>) horariosObj) {
+                    if (h instanceof Horario) {
+                        horarios.add((Horario) h);
+                    }
+                }
+            }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }

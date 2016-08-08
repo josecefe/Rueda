@@ -56,12 +56,12 @@ public class Rueda {
     }
 
     private void pruebaResolutor() {
-        Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
-        //Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
+        //Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
+        Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
         // Creando bd nueva y guardando
-        PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
+        //PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
         // Vamos a guardarlo en XML
-        PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
+        //PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
         
         List<? extends Resolutor> resolutores = Arrays.asList(
 //                new ResolutorV1(horarios),
