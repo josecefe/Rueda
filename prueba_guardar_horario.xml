@@ -60,7 +60,7 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -109,49 +109,13 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
       <int>1</int>
      </void>
      <void property="participante">
       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante1">
-       <void property="id">
-        <int>3</int>
-       </void>
-       <void property="nombre">
-        <string>Luis</string>
-       </void>
-       <void property="plazasCoche">
-        <int>4</int>
-       </void>
-       <void property="puntosEncuentro">
-        <object class="java.util.ArrayList">
-         <void method="add">
-          <object idref="Lugar0"/>
-         </void>
-        </object>
-       </void>
-      </object>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia1"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante2">
        <void property="id">
         <int>2</int>
        </void>
@@ -181,10 +145,46 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
-      <int>2</int>
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante2">
+       <void property="id">
+        <int>3</int>
+       </void>
+       <void property="nombre">
+        <string>Luis</string>
+       </void>
+       <void property="plazasCoche">
+        <int>4</int>
+       </void>
+       <void property="puntosEncuentro">
+        <object class="java.util.ArrayList">
+         <void method="add">
+          <object idref="Lugar0"/>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia0"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
      </void>
      <void property="participante">
       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante3">
@@ -207,7 +207,7 @@
       </object>
      </void>
      <void property="salida">
-      <int>7</int>
+      <int>5</int>
      </void>
     </object>
    </void>
@@ -217,26 +217,7 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante1"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -278,7 +259,7 @@
       </object>
      </void>
      <void property="salida">
-      <int>5</int>
+      <int>6</int>
      </void>
     </object>
    </void>
@@ -288,26 +269,7 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante3"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -346,29 +308,10 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante4"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
+      <int>3</int>
      </void>
      <void property="participante">
       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante6">
@@ -401,29 +344,10 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante5"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
-     </void>
-     <void property="entrada">
-      <int>2</int>
+      <int>7</int>
      </void>
      <void property="participante">
       <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante7">
@@ -449,7 +373,7 @@
       </object>
      </void>
      <void property="salida">
-      <int>5</int>
+      <int>8</int>
      </void>
     </object>
    </void>
@@ -459,26 +383,7 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia1"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante6"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia0"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -520,7 +425,7 @@
       <int>1</int>
      </void>
      <void property="participante">
-      <object idref="Participante7"/>
+      <object idref="Participante0"/>
      </void>
      <void property="salida">
       <int>6</int>
@@ -533,33 +438,130 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia3"/>
+      <object idref="Dia1"/>
      </void>
      <void property="entrada">
-      <int>3</int>
+      <int>1</int>
      </void>
      <void property="participante">
-      <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante9">
-       <void property="id">
-        <int>10</int>
-       </void>
-       <void property="nombre">
-        <string>Maria Jose</string>
-       </void>
-       <void property="plazasCoche">
-        <int>4</int>
-       </void>
-       <void property="puntosEncuentro">
-        <object class="java.util.ArrayList">
-         <void method="add">
-          <object idref="Lugar0"/>
-         </void>
-        </object>
-       </void>
-      </object>
+      <object idref="Participante1"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante2"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante3"/>
      </void>
      <void property="salida">
       <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante4"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante5"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante6"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia1"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante7"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
      </void>
     </object>
    </void>
@@ -588,44 +590,6 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante0"/>
-     </void>
-     <void property="salida">
-      <int>4</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante2"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
       <object idref="Dia2"/>
      </void>
      <void property="entrada">
@@ -636,82 +600,6 @@
      </void>
      <void property="salida">
       <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante1"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia2"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante2"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante3"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante0"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
      </void>
     </object>
    </void>
@@ -730,7 +618,7 @@
       <object idref="Participante1"/>
      </void>
      <void property="salida">
-      <int>6</int>
+      <int>5</int>
      </void>
     </object>
    </void>
@@ -740,26 +628,7 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante4"/>
-     </void>
-     <void property="salida">
-      <int>4</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
+      <object idref="Dia2"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -797,44 +666,6 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante5"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante1"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
       <object idref="Dia2"/>
      </void>
      <void property="entrada">
@@ -854,10 +685,29 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia4"/>
+      <object idref="Dia2"/>
      </void>
      <void property="entrada">
       <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante5"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia2"/>
+     </void>
+     <void property="entrada">
+      <int>2</int>
      </void>
      <void property="participante">
       <object idref="Participante6"/>
@@ -873,72 +723,15 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante3"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
       <object idref="Dia2"/>
      </void>
      <void property="entrada">
       <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante5"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>2</int>
      </void>
      <void property="participante">
       <object idref="Participante7"/>
      </void>
      <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante4"/>
-     </void>
-     <void property="salida">
       <int>6</int>
      </void>
     </object>
@@ -952,31 +745,67 @@
       <object idref="Dia2"/>
      </void>
      <void property="entrada">
-      <int>2</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante6"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia4"/>
-     </void>
-     <void property="entrada">
-      <int>2</int>
+      <int>1</int>
      </void>
      <void property="participante">
       <object idref="Participante8"/>
      </void>
      <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia2"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante9">
+       <void property="id">
+        <int>10</int>
+       </void>
+       <void property="nombre">
+        <string>Maria Jose</string>
+       </void>
+       <void property="plazasCoche">
+        <int>4</int>
+       </void>
+       <void property="puntosEncuentro">
+        <object class="java.util.ArrayList">
+         <void method="add">
+          <object idref="Lugar0"/>
+         </void>
+        </object>
+       </void>
+      </object>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante0"/>
+     </void>
+     <void property="salida">
       <int>5</int>
      </void>
     </object>
@@ -987,7 +816,83 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia0"/>
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante1"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante2"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>2</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante3"/>
+     </void>
+     <void property="salida">
+      <int>7</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante4"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
      </void>
      <void property="entrada">
       <int>1</int>
@@ -1006,13 +911,13 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia2"/>
+      <object idref="Dia3"/>
      </void>
      <void property="entrada">
       <int>1</int>
      </void>
      <void property="participante">
-      <object idref="Participante7"/>
+      <object idref="Participante6"/>
      </void>
      <void property="salida">
       <int>6</int>
@@ -1025,13 +930,32 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia4"/>
+      <object idref="Dia3"/>
      </void>
      <void property="entrada">
       <int>2</int>
      </void>
      <void property="participante">
-      <object idref="Participante9"/>
+      <object idref="Participante7"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia3"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante8"/>
      </void>
      <void property="salida">
       <int>6</int>
@@ -1044,12 +968,145 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia0"/>
+      <object idref="Dia3"/>
      </void>
      <void property="entrada">
       <int>3</int>
      </void>
      <void property="participante">
+      <object idref="Participante9"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante0"/>
+     </void>
+     <void property="salida">
+      <int>4</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante1"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante2"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante3"/>
+     </void>
+     <void property="salida">
+      <int>6</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante4"/>
+     </void>
+     <void property="salida">
+      <int>4</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante5"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>1</int>
+     </void>
+     <void property="participante">
       <object idref="Participante6"/>
      </void>
      <void property="salida">
@@ -1063,16 +1120,16 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia2"/>
+      <object idref="Dia4"/>
      </void>
      <void property="entrada">
-      <int>1</int>
+      <int>2</int>
      </void>
      <void property="participante">
-      <object idref="Participante8"/>
+      <object idref="Participante7"/>
      </void>
      <void property="salida">
-      <int>6</int>
+      <int>5</int>
      </void>
     </object>
    </void>
@@ -1082,92 +1139,35 @@
       <boolean>true</boolean>
      </void>
      <void property="dia">
-      <object idref="Dia2"/>
+      <object idref="Dia4"/>
      </void>
      <void property="entrada">
-      <int>1</int>
+      <int>2</int>
+     </void>
+     <void property="participante">
+      <object idref="Participante8"/>
+     </void>
+     <void property="salida">
+      <int>5</int>
+     </void>
+    </object>
+   </void>
+   <void method="add">
+    <object class="es.um.josecefe.rueda.modelo.Horario">
+     <void property="coche">
+      <boolean>true</boolean>
+     </void>
+     <void property="dia">
+      <object idref="Dia4"/>
+     </void>
+     <void property="entrada">
+      <int>2</int>
      </void>
      <void property="participante">
       <object idref="Participante9"/>
      </void>
      <void property="salida">
       <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>7</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante7"/>
-     </void>
-     <void property="salida">
-      <int>8</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia0"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante8"/>
-     </void>
-     <void property="salida">
-      <int>6</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante0"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
-     </void>
-    </object>
-   </void>
-   <void method="add">
-    <object class="es.um.josecefe.rueda.modelo.Horario">
-     <void property="coche">
-      <boolean>true</boolean>
-     </void>
-     <void property="dia">
-      <object idref="Dia3"/>
-     </void>
-     <void property="entrada">
-      <int>1</int>
-     </void>
-     <void property="participante">
-      <object idref="Participante2"/>
-     </void>
-     <void property="salida">
-      <int>5</int>
      </void>
     </object>
    </void>
@@ -1185,10 +1185,10 @@
     <object idref="Participante0"/>
    </void>
    <void method="add">
-    <object idref="Participante2"/>
+    <object idref="Participante1"/>
    </void>
    <void method="add">
-    <object idref="Participante1"/>
+    <object idref="Participante2"/>
    </void>
    <void method="add">
     <object idref="Participante3"/>

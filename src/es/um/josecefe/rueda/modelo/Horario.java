@@ -3,6 +3,9 @@
  */
 package es.um.josecefe.rueda.modelo;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -17,17 +20,22 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "horario")
 public class Horario implements Comparable<Horario> {
 
-    private Participante participante;
-    private Dia dia;
-    private int entrada;
-    private int salida;
-    private boolean coche;
+    private final SimpleObjectProperty<Participante> participanteProperty;
+    private final SimpleObjectProperty<Dia> diaProperty;
+    private final SimpleIntegerProperty entradaProperty;
+    private final SimpleIntegerProperty salidaProperty;
+    private final SimpleBooleanProperty cocheProperty;
 
-    /** 
+    /**
      * Constructor por defecto para cumplir el estandar de JavaBean. No debería
      * usarse directametne, solo debe usarse para la persistencia.
      */
     public Horario() {
+        this.participanteProperty = new SimpleObjectProperty<>();
+        this.diaProperty = new SimpleObjectProperty<>();
+        this.entradaProperty = new SimpleIntegerProperty();
+        this.salidaProperty = new SimpleIntegerProperty();
+        this.cocheProperty = new SimpleBooleanProperty();
     }
 
     /**
@@ -41,46 +49,46 @@ public class Horario implements Comparable<Horario> {
      * @param coche Indica si ese día podría compartir su coche
      */
     public Horario(Participante participante, Dia dia, int entrada, int salida, boolean coche) {
-        this.participante = participante;
-        this.dia = dia;
-        this.entrada = entrada;
-        this.salida = salida;
-        this.coche = coche;
+        this.participanteProperty = new SimpleObjectProperty<>(participante);
+        this.diaProperty = new SimpleObjectProperty<>(dia);
+        this.entradaProperty = new SimpleIntegerProperty(entrada);
+        this.salidaProperty = new SimpleIntegerProperty(salida);
+        this.cocheProperty = new SimpleBooleanProperty(coche);
     }
 
     /**
      * @return el participante
      */
     public Participante getParticipante() {
-        return participante;
+        return participanteProperty.get();
     }
 
     /**
      * @return el dia
      */
     public Dia getDia() {
-        return dia;
+        return diaProperty.get();
     }
 
     /**
      * @return la hora de entrada
      */
     public int getEntrada() {
-        return entrada;
+        return entradaProperty.get();
     }
 
     /**
      * @return la hora de salida
      */
     public int getSalida() {
-        return salida;
+        return salidaProperty.get();
     }
 
     /**
      * @return the coche
      */
     public boolean isCoche() {
-        return coche;
+        return cocheProperty.get();
     }
 
     /* (non-Javadoc)
@@ -88,8 +96,8 @@ public class Horario implements Comparable<Horario> {
      */
     @Override
     public String toString() {
-        return "Horario [participante=" + participante + ", dia=" + dia + ", entrada=" + entrada + ", salida=" + salida
-                + ", coche=" + coche + "]";
+        return "Horario [participante=" + getParticipante() + ", dia=" + getDia() + ", entrada=" + getEntrada() + ", salida=" + getSalida()
+                + ", coche=" + isCoche() + "]";
     }
 
     /* (non-Javadoc)
@@ -99,8 +107,8 @@ public class Horario implements Comparable<Horario> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((dia == null) ? 0 : dia.hashCode());
-        result = prime * result + ((participante == null) ? 0 : participante.hashCode());
+        result = prime * result + ((getDia() == null) ? 0 : getDia().hashCode());
+        result = prime * result + ((getParticipante() == null) ? 0 : getParticipante().hashCode());
         return result;
     }
 
@@ -119,18 +127,18 @@ public class Horario implements Comparable<Horario> {
             return false;
         }
         Horario other = (Horario) obj;
-        if (dia == null) {
-            if (other.dia != null) {
+        if (getDia() == null) {
+            if (other.getDia() != null) {
                 return false;
             }
-        } else if (!dia.equals(other.dia)) {
+        } else if (!getDia().equals(other.getDia())) {
             return false;
         }
-        if (participante == null) {
-            if (other.participante != null) {
+        if (getParticipante() == null) {
+            if (other.getParticipante() != null) {
                 return false;
             }
-        } else if (!participante.equals(other.participante)) {
+        } else if (!getParticipante().equals(other.getParticipante())) {
             return false;
         }
         return true;
@@ -141,56 +149,84 @@ public class Horario implements Comparable<Horario> {
      */
     @Override
     public int compareTo(Horario o) {
-        int res = dia.compareTo(o.getDia());
+        int res = getDia().compareTo(o.getDia());
         if (res == 0) {
-            res = participante.compareTo(o.getParticipante());
+            res = getParticipante().compareTo(o.getParticipante());
         }
 
         return res;
     }
 
     /**
-     * Permite fijar el participante de esta entrada en el horario
-     * Nota: Este método se incluye para la persistencia
+     * Permite fijar el participante de esta entrada en el horario Nota: Este
+     * método se incluye para la persistencia
+     *
      * @param participante Participante al que pertenece esta entrada
      */
     public void setParticipante(Participante participante) {
-        this.participante = participante;
+        this.participanteProperty.set(participante);
     }
 
     /**
-     * Permite fija el dia de esta entrada de horario. Perticipante + Dia no se pueden repetir
-     * Nota: Este método se incluye para la persistencia
+     * Permite fija el dia de esta entrada de horario. Perticipante + Dia no se
+     * pueden repetir Nota: Este método se incluye para la persistencia
+     *
      * @param dia El día al que pertenece esta entrada
      */
     public void setDia(Dia dia) {
-        this.dia = dia;
+        this.diaProperty.set(dia);
     }
 
     /**
-     * Permite fijar la hora de entrada (entendida como un entero, usualmente empezando por 1 para primera hora, 2 para la segunda, etc.)
-     * Nota: Este método se incluye para la persistencia
-     * @param entrada Hora de entrada (como un entero referido a 1º hora = 1, 2º hora = 2, etc)
+     * Permite fijar la hora de entrada (entendida como un entero, usualmente
+     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
+     * método se incluye para la persistencia
+     *
+     * @param entrada Hora de entrada (como un entero referido a 1º hora = 1, 2º
+     * hora = 2, etc)
      */
     public void setEntrada(int entrada) {
-        this.entrada = entrada;
+        this.entradaProperty.set(entrada);
     }
 
     /**
-     * Permite fijar la hora de salida (entendida como un entero, usualmente empezando por 1 para primera hora, 2 para la segunda, etc.)
-     * Nota: Este método se incluye para la persistencia
-     * @param salida Hora de salida (como un entero referido a 1º hora = 1, 2º hora = 2, etc)
+     * Permite fijar la hora de salida (entendida como un entero, usualmente
+     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
+     * método se incluye para la persistencia
+     *
+     * @param salida Hora de salida (como un entero referido a 1º hora = 1, 2º
+     * hora = 2, etc)
      */
     public void setSalida(int salida) {
-        this.salida = salida;
+        this.salidaProperty.set(salida);
     }
 
     /**
      * Indica si el participante dispone de coche para ese día
+     *
      * @param coche Indica si puede disponer de coche o no ese día
      */
     public void setCoche(boolean coche) {
-        this.coche = coche;
+        this.cocheProperty.set(coche);
     }
 
+    public SimpleObjectProperty<Participante> participanteProperty() {
+        return participanteProperty;
+    }
+
+    public SimpleObjectProperty<Dia> diaProperty() {
+        return diaProperty;
+    }
+
+    public SimpleIntegerProperty entradaProperty() {
+        return entradaProperty;
+    }
+
+    public SimpleIntegerProperty salidaProperty() {
+        return salidaProperty;
+    }
+
+    public SimpleBooleanProperty cocheProperty() {
+        return cocheProperty;
+    }
 }

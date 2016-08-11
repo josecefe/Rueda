@@ -6,89 +6,109 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.josecefe.rueda.vista.PrincipalController">
-   <center>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
-        <items>
-            <BorderPane>
-               <top>
-                  <ButtonBar prefHeight="40.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-                    <buttons>
-                      <Button mnemonicParsing="false" text="Añadir Día" />
-                        <Button mnemonicParsing="false" text="Añadir Participante" />
-                        <Button mnemonicParsing="false" text="Añadir Horario" />
-                        <Button mnemonicParsing="false" text="Guardar Horario" />
-                        <Button mnemonicParsing="false" onAction="#cargarHorario" text="Cargar Horario" />
-                    </buttons>
-                  </ButtonBar>
-               </top>
-               <center>
-                  <TableView fx:id="tablaHorario" prefHeight="264.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-                    <columns>
-                      <TableColumn fx:id="columnaHora" prefWidth="75.0" text="Hora" />
-                    </columns>
-                  </TableView>
-               </center>
-               <bottom>
-                  <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <buttons>
-                      <Button mnemonicParsing="false" text="Realizar asignación" />
-                        <Button mnemonicParsing="false" text="Guardar resultado" />
-                    </buttons>
-                  </ButtonBar>
-               </bottom>
-            </BorderPane>
-            <BorderPane>
-               <top>
-                  <Label text="Asignación (Resultado):" BorderPane.alignment="CENTER" />
-               </top>
-               <center>
-                  <TableView fx:id="tablaResultado" prefHeight="319.0" prefWidth="1279.0" BorderPane.alignment="CENTER">
-                    <columns>
-                      <TableColumn prefWidth="75.0" text="C1" />
-                      <TableColumn prefWidth="75.0" text="C2" />
-                    </columns>
-                  </TableView>
-               </center>
-            </BorderPane>
-        </items>
-      </SplitPane>
-   </center>
-   <bottom>
-      <HBox BorderPane.alignment="CENTER">
-         <children>
-            <ProgressIndicator fx:id="indicadorProgreso" focusTraversable="false" progress="0.0" />
-            <Label fx:id="barraEstado" text="Barra de estado" />
-         </children>
-      </HBox>
-   </bottom>
-   <top>
-      <MenuBar BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="Archivo">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <menus>
+                <Menu mnemonicParsing="false" text="Archivo">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#handleNew" text="Nuevo horario" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Cargar horario..." />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Guardar horario" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar horario como..." />
+                        <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Salir" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Editar">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Eliminar" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Ayuda">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#handleAbout" text="Acerca de..." />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
             <items>
-              <MenuItem mnemonicParsing="false" text="Salir" />
+                <BorderPane>
+                    <top>
+                        <ButtonBar prefHeight="40.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                            <buttons>
+                                <Button mnemonicParsing="false" text="Nuevo (eliminar todo)" />
+                                <Button mnemonicParsing="false" text="Añadir Día" />
+                                <Button mnemonicParsing="false" text="Añadir Participante" />
+                                <Button mnemonicParsing="false" text="Añadir entrada" />
+                                <Button mnemonicParsing="false" text="Eliminar entrada" />
+                                <Button mnemonicParsing="false" onAction="#handleSave" text="Guardar horario" />
+                                <Button mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar horario como..." />
+                                <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar horario..." />
+                            </buttons>
+                        </ButtonBar>
+                    </top>
+                    <center>
+                        <TableView fx:id="tablaHorario" editable="true" prefHeight="264.0" prefWidth="800.0" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
+                            <columns>
+                        <TableColumn fx:id="columnaDia" prefWidth="152.0" text="Día" />
+                                <TableColumn fx:id="columnaParticipante" prefWidth="362.0" text="Participante" />
+                        <TableColumn fx:id="columnaEntrada" minWidth="0.0" prefWidth="442.0" text="Entrada" />
+                        <TableColumn fx:id="columnaSalida" prefWidth="382.0" text="Salida" />
+                        <TableColumn fx:id="columnaCoche" prefWidth="132.0" text="Dispone de coche" />
+                            </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                        </TableView>
+                    </center>
+                    <bottom>
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <buttons>
+                                <Button mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación" />
+                                <Button mnemonicParsing="false" text="Guardar asignación" />
+                            </buttons>
+                        </ButtonBar>
+                    </bottom>
+                </BorderPane>
+                <BorderPane>
+                    <top>
+                        <Label text="Asignación (Resultado):" BorderPane.alignment="CENTER" />
+                    </top>
+                    <center>
+                        <TableView fx:id="tablaResultado" prefHeight="319.0" prefWidth="1279.0" BorderPane.alignment="CENTER">
+                            <columns>
+                                <TableColumn fx:id="columnaDiaAsignacion" editable="false" prefWidth="107.0" text="Dia" />
+                                <TableColumn fx:id="columnaConductores" editable="false" prefWidth="407.0" text="Conductores" />
+                        <TableColumn fx:id="columnaPeIda" editable="false" prefWidth="505.0" text="Puntos de Encuentro Ida" />
+                        <TableColumn fx:id="columnaPeVuelta" editable="false" prefWidth="418.0" text="Puntos de Encuentro Vuelta" />
+                        <TableColumn fx:id="columnaCoste" editable="false" minWidth="0.0" prefWidth="66.0" text="Coste" />
+                            </columns>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                        </TableView>
+                    </center>
+                </BorderPane>
             </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Editar">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Añadir Día" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Ayuda">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Acerca de" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
+        </SplitPane>
+    </center>
+    <bottom>
+        <HBox BorderPane.alignment="CENTER">
+            <children>
+            <ProgressBar fx:id="indicadorProgreso" prefWidth="200.0" progress="0.0" />
+                <Label fx:id="barraEstado" text="Introduzca los datos y calcule la asignación" />
+            </children>
+        </HBox>
+    </bottom>
 </BorderPane>

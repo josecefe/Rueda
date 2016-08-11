@@ -18,16 +18,16 @@ package es.um.josecefe.rueda.persistencia;
 
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.Horario;
+import es.um.josecefe.rueda.modelo.DatosRueda;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,26 +37,26 @@ import java.util.logging.Logger;
  */
 public class PersistenciaXML {
 
-    public static void guardaHorarios(String xmlfile, Set<Horario> horarios) {
+    public static void guardaDatosRueda(File xmlfile, DatosRueda datosRueda) {
         try (XMLEncoder encoder = new XMLEncoder(
                 new BufferedOutputStream(
                         new FileOutputStream(xmlfile)))) {
-            encoder.writeObject(horarios);
+            encoder.writeObject(datosRueda);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public static Set<Horario> cargaHorarios(String xmlfile) {
-        Set<Horario> horarios = null;
+    public static DatosRueda cargaDatosRueda(File xmlfile) {
+        DatosRueda datosRueda = null;
         try (XMLDecoder decoder = new XMLDecoder(
                 new BufferedInputStream(
                         new FileInputStream(xmlfile)))) {
-            horarios = (Set<Horario>) decoder.readObject();
+            datosRueda = (DatosRueda) decoder.readObject();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return horarios;
+        return datosRueda;
     }
 
     public static void guardaAsignacionRueda(String xmlfile, Map<Dia, ? extends AsignacionDia> solucionFinal) {

@@ -3,6 +3,7 @@
  */
 package es.um.josecefe.rueda;
 
+import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.resolutor.ResolutorJE;
 import es.um.josecefe.rueda.modelo.Dia;
@@ -11,6 +12,7 @@ import es.um.josecefe.rueda.resolutor.Resolutor;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.persistencia.PersistenciaSQL;
 import es.um.josecefe.rueda.resolutor.ResolutorV7;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
@@ -19,6 +21,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -57,11 +69,14 @@ public class Rueda {
 
     private void pruebaResolutor() {
         Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
-        //Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
+         //DatosRueda datos = PersistenciaXML.cargaDatosRueda(new File(RUEDAXML_HORARIOS));
+         //Set<Horario> horarios = datos.getHorarios();
         // Creando bd nueva y guardando
-        //PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
+        DatosRueda datos = new DatosRueda();
+        datos.poblarDesdeHorarios(horarios);
+        //PersistenciaSQL.guardaDatosRueda(RUEDABD, datos);
         // Vamos a guardarlo en XML
-        PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
+        PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
         
         List<? extends Resolutor> resolutores = Arrays.asList(
 //                new ResolutorV1(horarios),
