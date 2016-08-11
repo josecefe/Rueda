@@ -4,6 +4,7 @@
 package es.um.josecefe.rueda.modelo;
 
 import java.util.List;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author josec
@@ -12,6 +13,7 @@ import java.util.List;
  * NULL, "nombre" TEXT NOT NULL, "plazasCoche" INTEGER NOT NULL, "residencia"
  * INTEGER REFERENCES lugar(id) )
  */
+@XmlRootElement(name = "participante")
 public class Participante implements Comparable<Participante> {
 
     private int id;

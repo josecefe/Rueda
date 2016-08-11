@@ -3,6 +3,8 @@
  */
 package es.um.josecefe.rueda.modelo;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  *
  * SQL: CREATE TABLE "dia" ( "id" INTEGER PRIMARY KEY NOT NULL, "descripcion"
@@ -11,6 +13,7 @@ package es.um.josecefe.rueda.modelo;
  * @author josec
  *
  */
+@XmlRootElement(name = "dia")
 public class Dia implements Comparable<Dia> {
 
     private int id;

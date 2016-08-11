@@ -10,11 +10,14 @@ import java.util.Objects;
 import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author josec
  */
+@XmlRootElement(name = "asignacion")
 public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionDia {
     private Participante[] participantes;
     private boolean[] conductores;
@@ -46,10 +49,12 @@ public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionD
         this.coste=coste;
     }
 
+    @XmlElement(name = "participante")
     public Participante[] getParticipantes() {
         return participantes;
     }
     
+    @XmlElement(name = "condutor")
     @Override
     public Set<Participante> getConductores() {
         return IntStream.range(0, conductores.length).filter(i -> conductores[i]).mapToObj(i -> participantes[i]).collect(toSet());
@@ -63,16 +68,19 @@ public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionD
         return conductores;
     }
 
+    @XmlElement(name = "ida")
     @Override
     public Map<Participante, Lugar> getPeIda() {
         return peIda;
     }
 
+    @XmlElement(name = "vuelta")
     @Override
     public Map<Participante, Lugar> getPeVuelta() {
         return peVuelta;
     }
 
+    @XmlElement(name = "coste")
     @Override
     public int getCoste() {
         return coste;

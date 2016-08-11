@@ -59,7 +59,7 @@ public class Rueda {
         Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
         //Set<Horario> horarios = PersistenciaXML.cargaHorarios(RUEDAXML_HORARIOS);
         // Creando bd nueva y guardando
-        PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
+        //PersistenciaSQL.guardaHorarios(RUEDABD, horarios);
         // Vamos a guardarlo en XML
         PersistenciaXML.guardaHorarios(RUEDAXML_HORARIOS, horarios);
         

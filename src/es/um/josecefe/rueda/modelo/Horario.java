@@ -3,6 +3,8 @@
  */
 package es.um.josecefe.rueda.modelo;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * SQL: CREATE TABLE "horario" ( "participante" INTEGER NOT NULL REFERENCES
  * participante(id) ON DELETE CASCADE, "dia" INTEGER NOT NULL REFERENCES dia(id)
@@ -12,6 +14,7 @@ package es.um.josecefe.rueda.modelo;
  * @author josec
  *
  */
+@XmlRootElement(name = "horario")
 public class Horario implements Comparable<Horario> {
 
     private Participante participante;

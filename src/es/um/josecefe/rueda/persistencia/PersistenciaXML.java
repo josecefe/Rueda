@@ -46,7 +46,7 @@ public class PersistenciaXML {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public static Set<Horario> cargaHorarios(String xmlfile) {
         Set<Horario> horarios = null;
         try (XMLDecoder decoder = new XMLDecoder(

@@ -1,1157 +1,1053 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_102" class="java.beans.XMLDecoder">
- <object class="java.util.HashSet">
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia0">
-      <void property="descripcion">
-       <string>Martes</string>
-      </void>
-      <void property="id">
-       <int>2</int>
-      </void>
-     </object>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante0">
-      <void property="id">
-       <int>1</int>
-      </void>
-      <void property="nombre">
-       <string>Pedro</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar0">
-          <void property="id">
-           <int>1</int>
-          </void>
-          <void property="latitud">
-           <double>0.0</double>
-          </void>
-          <void property="longitud">
-           <double>0.0</double>
-          </void>
-          <void property="nombre">
-           <string>Alberca</string>
-          </void>
-         </object>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia1">
-      <void property="descripcion">
-       <string>Jueves</string>
-      </void>
-      <void property="id">
-       <int>4</int>
-      </void>
-     </object>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante1">
-      <void property="id">
-       <int>3</int>
-      </void>
-      <void property="nombre">
-       <string>Luis</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante2">
-      <void property="id">
-       <int>2</int>
-      </void>
-      <void property="nombre">
-       <string>Jose PT</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante3">
-      <void property="id">
-       <int>4</int>
-      </void>
-      <void property="nombre">
-       <string>Natalia</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>7</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante1"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante4">
-      <void property="id">
-       <int>5</int>
-      </void>
-      <void property="nombre">
-       <string>Elia</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar1">
-          <void property="id">
-           <int>2</int>
-          </void>
-          <void property="latitud">
-           <double>0.0</double>
-          </void>
-          <void property="longitud">
-           <double>0.0</double>
-          </void>
-          <void property="nombre">
-           <string>Molina</string>
-          </void>
-         </object>
-        </void>
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante3"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante5">
-      <void property="id">
-       <int>6</int>
-      </void>
-      <void property="nombre">
-       <string>Cefe</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar1"/>
-        </void>
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante4"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante6">
-      <void property="id">
-       <int>7</int>
-      </void>
-      <void property="nombre">
-       <string>Ana Luz</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante5"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante7">
-      <void property="id">
-       <int>8</int>
-      </void>
-      <void property="nombre">
-       <string>Loli</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar1"/>
-        </void>
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante6"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante8">
-      <void property="id">
-       <int>9</int>
-      </void>
-      <void property="nombre">
-       <string>Marisa</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante7"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>3</int>
-    </void>
-    <void property="participante">
-     <object class="es.um.josecefe.rueda.modelo.Participante" id="Participante9">
-      <void property="id">
-       <int>10</int>
-      </void>
-      <void property="nombre">
-       <string>Maria Jose</string>
-      </void>
-      <void property="plazasCoche">
-       <int>4</int>
-      </void>
-      <void property="puntosEncuentro">
-       <object class="java.util.ArrayList">
-        <void method="add">
-         <object idref="Lugar0"/>
-        </void>
-       </object>
-      </void>
-     </object>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia0"/>
-    </void>
-    <void property="entrada">
-     <int>3</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante8"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia2">
-      <void property="descripcion">
-       <string>Viernes</string>
-      </void>
-      <void property="id">
-       <int>5</int>
-      </void>
-     </object>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante0"/>
-    </void>
-    <void property="salida">
-     <int>4</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante2"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia3">
-      <void property="descripcion">
-       <string>Miercoles</string>
-      </void>
-      <void property="id">
-       <int>3</int>
-      </void>
-     </object>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante0"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante1"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante2"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante3"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object class="es.um.josecefe.rueda.modelo.Dia" id="Dia4">
-      <void property="descripcion">
-       <string>Lunes</string>
-      </void>
-      <void property="id">
-       <int>1</int>
-      </void>
-     </object>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante0"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante1"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante4"/>
-    </void>
-    <void property="salida">
-     <int>4</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante2"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante3"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante5"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante1"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante4"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante6"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante3"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante5"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante7"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante4"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante6"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante8"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante5"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante7"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia2"/>
-    </void>
-    <void property="entrada">
-     <int>2</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante9"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>3</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante6"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante8"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia3"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante9"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>7</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante7"/>
-    </void>
-    <void property="salida">
-     <int>8</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia4"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante8"/>
-    </void>
-    <void property="salida">
-     <int>6</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante0"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
-  <void method="add">
-   <object class="es.um.josecefe.rueda.modelo.Horario">
-    <void property="coche">
-     <boolean>true</boolean>
-    </void>
-    <void property="dia">
-     <object idref="Dia1"/>
-    </void>
-    <void property="entrada">
-     <int>1</int>
-    </void>
-    <void property="participante">
-     <object idref="Participante2"/>
-    </void>
-    <void property="salida">
-     <int>5</int>
-    </void>
-   </object>
-  </void>
- </object>
-</java>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<horarios>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>1</id>
+            <nombre>Pedro</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>3</id>
+            <nombre>Luis</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>2</id>
+            <nombre>Jose PT</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>4</id>
+            <nombre>Natalia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>7</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>3</id>
+            <nombre>Luis</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>5</id>
+            <nombre>Elia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>4</id>
+            <nombre>Natalia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>6</id>
+            <nombre>Cefe</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>5</id>
+            <nombre>Elia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>7</id>
+            <nombre>Ana Luz</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>6</id>
+            <nombre>Cefe</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>8</id>
+            <nombre>Loli</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>7</id>
+            <nombre>Ana Luz</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>9</id>
+            <nombre>Marisa</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>8</id>
+            <nombre>Loli</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>3</entrada>
+        <participante>
+            <id>10</id>
+            <nombre>Maria Jose</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Martes</descripcion>
+            <id>2</id>
+        </dia>
+        <entrada>3</entrada>
+        <participante>
+            <id>9</id>
+            <nombre>Marisa</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>1</id>
+            <nombre>Pedro</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>4</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>2</id>
+            <nombre>Jose PT</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>1</id>
+            <nombre>Pedro</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>3</id>
+            <nombre>Luis</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>2</id>
+            <nombre>Jose PT</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>4</id>
+            <nombre>Natalia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>1</id>
+            <nombre>Pedro</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>3</id>
+            <nombre>Luis</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>5</id>
+            <nombre>Elia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>4</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>2</id>
+            <nombre>Jose PT</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>4</id>
+            <nombre>Natalia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>6</id>
+            <nombre>Cefe</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>3</id>
+            <nombre>Luis</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>5</id>
+            <nombre>Elia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>7</id>
+            <nombre>Ana Luz</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>4</id>
+            <nombre>Natalia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>6</id>
+            <nombre>Cefe</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>8</id>
+            <nombre>Loli</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>5</id>
+            <nombre>Elia</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>7</id>
+            <nombre>Ana Luz</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>9</id>
+            <nombre>Marisa</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>6</id>
+            <nombre>Cefe</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>8</id>
+            <nombre>Loli</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Viernes</descripcion>
+            <id>5</id>
+        </dia>
+        <entrada>2</entrada>
+        <participante>
+            <id>10</id>
+            <nombre>Maria Jose</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>3</entrada>
+        <participante>
+            <id>7</id>
+            <nombre>Ana Luz</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>9</id>
+            <nombre>Marisa</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Miercoles</descripcion>
+            <id>3</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>10</id>
+            <nombre>Maria Jose</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>7</entrada>
+        <participante>
+            <id>8</id>
+            <nombre>Loli</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>2</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Molina</nombre>
+            </puntosEncuentro>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>8</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Lunes</descripcion>
+            <id>1</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>9</id>
+            <nombre>Marisa</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>6</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>1</id>
+            <nombre>Pedro</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+    <horario>
+        <coche>true</coche>
+        <dia>
+            <descripcion>Jueves</descripcion>
+            <id>4</id>
+        </dia>
+        <entrada>1</entrada>
+        <participante>
+            <id>2</id>
+            <nombre>Jose PT</nombre>
+            <plazasCoche>4</plazasCoche>
+            <puntosEncuentro>
+                <id>1</id>
+                <latitud>0.0</latitud>
+                <longitud>0.0</longitud>
+                <nombre>Alberca</nombre>
+            </puntosEncuentro>
+        </participante>
+        <salida>5</salida>
+    </horario>
+</horarios>

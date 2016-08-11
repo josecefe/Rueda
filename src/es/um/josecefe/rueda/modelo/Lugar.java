@@ -1,5 +1,7 @@
 package es.um.josecefe.rueda.modelo;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Representa un lugar
  *
@@ -10,6 +12,7 @@ package es.um.josecefe.rueda.modelo;
  * @author josec
  *
  */
+@XmlRootElement(name = "lugar")
 public class Lugar {
 
     private int id;
