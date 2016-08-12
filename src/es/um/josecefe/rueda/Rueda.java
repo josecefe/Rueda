@@ -22,16 +22,6 @@ import java.util.Set;
 import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Clase principal de la aplicación Rueda
@@ -41,8 +31,8 @@ import static java.util.stream.Collectors.toMap;
  */
 public class Rueda {
 //    private static final String RUEDA_BASE = "ruedamurcia";
-    private static final String RUEDA_BASE = "ruedaalberca";
-    private static final String RUEDABD = RUEDA_BASE+"_prueba.db";
+    private static final String RUEDA_BASE = "ruedamurcia";
+    private static final String RUEDABD = RUEDA_BASE+".db";
     private static final String RUEDAXML_HORARIOS = RUEDA_BASE+"_horarios.xml";
     private static final String RUEDAXML_ASIGNACION = RUEDA_BASE+"_asignacion.xml";
     private static final boolean COMPARANDO = false;
@@ -68,7 +58,7 @@ public class Rueda {
     }
 
     private void pruebaResolutor() {
-        Set<Horario> horarios = PersistenciaSQL.cargaHorarios("ruedaalberca.db");
+        Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
          //DatosRueda datos = PersistenciaXML.cargaDatosRueda(new File(RUEDAXML_HORARIOS));
          //Set<Horario> horarios = datos.getHorarios();
         // Creando bd nueva y guardando

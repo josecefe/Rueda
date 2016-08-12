@@ -31,6 +31,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
@@ -44,6 +46,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorV8 implements Resolutor {
 
+    private final DoubleProperty progreso = new SimpleDoubleProperty(0);
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
     private final static long CADA_EXPANDIDOS = 1000000L;
@@ -204,8 +207,10 @@ public class ResolutorV8 implements Resolutor {
         if (ESTADISTICAS) {
             tamanosNivel = solucionesCandidatas.keySet().stream().mapToInt(k -> solucionesCandidatas.get(k).size()).toArray();
             totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
-            System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
-                    + totalPosiblesSoluciones);
+            if (DEBUG) {
+                System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
+                        + totalPosiblesSoluciones);
+            }
             double acum = 1.0;
             nPosiblesSoluciones = new double[tamanosNivel.length];
 
@@ -262,6 +267,7 @@ public class ResolutorV8 implements Resolutor {
         if (ESTADISTICAS) {
             estGlobal.setFitness(mejor.getCosteEstimado());
             estGlobal.updateTime();
+            progreso.set(estGlobal.getCompletado());
             if (DEBUG) {
                 System.out.println("====================");
                 System.out.println("Estadísticas finales");
@@ -285,6 +291,7 @@ public class ResolutorV8 implements Resolutor {
         //Estadisticas estGlobal = new EstadisticasV8(nSoluciones);
         if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L) {
             estGlobal.updateTime();
+            progreso.set(estGlobal.getCompletado());
             if (DEBUG) {
                 System.out.println(estGlobal.setFitness(cotaInferiorCorte.get()));
                 System.out.println("-- Trabajando con " + actual);
@@ -306,9 +313,12 @@ public class ResolutorV8 implements Resolutor {
                     do {
                         cota = cotaInferiorCorte.get();
                     } while (mejor.getCosteEstimado() < cota && !cotaInferiorCorte.compareAndSet(cota, mejor.getCosteEstimado()));
-                    if (DEBUG && mejor.getCosteEstimado() < cota) {
-                        System.out.format("$$$$ A partir del padre=%s\n    -> mejoramos con el hijo=%s\n", actual, mejor);
-                        System.out.format("** Nuevo (nueva solución) C: Anterior=%,d, Nuevo=%,d\n", cota, mejor.getCosteEstimado());
+                    if (mejor.getCosteEstimado() < cota) {
+                        progreso.set(estGlobal.getCompletado());
+                        if (DEBUG) {
+                            System.out.format("$$$$ A partir del padre=%s\n    -> mejoramos con el hijo=%s\n", actual, mejor);
+                            System.out.format("** Nuevo (nueva solución) C: Anterior=%,d, Nuevo=%,d\n", cota, mejor.getCosteEstimado());
+                        }
                     }
                 }
             } else { // Es un nodo intermedio
@@ -319,8 +329,11 @@ public class ResolutorV8 implements Resolutor {
                     do {
                         cota = cotaInferiorCorte.get();
                     } while (menorCotaSuperior.getAsInt() < cota && !cotaInferiorCorte.compareAndSet(cota, menorCotaSuperior.getAsInt()));
-                    if (DEBUG && menorCotaSuperior.getAsInt() < cota) {
-                        System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cota, menorCotaSuperior.getAsInt());
+                    if (menorCotaSuperior.getAsInt() < cota) {
+                        progreso.set(estGlobal.getCompletado());
+                        if (DEBUG) {
+                            System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cota, menorCotaSuperior.getAsInt());
+                        }
                     }
                     lNF.removeIf(n -> n.getCotaInferior() >= cotaInferiorCorte.get()); //Recalculamos lNF
                     // Limpiamos la LNV
@@ -346,6 +359,10 @@ public class ResolutorV8 implements Resolutor {
         return solucionFinal;
     }
 
+    public DoubleProperty progresoProperty() {
+        return progreso;
+    }
+    
     @Override
     public Optional<Estadisticas> getEstadisticas() {
         return Optional.ofNullable(estGlobal);

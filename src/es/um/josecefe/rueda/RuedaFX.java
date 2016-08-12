@@ -17,7 +17,6 @@
 package es.um.josecefe.rueda;
 
 import es.um.josecefe.rueda.modelo.DatosRueda;
-import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.vista.PrincipalController;
 import java.io.File;
@@ -26,8 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -146,7 +143,7 @@ public class RuedaFX extends Application {
         } catch (Exception e) { // catches ANY exception
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setHeaderText("\"Could not load data from file:\\n\" + file.getPath()");
+            alert.setHeaderText("No se ha podido cargar los datos del fichero:\n" + file.getPath());
             alert.setContentText(e.toString());
             alert.showAndWait();
         }
@@ -165,7 +162,7 @@ public class RuedaFX extends Application {
         } catch (Exception e) { // catches ANY exception
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setHeaderText("\"Could not save data to file:\\n\" + file.getPath()");
+            alert.setHeaderText("No se ha podido guarda los datos al fichero:\n" + file.getPath());
             alert.setContentText(e.toString());
             alert.showAndWait();
         }

@@ -16,19 +16,16 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import com.sun.javafx.collections.ObservableMapWrapper;
-import com.sun.javafx.collections.ObservableSetWrapper;
-import java.util.Map;
+import static java.util.stream.Collectors.toList;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.MapProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyMapWrapper;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlySetWrapper;
-import javafx.beans.property.SetProperty;
-import javafx.collections.ObservableMap;
-import javafx.collections.ObservableSet;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.util.Pair;
 
 /**
  *
@@ -36,20 +33,20 @@ import javafx.collections.ObservableSet;
  */
 public class Asignacion {
 
-    private final ObjectProperty<Dia> dia = new ReadOnlyObjectWrapper<>();
-    private final SetProperty<Participante> conductores = new ReadOnlySetWrapper<>();
-    private final MapProperty<Participante, Lugar> peida = new ReadOnlyMapWrapper<>();
-    private final MapProperty<Participante, Lugar> pevuelta = new ReadOnlyMapWrapper<>();
+    private final ObjectProperty<Dia> dia = new SimpleObjectProperty<>();
+    private final ListProperty<Participante> conductores = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Pair<Participante, Lugar>> peida = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Pair<Participante, Lugar>> pevuelta = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final IntegerProperty coste = new ReadOnlyIntegerWrapper();
 
     public Asignacion() {
     }
-    
+
     public Asignacion(Dia d, AsignacionDia asignacionDia) {
         dia.set(d);
-        conductores.set(new ObservableSetWrapper<>(asignacionDia.getConductores()));
-        peida.set(new ObservableMapWrapper<>(asignacionDia.getPeIda()));
-        pevuelta.set(new ObservableMapWrapper<>(asignacionDia.getPeVuelta()));
+        conductores.addAll(asignacionDia.getConductores());
+        peida.addAll(asignacionDia.getPeIda().entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).collect(toList()));
+        pevuelta.addAll(asignacionDia.getPeVuelta().entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).collect(toList()));
         coste.set(asignacionDia.getCoste());
     }
 
@@ -65,39 +62,39 @@ public class Asignacion {
         return dia;
     }
 
-    public ObservableSet<Participante> getConductores() {
+    public ObservableList<Participante> getConductores() {
         return conductores.get();
     }
 
-    public void setConductores(ObservableSet<Participante> value) {
+    public void setConductores(ObservableList<Participante> value) {
         conductores.set(value);
     }
 
-    public SetProperty<Participante> participantesProperty() {
+    public ListProperty<Participante> participantesProperty() {
         return conductores;
     }
 
-    public ObservableMap<Participante, Lugar> getPeIda() {
+    public ObservableList<Pair<Participante, Lugar>> getPeIda() {
         return peida.get();
     }
 
-    public void setPeIda(ObservableMap<Participante, Lugar> value) {
+    public void setPeIda(ObservableList<Pair<Participante, Lugar>> value) {
         peida.set(value);
     }
 
-    public MapProperty<Participante, Lugar> peIdaProperty() {
+    public ListProperty<Pair<Participante, Lugar>> peIdaProperty() {
         return peida;
     }
 
-    public ObservableMap<Participante, Lugar> getPeVuelta() {
+    public ObservableList<Pair<Participante, Lugar>> getPeVuelta() {
         return pevuelta.get();
     }
 
-    public void setPeVuelta(ObservableMap<Participante, Lugar> value) {
+    public void setPeVuelta(ObservableList<Pair<Participante, Lugar>> value) {
         pevuelta.set(value);
     }
 
-    public MapProperty<Participante, Lugar> peVueltaProperty() {
+    public ListProperty<Pair<Participante, Lugar>> peVueltaProperty() {
         return pevuelta;
     }
 
@@ -112,6 +109,4 @@ public class Asignacion {
     public IntegerProperty costeProperty() {
         return coste;
     }
-    
-    
 }

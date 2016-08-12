@@ -16,21 +16,20 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import java.beans.Transient;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author josec
  */
-@XmlRootElement(name = "horario")
 public class DatosRueda {
 
     private final ListProperty<Dia> dias = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -38,6 +37,7 @@ public class DatosRueda {
     private final ListProperty<Participante> participantes = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Horario> horarios = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Asignacion> asignaciones = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final IntegerProperty costeAsignacion = new SimpleIntegerProperty();
 
     public ObservableList<Dia> getDias() {
         return dias.get();
@@ -87,7 +87,6 @@ public class DatosRueda {
         return horarios;
     }
 
-    @Transient
     public ObservableList<Asignacion> getAsignacion() {
         return asignaciones.get();
     }
@@ -98,6 +97,18 @@ public class DatosRueda {
 
     public ListProperty<Asignacion> asignacionProperty() {
         return asignaciones;
+    }
+
+    public int getCosteAsignacion() {
+        return costeAsignacion.get();
+    }
+
+    public void setCosteAsignacion(int value) {
+        costeAsignacion.set(value);
+    }
+
+    public IntegerProperty costeAsignacionProperty() {
+        return costeAsignacion;
     }
 
     public void reemplazar(DatosRueda nuevosDatosRueda) {
@@ -132,6 +143,6 @@ public class DatosRueda {
 
     public void setSolucion(Map<Dia, ? extends AsignacionDia> resolver) {
         asignaciones.clear();
-        resolver.entrySet().stream().map(entry -> new Asignacion(entry.getKey(), entry.getValue())).collect(()-> asignaciones, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
+        resolver.entrySet().stream().map(entry -> new Asignacion(entry.getKey(), entry.getValue())).collect(() -> asignaciones, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
     }
 }

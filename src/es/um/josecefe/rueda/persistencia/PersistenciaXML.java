@@ -19,6 +19,12 @@ package es.um.josecefe.rueda.persistencia;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.DatosRueda;
+import es.um.josecefe.rueda.modelo.Lugar;
+import es.um.josecefe.rueda.modelo.Participante;
+import java.beans.DefaultPersistenceDelegate;
+import java.beans.Encoder;
+import java.beans.Expression;
+import java.beans.PersistenceDelegate;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
@@ -27,11 +33,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.util.Pair;
 
 /**
  *
@@ -43,12 +48,16 @@ public class PersistenciaXML {
         try (XMLEncoder encoder = new XMLEncoder(
                 new BufferedOutputStream(
                         new FileOutputStream(xmlfile)))) {
+
+            encoder.setExceptionListener(e -> e.printStackTrace());
+            encoder.setPersistenceDelegate(Pair.class, new PairPersistenceDelegate());
+
             encoder.writeObject(datosRueda);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static DatosRueda cargaDatosRueda(File xmlfile) {
         DatosRueda datosRueda = null;
         try (XMLDecoder decoder = new XMLDecoder(
@@ -68,6 +77,19 @@ public class PersistenciaXML {
             encoder.writeObject(solucionFinal);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private static class PairPersistenceDelegate extends DefaultPersistenceDelegate {
+        public PairPersistenceDelegate() {
+            super(new String[]{"key", "value"});
+        }
+
+        @Override
+        protected Expression instantiate(Object oldInstance, Encoder out) {
+            Pair par = (Pair) oldInstance;
+            Object[] constructorArgs = new Object[]{par.getKey(), par.getValue()};
+            return new Expression(oldInstance, oldInstance.getClass(), "new", constructorArgs);
         }
     }
 

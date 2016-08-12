@@ -47,14 +47,11 @@
                     <top>
                         <ButtonBar prefHeight="40.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                             <buttons>
-                                <Button mnemonicParsing="false" text="Nuevo (eliminar todo)" />
-                                <Button mnemonicParsing="false" text="Añadir Día" />
-                                <Button mnemonicParsing="false" text="Añadir Participante" />
-                                <Button mnemonicParsing="false" text="Añadir entrada" />
-                                <Button mnemonicParsing="false" text="Eliminar entrada" />
+                                <Button mnemonicParsing="false" onAction="#handleNew" text="Nuevo (eliminar todo)" />
+                                <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar horario..." />
                                 <Button mnemonicParsing="false" onAction="#handleSave" text="Guardar horario" />
                                 <Button mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar horario como..." />
-                                <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar horario..." />
+                        <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario..." />
                             </buttons>
                         </ButtonBar>
                     </top>

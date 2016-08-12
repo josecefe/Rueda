@@ -19,6 +19,7 @@ package es.um.josecefe.rueda.vista;
 import es.um.josecefe.rueda.RuedaFX;
 import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
+import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
@@ -26,14 +27,25 @@ import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import java.io.File;
 import java.util.HashSet;
+import java.util.IntSummaryStatistics;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
@@ -55,6 +67,9 @@ public class PrincipalController {
     private RuedaFX mainApp;
 
     @FXML
+    private DatosRueda datosRueda;
+
+    @FXML
     private TableView<Horario> tablaHorario;
 
     @FXML
@@ -74,19 +89,19 @@ public class PrincipalController {
 
     @FXML
     private TableView<Asignacion> tablaResultado;
-    
+
     @FXML
     private TableColumn<Asignacion, Dia> columnaDiaAsignacion;
 
     @FXML
     private TableColumn<Asignacion, Set<Participante>> columnaConductores;
-    
+
     @FXML
     private TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeIda;
-    
+
     @FXML
     private TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeVuelta;
-    
+
     @FXML
     private TableColumn<Asignacion, Integer> columnaCoste;
 
@@ -110,7 +125,7 @@ public class PrincipalController {
         columnaSalida.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
         columnaCoche.setCellValueFactory(new PropertyValueFactory<>("coche"));
         columnaCoche.setCellFactory(CheckBoxTableCell.forTableColumn(columnaCoche));
-        
+
         // Tabla de asignaciones
         columnaDiaAsignacion.setCellValueFactory(new PropertyValueFactory<>("dia"));
         columnaConductores.setCellValueFactory(new PropertyValueFactory<>("conductores"));
@@ -121,10 +136,11 @@ public class PrincipalController {
 
     public void setMainApp(RuedaFX mainApp) {
         this.mainApp = mainApp;
-        tablaHorario.setItems(mainApp.getDatosRueda().getHorarios());
-        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.getDatosRueda().getDias()));
-        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(mainApp.getDatosRueda().getParticipantes()));
-        tablaResultado.setItems(mainApp.getDatosRueda().getAsignacion());
+        datosRueda = mainApp.getDatosRueda();
+        tablaHorario.setItems(datosRueda.getHorarios());
+        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getDias()));
+        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getParticipantes()));
+        tablaResultado.setItems(datosRueda.getAsignacion());
     }
 
     /**
@@ -142,7 +158,8 @@ public class PrincipalController {
     @FXML
     private void handleOpen() {
         FileChooser fileChooser = new FileChooser();
-
+        if (mainApp.getLastFilePath()!=null)
+            fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
         // Set extension filter
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos XML (*.xml)", "*.xml");
@@ -178,6 +195,8 @@ public class PrincipalController {
         FileChooser fileChooser = new FileChooser();
 
         // Set extension filter
+        if (mainApp.getLastFilePath()!=null)
+            fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos XML (*.xml)", "*.xml");
         fileChooser.getExtensionFilters().add(extFilter);
@@ -213,17 +232,47 @@ public class PrincipalController {
     @FXML
     private void handleCalculaAsignacion() {
         ResolutorService resolutorService = new ResolutorService();
-        resolutorService.setResolutor(new ResolutorV8(new HashSet<>(mainApp.getDatosRueda().getHorarios())));
+        resolutorService.setResolutor(new ResolutorV8(new HashSet<>(datosRueda.getHorarios())));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
-            barraEstado.setText("Calculo de asignación completado con un coste final de "+resolutorService.getResolutor().getEstadisticas().get().getFitness());
+            datosRueda.setCosteAsignacion(resolutorService.getResolutor().getEstadisticas().get().getFitness());
+            barraEstado.textProperty().unbind();
+            barraEstado.setText("Calculo de asignación completado con un coste final de " + datosRueda.getCosteAsignacion());
             indicadorProgreso.progressProperty().unbind();
-            indicadorProgreso.setProgress(1);
-            mainApp.getDatosRueda().setSolucion(resolutorService.getValue());
+            indicadorProgreso.setProgress(0);
+            datosRueda.setSolucion(resolutorService.getValue());
+            mainApp.getPrimaryStage().getScene().setCursor(Cursor.DEFAULT);
         });
-        barraEstado.setText("Calculando asignación...");
-        indicadorProgreso.setProgress(-1);
+        barraEstado.textProperty().bind(resolutorService.messageProperty());
+        indicadorProgreso.setProgress(0);
         indicadorProgreso.progressProperty().bind(resolutorService.progressProperty());
+        datosRueda.asignacionProperty().clear(); // Borramos todo antes de empezar
+        mainApp.getPrimaryStage().getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
+    }
+
+    /**
+     * Extiende el horario actual duplicando los días y sus entradas
+     * correspondientes
+     */
+    @FXML
+    private void handleExtiendeHorario() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Extender horario");
+        alert.setHeaderText("Duplica el nº de días y extiendiende el horario");
+        alert.setContentText("Atención: usando esta función perderá la configuración del horario actual, "
+                + "creandose uno nuevo consistente en duplicar el nº de días repitiendo "
+                + "el patrón actual. Es útil para intentar mejorar la asignación en una "
+                + "extensión de tiempo mayor. ¿Desea continuar?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            Set<Horario> nHorarios = new HashSet<>(datosRueda.getHorarios());
+            IntSummaryStatistics estadisticas = datosRueda.getHorarios().stream().mapToInt(h -> h.getDia().getId()).summaryStatistics();
+            int desplazamiento = estadisticas.getMax() - estadisticas.getMin() + 1;
+            Map<Dia, Dia> dias = datosRueda.getHorarios().stream().map(Horario::getDia).sorted().distinct().collect(toMap(Function.identity(), d -> new Dia(d.getId() + desplazamiento, d.getDescripcion() + "Ex")));
+            nHorarios.addAll(datosRueda.getHorarios().stream().map(h -> new Horario(h.getParticipante(), dias.get(h.getDia()), h.getEntrada(), h.getSalida(), h.isCoche())).collect(toList()));
+            datosRueda.poblarDesdeHorarios(nHorarios);
+            mainApp.setLastFilePath(null); // Eliminamos la referencia al último fichero guardado para evitar lios...
+        }
     }
 
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {
@@ -247,6 +296,12 @@ public class PrincipalController {
             return new Task<Map<Dia, ? extends AsignacionDia>>() {
                 @Override
                 protected Map<Dia, ? extends AsignacionDia> call() throws Exception {
+                    updateProgress(0, 1);
+                    updateMessage("Iniciando la resolución...");
+                    resolutor.get().progresoProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                        updateProgress(newValue.doubleValue(), 1.0);
+                        updateMessage("Calculando asignación: "+resolutor.get().getEstadisticas().get().toString());
+                    });
                     return resolutor.get().resolver();
                 }
             };
