@@ -40,7 +40,7 @@ import javafx.stage.Window;
 public class RuedaFX extends Application {
 
     private static final String COPYRIGHT = "(C)2016 José Ceferino Ortega Carretero";
-    private static final String TITLE = "Rueda";
+    private static final String TITLE = "Optimizador de la Rueda";
 
     private Stage primaryStage;
     private final DatosRueda datosRueda;
@@ -63,19 +63,19 @@ public class RuedaFX extends Application {
         try {
             primaryStage = pStage;
             primaryStage.setTitle(TITLE + " - " + COPYRIGHT);
-            primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("rueda.png")));
+            primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("res/rueda.png")));
 
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("vista/Principal.fxml"));
             Principal = (BorderPane) loader.load();
 
-            // Show the scene containing the root layout.
-            Scene scene = new Scene(Principal);
-            primaryStage.setScene(scene);
-
             // Give the controller access to the main app.
             PrincipalController controller = loader.getController();
             controller.setMainApp(this);
+
+            // Show the scene containing the root layout.
+            Scene scene = new Scene(Principal);
+            primaryStage.setScene(scene);
 
             primaryStage.show();
 
