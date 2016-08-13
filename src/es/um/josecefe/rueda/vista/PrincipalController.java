@@ -59,6 +59,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -152,6 +153,12 @@ public class PrincipalController {
 
     @FXML
     private Label barraEstado;
+    
+    @FXML
+    private Button bCalcular;
+
+    @FXML
+    private Button bCancelarCalculo;
 
     @FXML
     private ComboBox<Dia> cbDia;
@@ -180,8 +187,23 @@ public class PrincipalController {
     @FXML
     private TextField tfDescripcionDia;
 
+    @FXML
+    private TableView<Lugar> tablaLugares;
+
+    @FXML
+    private TableColumn<Lugar, Integer> columnaIdLugar;
+
+    @FXML
+    private TableColumn<Lugar, String> columnaNombreLugar;
+
+    @FXML
+    private TextField tfNombreLugar;
+    
+    
+
     private Window stage;
     private boolean cerrandoAcercade;
+    private ResolutorService resolutorService;
 
     /**
      * Initializes the controller class.
@@ -222,6 +244,25 @@ public class PrincipalController {
                 v.getRowValue().setDescripcion(descripcion);
             }
         });
+        
+        // Tabla de lugars
+        columnaIdLugar.setCellValueFactory(new PropertyValueFactory<>("id"));
+        columnaNombreLugar.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        columnaNombreLugar.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnaNombreLugar.setOnEditCommit((TableColumn.CellEditEvent<Lugar, String> v) -> {
+            final String nombre = v.getNewValue();
+            if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("nombre inválido");
+                alert.setHeaderText("El nombre del punto de encuentro no es válido o ya está usado");
+                alert.setContentText("Por favor, introduzca un nombre del punto de encuentro que no este en uso");
+                alert.showAndWait();
+                tablaLugares.refresh();
+            } else {
+                v.getRowValue().setNombre(nombre);
+            }
+        });
+
     }
 
     public void setMainApp(RuedaFX mainApp) {
@@ -237,6 +278,8 @@ public class PrincipalController {
         cbParticipante.setItems(datosRueda.getParticipantes());
         // Tabla de Dias
         tablaDias.setItems(datosRueda.getDias());
+        // Tabla de Lugares
+        tablaLugares.setItems(datosRueda.getLugares());
     }
 
     /**
@@ -330,7 +373,6 @@ public class PrincipalController {
         acercadeStage.initOwner(stage);
         acercadeStage.initModality(Modality.APPLICATION_MODAL);
         acercadeStage.setTitle("Acerca de Optimización de Rueda");
-        //acercadeStage.initStyle(StageStyle.TRANSPARENT);
 
         Pane acercadeRoot = new Pane();
 
@@ -484,7 +526,7 @@ public class PrincipalController {
 
     @FXML
     private void handleCalculaAsignacion() {
-        ResolutorService resolutorService = new ResolutorService();
+        resolutorService = new ResolutorService();
         resolutorService.setResolutor(new ResolutorV8(new HashSet<>(datosRueda.getHorarios())));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
             datosRueda.setCosteAsignacion(resolutorService.getResolutor().getEstadisticas().get().getFitness());
@@ -494,6 +536,8 @@ public class PrincipalController {
             indicadorProgreso.setProgress(0);
             datosRueda.setSolucion(resolutorService.getValue());
             stage.getScene().setCursor(Cursor.DEFAULT);
+            bCalcular.setDisable(false);
+            bCancelarCalculo.setDisable(true);
         });
         barraEstado.textProperty().bind(resolutorService.messageProperty());
         indicadorProgreso.setProgress(0);
@@ -501,6 +545,16 @@ public class PrincipalController {
         datosRueda.asignacionProperty().clear(); // Borramos todo antes de empezar
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
+        bCancelarCalculo.setDisable(false);
+        bCalcular.setDisable(true);
+    }
+    
+    @FXML
+    private void handleCancelaCalculo() {
+        bCancelarCalculo.setDisable(true);
+        if (resolutorService!=null) {
+            resolutorService.getResolutor().parar();
+        }
     }
 
     /**
@@ -583,13 +637,14 @@ public class PrincipalController {
         final String descripcion = tfDescripcionDia.getText();
         if (descripcion.isEmpty() || datosRueda.getDias().stream().map(Dia::getDescripcion).anyMatch(d -> d.equalsIgnoreCase(descripcion))) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("nombre o descripción inválido");
+            alert.setTitle("Nombre o descripción inválido");
             alert.setHeaderText("El nombre o descripción del día no es válido o ya está usado");
             alert.setContentText("Por favor, introduzca un nombre o descripción de día que no este en uso");
             alert.showAndWait();
             return;
         }
         datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, tfDescripcionDia.getText()));
+        tfDescripcionDia.clear();
     }
 
     @FXML
@@ -615,8 +670,53 @@ public class PrincipalController {
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nada seleccionado");
-            alert.setHeaderText("No ha seleccionado ninguna entrada en la tabla de horarios");
-            alert.setContentText("Por favor, seleccione una entrada del horario para eliminarla");
+            alert.setHeaderText("No ha seleccionado Día de la tabla");
+            alert.setContentText("Por favor, seleccione un Día para eliminarlo");
+            alert.showAndWait();
+        }
+    }
+
+        @FXML
+    void handleAddLugar() {
+        final String nombre = tfNombreLugar.getText();
+        if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nombre de Lugar inválido");
+            alert.setHeaderText("El nombre del Lugar no es válido o ya está usado");
+            alert.setContentText("Por favor, introduzca un nombre de Lugar que no este en uso");
+            alert.showAndWait();
+            return;
+        }
+        datosRueda.getLugares().add(new Lugar(datosRueda.getLugares().stream().mapToInt(Lugar::getId).max().orElse(0) + 1, tfNombreLugar.getText(), null, null, null, null, null));
+        tfNombreLugar.clear();
+    }
+
+    @FXML
+    void handleDeleteLugar() {
+        int selectedIndex = tablaLugares.getSelectionModel().getSelectedIndex();
+
+        if (selectedIndex >= 0) {
+            final Lugar ds = tablaLugares.getItems().get(selectedIndex);
+            if (datosRueda.getParticipantes().stream().map(Participante::getPuntosEncuentro).flatMap(List::stream).anyMatch(d -> d.equals(ds))) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Lugar en uso");
+                alert.setHeaderText("El Lugar seleccionado está en uso");
+                alert.setContentText("El Lugar seleccionado está en uso como punto de encuentro de algún participante. Si continua se eliminarán todos los puntos de encuentro que lo usen. ¿Desea continuar?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    datosRueda.getParticipantes().stream().forEach((Participante p) -> {
+                        p.getPuntosEncuentro().remove(ds);
+                    });
+                } else {
+                    return;
+                }
+            }
+            tablaLugares.getItems().remove(selectedIndex);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nada seleccionado");
+            alert.setHeaderText("No ha seleccionado ninguno Lugar");
+            alert.setContentText("Por favor, seleccione un Lugar para eliminarlo");
             alert.showAndWait();
         }
     }

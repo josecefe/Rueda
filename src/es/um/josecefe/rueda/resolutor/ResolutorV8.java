@@ -368,6 +368,10 @@ public class ResolutorV8 implements Resolutor {
         return Optional.ofNullable(estGlobal);
     }
 
+    public void parar() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     //Function<Nodo, Double> funcionCoste;
     final private class Nodo implements Comparable<Nodo> {
 

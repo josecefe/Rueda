@@ -101,23 +101,37 @@
                                 <Tab closable="false" text="Dias">
                                     <content>
                                         <AnchorPane>
-                                 <children>
-                                    <Label layoutX="228.0" layoutY="14.0" text="Nuevo Día:" AnchorPane.topAnchor="14.0" />
-                                    <TextField fx:id="tfDescripcionDia" layoutX="228.0" layoutY="31.0" prefHeight="25.0" prefWidth="210.0" promptText="Nombre o descripción del nuevo día" AnchorPane.topAnchor="31.0" />
-                                    <Button layoutX="447.0" layoutY="31.0" mnemonicParsing="false" onAction="#handleAddDia" text="Añadir" />
-                                    <Button layoutX="228.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleDeleteDia" text="Eliminar día seleccionado" AnchorPane.bottomAnchor="14.0" />
-                                    <TableView fx:id="tablaDias" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="305.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
-                                      <columns>
-                                        <TableColumn fx:id="columnaIdDia" editable="false" prefWidth="33.0" text="Id" />
-                                        <TableColumn fx:id="columnaDescripcionDia" prefWidth="166.0" text="Nombre o Descripción" />
-                                      </columns>
-                                    </TableView>
-                                 </children></AnchorPane>
+                                            <children>
+                                                <Label layoutX="228.0" layoutY="14.0" text="Nuevo Día:" AnchorPane.topAnchor="14.0" />
+                                                <TextField fx:id="tfDescripcionDia" layoutX="228.0" layoutY="31.0" prefHeight="25.0" prefWidth="210.0" promptText="Nombre o descripción del nuevo día" AnchorPane.topAnchor="31.0" />
+                                                <Button layoutX="447.0" layoutY="31.0" mnemonicParsing="false" onAction="#handleAddDia" text="Añadir" />
+                                                <Button layoutX="228.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleDeleteDia" text="Eliminar día seleccionado" AnchorPane.bottomAnchor="14.0" />
+                                                <TableView fx:id="tablaDias" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="305.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="columnaIdDia" editable="false" prefWidth="33.0" text="Id" />
+                                                        <TableColumn fx:id="columnaDescripcionDia" prefWidth="166.0" text="Nombre o Descripción" />
+                                                    </columns>
+                                                </TableView>
+                                            </children>
+                                        </AnchorPane>
                                     </content>
                                 </Tab>
-                                <Tab closable="false" text="Puntos de Encuentro">
+                                <Tab closable="false" text="Lugares">
                                     <content>
-                                        <AnchorPane />
+                                        <AnchorPane>
+                                            <children>
+                                                <Label layoutX="228.0" layoutY="14.0" text="Nuevo Lugar:" AnchorPane.topAnchor="14.0" />
+                                                <TextField fx:id="tfNombreLugar" layoutX="228.0" layoutY="31.0" prefHeight="25.0" prefWidth="210.0" promptText="Nombre del nuevo Lugar" AnchorPane.topAnchor="31.0" />
+                                                <Button layoutX="447.0" layoutY="31.0" mnemonicParsing="false" onAction="#handleAddLugar" text="Añadir" />
+                                                <Button layoutX="228.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleDeleteLugar" text="Eliminar seleccionado" AnchorPane.bottomAnchor="14.0" />
+                                                <TableView fx:id="tablaLugares" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="305.0" prefWidth="200.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="columnaIdLugar" editable="false" prefWidth="33.0" text="Id" />
+                                                        <TableColumn fx:id="columnaNombreLugar" prefWidth="166.0" text="Nombre" />
+                                                    </columns>
+                                                </TableView>
+                                            </children>
+                                        </AnchorPane>
                                     </content>
                                 </Tab>
                                 <Tab closable="false" text="Participantes">
@@ -150,8 +164,8 @@
                     <bottom>
                         <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                             <buttons>
-                                <Button mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación" />
-                                <Button mnemonicParsing="false" text="Guardar asignación" />
+                                <Button fx:id="bCalcular" mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación" />
+                                <Button fx:id="bCancelarCalculo" disable="true" mnemonicParsing="false" onAction="#handleCancelaCalculo" text="Cancela Cálculo" />
                             </buttons>
                         </ButtonBar>
                     </bottom>
