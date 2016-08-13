@@ -69,6 +69,7 @@ public class ResolutorV8 implements Resolutor {
     private AtomicInteger cotaInferiorCorte;
     private final Nodo RAIZ;
     private EstadisticasV8 estGlobal;
+    private boolean continuar = true; // Sirve para detener los calculos
 
     public ResolutorV8(Set<Horario> horarios) {
         this.horarios = horarios;
@@ -297,7 +298,7 @@ public class ResolutorV8 implements Resolutor {
                 System.out.println("-- Trabajando con " + actual);
             }
         }
-        if (actual.getCotaInferior() < cotaInferiorCorte.get()) { //Estrategia de poda: si la cotaInferior >= C no seguimos
+        if (actual.getCotaInferior() < cotaInferiorCorte.get() && continuar) { //Estrategia de poda: si la cotaInferior >= C no seguimos
             if (ESTADISTICAS) {
                 estGlobal.addGenerados(tamanosNivel[actual.getIndiceDia() + 1]);
             }
@@ -348,7 +349,9 @@ public class ResolutorV8 implements Resolutor {
                 }
             }
         } else if (ESTADISTICAS) {
-            estGlobal.addDescartados(nPosiblesSoluciones[actual.getIndiceDia()]);
+            if (continuar) {
+                estGlobal.addDescartados(nPosiblesSoluciones[actual.getIndiceDia()]);
+            }
         }
 
         return Optional.ofNullable(mejor);
@@ -362,14 +365,14 @@ public class ResolutorV8 implements Resolutor {
     public DoubleProperty progresoProperty() {
         return progreso;
     }
-    
+
     @Override
     public Optional<Estadisticas> getEstadisticas() {
         return Optional.ofNullable(estGlobal);
     }
 
     public void parar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        continuar = false;
     }
 
     //Function<Nodo, Double> funcionCoste;
