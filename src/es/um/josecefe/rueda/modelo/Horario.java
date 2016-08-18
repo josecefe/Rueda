@@ -3,6 +3,9 @@
  */
 package es.um.josecefe.rueda.modelo;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,11 +23,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "horario")
 public class Horario implements Comparable<Horario> {
 
-    private final SimpleObjectProperty<Participante> participanteProperty;
-    private final SimpleObjectProperty<Dia> diaProperty;
-    private final SimpleIntegerProperty entradaProperty;
-    private final SimpleIntegerProperty salidaProperty;
-    private final SimpleBooleanProperty cocheProperty;
+    private final ObjectProperty<Participante> participanteProperty;
+    private final ObjectProperty<Dia> diaProperty;
+    private final IntegerProperty entradaProperty;
+    private final IntegerProperty salidaProperty;
+    private final BooleanProperty cocheProperty;
 
     /**
      * Constructor por defecto para cumplir el estandar de JavaBean. No debería
@@ -210,23 +213,24 @@ public class Horario implements Comparable<Horario> {
         this.cocheProperty.set(coche);
     }
 
-    public SimpleObjectProperty<Participante> participanteProperty() {
+    /* FX Properties */
+    public ObjectProperty<Participante> participanteProperty() {
         return participanteProperty;
     }
 
-    public SimpleObjectProperty<Dia> diaProperty() {
+    public ObjectProperty<Dia> diaProperty() {
         return diaProperty;
     }
 
-    public SimpleIntegerProperty entradaProperty() {
+    public IntegerProperty entradaProperty() {
         return entradaProperty;
     }
 
-    public SimpleIntegerProperty salidaProperty() {
+    public IntegerProperty salidaProperty() {
         return salidaProperty;
     }
 
-    public SimpleBooleanProperty cocheProperty() {
+    public BooleanProperty cocheProperty() {
         return cocheProperty;
     }
 }

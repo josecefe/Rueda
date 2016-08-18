@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.toList;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -37,7 +37,7 @@ public class Asignacion {
     private final ListProperty<Participante> conductores = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Pair<Participante, Lugar>> peida = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Pair<Participante, Lugar>> pevuelta = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final IntegerProperty coste = new ReadOnlyIntegerWrapper();
+    private final IntegerProperty coste = new SimpleIntegerProperty();
 
     public Asignacion() {
     }

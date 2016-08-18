@@ -27,6 +27,7 @@ import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -50,6 +51,7 @@ import javafx.animation.TranslateTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -64,7 +66,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -98,6 +103,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import javafx.util.converter.DefaultStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 /**
@@ -110,96 +116,118 @@ public class PrincipalController {
     private RuedaFX mainApp;
 
     @FXML
-    private DatosRueda datosRueda;
+    DatosRueda datosRueda;
 
     @FXML
-    private TableView<Horario> tablaHorario;
+    TableView<Horario> tablaHorario;
 
     @FXML
-    private TableColumn<Horario, Dia> columnaDia;
+    TableColumn<Horario, Dia> columnaDia;
 
     @FXML
-    private TableColumn<Horario, Participante> columnaParticipante;
+    TableColumn<Horario, Participante> columnaParticipante;
 
     @FXML
-    private TableColumn<Horario, Integer> columnaEntrada;
+    TableColumn<Horario, Integer> columnaEntrada;
 
     @FXML
-    private TableColumn<Horario, Integer> columnaSalida;
+    TableColumn<Horario, Integer> columnaSalida;
 
     @FXML
-    private TableColumn<Horario, Boolean> columnaCoche;
+    TableColumn<Horario, Boolean> columnaCoche;
 
     @FXML
-    private TableView<Asignacion> tablaResultado;
+    TableView<Asignacion> tablaResultado;
 
     @FXML
-    private TableColumn<Asignacion, Dia> columnaDiaAsignacion;
+    TableColumn<Asignacion, Dia> columnaDiaAsignacion;
 
     @FXML
-    private TableColumn<Asignacion, Set<Participante>> columnaConductores;
+    TableColumn<Asignacion, Set<Participante>> columnaConductores;
 
     @FXML
-    private TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeIda;
+    TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeIda;
 
     @FXML
-    private TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeVuelta;
+    TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeVuelta;
 
     @FXML
-    private TableColumn<Asignacion, Integer> columnaCoste;
+    TableColumn<Asignacion, Integer> columnaCoste;
 
     @FXML
-    private ProgressBar indicadorProgreso;
+    ProgressBar indicadorProgreso;
 
     @FXML
-    private Label barraEstado;
-    
-    @FXML
-    private Button bCalcular;
+    Label barraEstado;
 
     @FXML
-    private Button bCancelarCalculo;
+    Button bCalcular;
 
     @FXML
-    private ComboBox<Dia> cbDia;
+    Button bCancelarCalculo;
 
     @FXML
-    private ComboBox<Participante> cbParticipante;
+    ComboBox<Dia> cbDia;
 
     @FXML
-    private TextField tfEntrada;
+    ComboBox<Participante> cbParticipante;
 
     @FXML
-    private TextField tfSalida;
+    TextField tfEntrada;
 
     @FXML
-    private CheckBox cCoche;
+    TextField tfSalida;
 
     @FXML
-    private TableView<Dia> tablaDias;
+    CheckBox cCoche;
 
     @FXML
-    private TableColumn<Dia, Integer> columnaIdDia;
+    TableView<Dia> tablaDias;
 
     @FXML
-    private TableColumn<Dia, String> columnaDescripcionDia;
+    TableColumn<Dia, Integer> columnaIdDia;
 
     @FXML
-    private TextField tfDescripcionDia;
+    TableColumn<Dia, String> columnaDescripcionDia;
 
     @FXML
-    private TableView<Lugar> tablaLugares;
+    TextField tfDescripcionDia;
 
     @FXML
-    private TableColumn<Lugar, Integer> columnaIdLugar;
+    TableView<Lugar> tablaLugares;
 
     @FXML
-    private TableColumn<Lugar, String> columnaNombreLugar;
+    TableColumn<Lugar, Integer> columnaIdLugar;
 
     @FXML
-    private TextField tfNombreLugar;
-    
-    
+    TableColumn<Lugar, String> columnaNombreLugar;
+
+    @FXML
+    TextField tfNombreLugar;
+
+    @FXML
+    TableView<Participante> tablaParticipantes;
+
+    @FXML
+    TableColumn<Participante, Integer> columnaIdParticipante;
+
+    @FXML
+    TableColumn<Participante, String> columnaNombreParticipante;
+
+    @FXML
+    TableColumn<Participante, Integer> columnaPlazasCoche;
+
+    @FXML
+    TextField tfNombreParticipante;
+
+    @FXML
+    Spinner<Integer> sPlazas;
+
+    @FXML
+    ComboBox<Lugar> cbLugares;
+
+    @FXML
+    ListView<Lugar> lvLugaresEncuentro;
 
     private Window stage;
     private boolean cerrandoAcercade;
@@ -244,8 +272,8 @@ public class PrincipalController {
                 v.getRowValue().setDescripcion(descripcion);
             }
         });
-        
-        // Tabla de lugars
+
+        // Tabla de lugares
         columnaIdLugar.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaNombreLugar.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaNombreLugar.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -253,15 +281,60 @@ public class PrincipalController {
             final String nombre = v.getNewValue();
             if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("nombre inválido");
-                alert.setHeaderText("El nombre del punto de encuentro no es válido o ya está usado");
-                alert.setContentText("Por favor, introduzca un nombre del punto de encuentro que no este en uso");
+                alert.setTitle("Nombre de Lugar inválido");
+                alert.setHeaderText("El nombre del Lugar de encuentro no es válido o ya está en uso");
+                alert.setContentText("Por favor, introduzca un nombre de Lugar de encuentro que no esté en uso");
                 alert.showAndWait();
                 tablaLugares.refresh();
             } else {
                 v.getRowValue().setNombre(nombre);
             }
         });
+
+        //Tabla Participantes
+        columnaIdParticipante.setCellValueFactory(new PropertyValueFactory<>("id"));
+        columnaNombreParticipante.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        columnaNombreParticipante.setCellFactory(TextFieldTableCell.forTableColumn());
+        columnaNombreParticipante.setOnEditCommit((TableColumn.CellEditEvent<Participante, String> v) -> {
+            final String nombre = v.getNewValue();
+            if (nombre.isEmpty() || datosRueda.getParticipantes().stream().map(Participante::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Nombre inválido");
+                alert.setHeaderText("El nombre del Participante no es válido o ya está en uso");
+                alert.setContentText("Por favor, introduzca un nombre de Participante que no esté en uso");
+                alert.showAndWait();
+                tablaLugares.refresh();
+            } else {
+                v.getRowValue().setNombre(nombre);
+            }
+        });
+        columnaPlazasCoche.setCellValueFactory(new PropertyValueFactory<>("plazasCoche"));
+        columnaPlazasCoche.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        columnaPlazasCoche.setOnEditCommit((TableColumn.CellEditEvent<Participante, Integer> v) -> {
+            final int plazasCoche = v.getNewValue();
+            if (plazasCoche < 0 || plazasCoche > 9) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Nº de plazas incorrecto");
+                alert.setHeaderText("El nº de plazas debe estar entre 0 y 9");
+                alert.setContentText("Cada participante tiene asociado un nº de plazas disponibles en su vehículo que "
+                        + "comparte con el resto de participantes. Si un participante tiene 0 plazas se entiende que nunca va "
+                        + "a disponer de vehículo propio y por tanto nunca será conductor (sólo será pasajero).");
+                alert.showAndWait();
+                tablaParticipantes.refresh();
+            } else {
+                v.getRowValue().setPlazasCoche(plazasCoche);
+            }
+        });
+        tablaParticipantes.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Participante> ob, Participante o, Participante n) -> {
+            if (n != null) {
+                lvLugaresEncuentro.setItems(n.puntosEncuentroProperty().get());
+            }
+        });
+
+        // Spinner del nº de plazas
+        sPlazas.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 9, 5));
+        
+        // Lista de lugares de encuentro de un participante
 
     }
 
@@ -276,17 +349,20 @@ public class PrincipalController {
         // Combos
         cbDia.setItems(datosRueda.getDias());
         cbParticipante.setItems(datosRueda.getParticipantes());
+        cbLugares.setItems(datosRueda.getLugares());
         // Tabla de Dias
         tablaDias.setItems(datosRueda.getDias());
         // Tabla de Lugares
         tablaLugares.setItems(datosRueda.getLugares());
+        //Tabla de Participantes
+        tablaParticipantes.setItems(datosRueda.getParticipantes());
     }
 
     /**
      * Borra todos los datos y deja un horario vacío
      */
     @FXML
-    private void handleNew() {
+    void handleNew() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Nuevo horario");
         alert.setHeaderText("Eliminar todos los datos actuales y empezar un nuevo horario");
@@ -303,7 +379,7 @@ public class PrincipalController {
      * Opens a FileChooser to let the user select an address book to load.
      */
     @FXML
-    private void handleOpen() {
+    void handleOpen() {
         FileChooser fileChooser = new FileChooser();
         if (mainApp.getLastFilePath() != null) {
             fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
@@ -326,7 +402,7 @@ public class PrincipalController {
      * open file, the "save as" dialog is shown.
      */
     @FXML
-    private void handleSave() {
+    void handleSave() {
         File personFile = mainApp.getLastFilePath();
         if (personFile != null) {
             mainApp.guardaHorarios(personFile);
@@ -339,7 +415,7 @@ public class PrincipalController {
      * Opens a FileChooser to let the user select a file to save to.
      */
     @FXML
-    private void handleSaveAs() {
+    void handleSaveAs() {
         FileChooser fileChooser = new FileChooser();
 
         // Set extension filter
@@ -366,7 +442,7 @@ public class PrincipalController {
      * Opens an about dialog.
      */
     @FXML
-    private void handleAbout() {
+    void handleAbout() {
         // Preparamos la ventana
         cerrandoAcercade = false;
         Stage acercadeStage = new Stage(StageStyle.TRANSPARENT);
@@ -520,12 +596,12 @@ public class PrincipalController {
      * Closes the application.
      */
     @FXML
-    private void handleExit() {
+    void handleExit() {
         System.exit(0);
     }
 
     @FXML
-    private void handleCalculaAsignacion() {
+    void handleCalculaAsignacion() {
         resolutorService = new ResolutorService();
         resolutorService.setResolutor(new ResolutorV8(new HashSet<>(datosRueda.getHorarios())));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
@@ -548,11 +624,11 @@ public class PrincipalController {
         bCancelarCalculo.setDisable(false);
         bCalcular.setDisable(true);
     }
-    
+
     @FXML
-    private void handleCancelaCalculo() {
+    void handleCancelaCalculo() {
         bCancelarCalculo.setDisable(true);
-        if (resolutorService!=null) {
+        if (resolutorService != null) {
             resolutorService.getResolutor().parar();
         }
     }
@@ -562,7 +638,7 @@ public class PrincipalController {
      * correspondientes
      */
     @FXML
-    private void handleExtiendeHorario() {
+    void handleExtiendeHorario() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Extender horario");
         alert.setHeaderText("Duplica el nº de días y extiende el horario");
@@ -676,7 +752,7 @@ public class PrincipalController {
         }
     }
 
-        @FXML
+    @FXML
     void handleAddLugar() {
         final String nombre = tfNombreLugar.getText();
         if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
@@ -721,6 +797,70 @@ public class PrincipalController {
         }
     }
 
+    @FXML
+    void handleAddParticipante() {
+        final String nombre = tfNombreParticipante.getText();
+        if (nombre.isEmpty() || datosRueda.getParticipantes().stream().map(Participante::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nombre de Participante inválido");
+            alert.setHeaderText("El nombre del Participante no es válido o ya está en suo");
+            alert.setContentText("Por favor, introduzca un nombre de Participante que no esté en uso");
+            alert.showAndWait();
+            return;
+        }
+        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), null, Collections.EMPTY_LIST));
+        tfNombreParticipante.clear();
+    }
+
+    @FXML
+    void handleDeleteParticipante() {
+        int selectedIndex = tablaParticipantes.getSelectionModel().getSelectedIndex();
+
+        if (selectedIndex >= 0) {
+            final Participante ps = tablaParticipantes.getItems().get(selectedIndex);
+            if (datosRueda.getHorarios().stream().map(Horario::getParticipante).anyMatch(d -> d.equals(ps))) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Participante con horario asignado");
+                alert.setHeaderText("El Participante seleccionado tiene entradas en el horario");
+                alert.setContentText("El Participante seleccionado tiene datos en el horario. Si continua se eliminarán todas las entradas del horario que lo referencien. ¿Desea continuar?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    final List<Horario> aBorrar = datosRueda.getHorarios().stream().filter(h -> h.getParticipante().equals(ps)).collect(toList());
+                    datosRueda.getHorarios().removeAll(aBorrar);
+                } else {
+                    return;
+                }
+            }
+            tablaParticipantes.getItems().remove(selectedIndex);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nada seleccionado");
+            alert.setHeaderText("No ha seleccionado ninguno Participante");
+            alert.setContentText("Por favor, seleccione un Participante para eliminarlo");
+            alert.showAndWait();
+        }
+    }
+    
+    @FXML
+    void handleAddLugarEncuentro() {
+        //TODO: Implementar correctamente
+    }
+    
+    @FXML
+    void handleDeleteLugarEncuentro() {
+        //TODO: Implementar correctamente
+    }
+    
+    @FXML
+    void handleUpLugarEncuentro() {
+        //TODO: Implementar correctamente
+    }
+    
+    @FXML
+    void handleDownLugarEncuentro() {
+        //TODO: Implementar correctamente
+    }
+    
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {
 
         private final ObjectProperty<ResolutorV8> resolutor = new SimpleObjectProperty<>();

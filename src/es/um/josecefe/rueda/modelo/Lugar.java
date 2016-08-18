@@ -1,5 +1,7 @@
 package es.um.josecefe.rueda.modelo;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -15,8 +17,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "lugar")
 public class Lugar {
 
-    private int id;
-    private String nombre;
+    private final SimpleIntegerProperty id;
+    private final SimpleStringProperty nombre;
     private Double latitud;
     private Double longitud;
     private String direccion;
@@ -27,6 +29,8 @@ public class Lugar {
      * Constructor por defecto para la persistencia
      */
     public Lugar() {
+        this.id = new SimpleIntegerProperty();
+        this.nombre = new SimpleStringProperty();
     }
 
     /**
@@ -44,8 +48,8 @@ public class Lugar {
      */
     public Lugar(int id, String nombre, Double latitud, Double longitud, String direccion, String poblacion,
             String cp) {
-        this.id = id;
-        this.nombre = nombre;
+        this.id = new SimpleIntegerProperty(id);
+        this.nombre = new SimpleStringProperty(nombre);
         this.latitud = latitud;
         this.longitud = longitud;
         this.direccion = direccion;
@@ -58,18 +62,33 @@ public class Lugar {
      * @return the id
      */
     public int getId() {
-        return id;
+        return id.get();
     }
 
     public void setId(int id) {
         // Solo se puede establecer el id en un objeto nuevo
-        if (this.id == 0) {
-            this.id = id;
+        if (this.getId() == 0) {
+            this.id.set(id);
         }
     }
+    
+    public SimpleIntegerProperty idProperty() {
+        return id;
+    }
 
+    /**
+     * @return the nombre
+     */
+    public String getNombre() {
+        return nombre.get();
+    }
+    
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.nombre.set(nombre);
+    }
+    
+    public SimpleStringProperty nombreProperty() {
+        return nombre;
     }
 
     public void setLatitud(Double latitud) {
@@ -92,12 +111,6 @@ public class Lugar {
         this.cp = cp;
     }
 
-    /**
-     * @return the nombre
-     */
-    public String getNombre() {
-        return nombre;
-    }
 
     /**
      * @return the latitud
@@ -137,7 +150,7 @@ public class Lugar {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 97 * hash + this.id;
+        hash = 97 * hash + this.getId();
         return hash;
     }
 
@@ -158,7 +171,7 @@ public class Lugar {
 
     @Override
     public String toString() {
-        return nombre;
+        return nombre.get();
     }
 
 }
