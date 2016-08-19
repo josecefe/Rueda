@@ -39,60 +39,65 @@ public class DatosRueda {
     private final ListProperty<Asignacion> asignaciones = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final IntegerProperty costeAsignacion = new SimpleIntegerProperty();
 
-    public ObservableList<Dia> getDias() {
+    public List<Dia> getDias() {
         return dias.get();
     }
 
-    public void setDias(ObservableList<Dia> value) {
-        dias.set(value);
+    public void setDias(List<Dia> value) {
+        dias.clear();
+        dias.addAll(value);
     }
 
     public ListProperty<Dia> diasProperty() {
         return dias;
     }
 
-    public ObservableList<Lugar> getLugares() {
+    public List<Lugar> getLugares() {
         return lugares.get();
     }
 
-    public void setLugares(ObservableList<Lugar> value) {
-        lugares.set(value);
+    public void setLugares(List<Lugar> value) {
+        lugares.clear();
+        lugares.addAll(value);
     }
 
     public ListProperty<Lugar> lugaresProperty() {
         return lugares;
     }
 
-    public ObservableList<Participante> getParticipantes() {
+    public List<Participante> getParticipantes() {
         return participantes.get();
     }
 
-    public void setParticipantes(ObservableList<Participante> value) {
-        participantes.set(value);
+    public void setParticipantes(List<Participante> value) {
+        participantes.clear();
+        participantes.addAll(value);
     }
 
     public ListProperty<Participante> participantesProperty() {
         return participantes;
     }
 
-    public ObservableList<Horario> getHorarios() {
+    public List<Horario> getHorarios() {
         return horarios.get();
     }
 
-    public void setHorarios(ObservableList<Horario> value) {
-        horarios.set(value);
+    public void setHorarios(List<Horario> value) {
+        horarios.clear();
+        horarios.addAll(value);
     }
 
     public ListProperty<Horario> horariosProperty() {
         return horarios;
     }
 
-    public ObservableList<Asignacion> getAsignacion() {
+    public List<Asignacion> getAsignacion() {
         return asignaciones.get();
     }
 
-    public void setAsignacion(ObservableList<Asignacion> value) {
-        asignaciones.set(value);
+    public void setAsignacion(List<Asignacion> value) {
+        asignaciones.clear();
+        asignaciones.addAll(value);
     }
 
     public ListProperty<Asignacion> asignacionProperty() {
@@ -122,6 +127,7 @@ public class DatosRueda {
         participantes.addAll(nuevosDatosRueda.getParticipantes());
         horarios.addAll(nuevosDatosRueda.getHorarios());
         asignaciones.addAll(nuevosDatosRueda.getAsignacion());
+        costeAsignacion.set(nuevosDatosRueda.getCosteAsignacion());
     }
 
     public void poblarDesdeHorarios(Set<Horario> horariosBase) {
@@ -130,6 +136,7 @@ public class DatosRueda {
         participantes.clear();
         lugares.clear();
         dias.clear();
+        costeAsignacion.set(0);
 
         // Creamos las demas cosas a partir de solo los horarios de entrada
         horarios.addAll(FXCollections.observableArrayList(horariosBase));
@@ -141,8 +148,11 @@ public class DatosRueda {
         participantes.stream().map(Participante::getPuntosEncuentro).flatMap(List::stream).distinct().collect(() -> lugares, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
     }
 
-    public void setSolucion(Map<Dia, ? extends AsignacionDia> resolver) {
+    public void setSolucion(Map<Dia, ? extends AsignacionDia> resolver, int costeTotal) {
         asignaciones.clear();
-        resolver.entrySet().stream().map(entry -> new Asignacion(entry.getKey(), entry.getValue())).collect(() -> asignaciones, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
+        if (resolver != null) {
+            resolver.entrySet().stream().map(entry -> new Asignacion(entry.getKey(), entry.getValue())).collect(() -> asignaciones, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
+        }
+        setCosteAsignacion(costeTotal);
     }
 }

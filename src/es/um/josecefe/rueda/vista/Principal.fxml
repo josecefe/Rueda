@@ -23,8 +23,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.josecefe.rueda.vista.PrincipalController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.josecefe.rueda.vista.PrincipalController">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <menus>
@@ -39,9 +40,10 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Salir" />
                     </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Editar">
+                <Menu mnemonicParsing="false" text="Optimizar">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Eliminar" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcula asignación" />
+                        <MenuItem disable="true" mnemonicParsing="false" onAction="#handleCancelaCalculo" text="Cancela cálculo" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ayuda">
@@ -60,11 +62,26 @@
                     <top>
                         <ButtonBar BorderPane.alignment="CENTER">
                             <buttons>
-                                <Button mnemonicParsing="false" onAction="#handleNew" text="Nuevo (limpiar)" />
-                                <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar..." />
-                                <Button mnemonicParsing="false" onAction="#handleSave" text="Guardar" />
-                                <Button mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar como..." />
-                                <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario" />
+                                <Button mnemonicParsing="false" onAction="#handleNew" text="Nuevo (limpiar)">
+                           <tooltip>
+                              <Tooltip text="Limpia todos los datos" />
+                           </tooltip></Button>
+                                <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar...">
+                           <tooltip>
+                              <Tooltip text="Carga (abre o lee) un fichero con todos los datos, reemplazando los actuales" textAlignment="JUSTIFY" wrapText="true" />
+                           </tooltip></Button>
+                                <Button mnemonicParsing="false" onAction="#handleSave" text="Guardar">
+                           <tooltip>
+                              <Tooltip text="Guarda todos los datos en el último fichero usado" />
+                           </tooltip></Button>
+                                <Button mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar como...">
+                           <tooltip>
+                              <Tooltip text="Guarda los datos en un fichero nuevo" />
+                           </tooltip></Button>
+                                <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario">
+                           <tooltip>
+                              <Tooltip text="Amplia el horario duplicando los días y las entradas, para tratar de hacer una optimización cubriendo un periodo de tiempo mayor. Esta opción es útil si en un periodo de tiempo corto no se consigue una optimización aceptable. Incrementa de forma exponencial el tiempo requerido para hacer la optimización" textAlignment="JUSTIFY" wrapText="true" />
+                           </tooltip></Button>
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -90,17 +107,45 @@
                                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                     </columnResizePolicy>
                                                 </TableView>
-                                                <ComboBox fx:id="cbDia" layoutX="14.0" layoutY="293.0" prefHeight="25.0" prefWidth="86.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" />
-                                                <ComboBox fx:id="cbParticipante" layoutX="96.0" layoutY="163.0" prefHeight="25.0" prefWidth="109.0" AnchorPane.bottomAnchor="5.0" />
+                                                <ComboBox fx:id="cbDia" layoutX="14.0" layoutY="293.0" prefHeight="25.0" prefWidth="86.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Día de la nueva entrada en el horario" />
+                                                    </tooltip>
+                                                </ComboBox>
+                                                <ComboBox fx:id="cbParticipante" layoutX="96.0" layoutY="163.0" prefHeight="25.0" prefWidth="109.0" AnchorPane.bottomAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Participante de la nueva entrada del horario" />
+                                                    </tooltip>
+                                                </ComboBox>
                                                 <Label layoutX="5.0" layoutY="282.0" text="Día:" AnchorPane.bottomAnchor="33.0" />
                                                 <Label layoutX="96.0" layoutY="143.0" text="Participante:" AnchorPane.bottomAnchor="33.0" />
-                                                <TextField fx:id="tfEntrada" layoutX="210.0" layoutY="163.0" prefHeight="25.0" prefWidth="43.0" promptText="Hora de entrada" AnchorPane.bottomAnchor="5.0" />
+                                                <TextField fx:id="tfEntrada" layoutX="210.0" layoutY="163.0" prefHeight="25.0" prefWidth="43.0" promptText="Hora de entrada" AnchorPane.bottomAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Hora de entrada expresada como un cardianl (1 para la primera hora, 2 para la segunda, etc.)" textAlignment="JUSTIFY" wrapText="true" />
+                                                    </tooltip>
+                                                </TextField>
                                                 <Label layoutX="210.0" layoutY="143.0" text="Entrada:" AnchorPane.bottomAnchor="33.0" />
-                                                <TextField fx:id="tfSalida" layoutX="258.0" layoutY="163.0" prefHeight="25.0" prefWidth="45.0" promptText="Hora de salida" AnchorPane.bottomAnchor="5.0" />
+                                                <TextField fx:id="tfSalida" layoutX="258.0" layoutY="163.0" prefHeight="25.0" prefWidth="45.0" promptText="Hora de salida" AnchorPane.bottomAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Hora de salida expresada como un cardianl (1 para la primera hora, 2 para la segunda, etc.)" textAlignment="JUSTIFY" wrapText="true" />
+                                                    </tooltip>
+                                                </TextField>
                                                 <Label layoutX="258.0" layoutY="143.0" text="Salida:" AnchorPane.bottomAnchor="33.0" />
-                                                <CheckBox fx:id="cCoche" layoutX="305.0" layoutY="167.0" mnemonicParsing="false" text="Dispone de coche" AnchorPane.bottomAnchor="9.0" />
-                                                <Button layoutX="425.0" layoutY="161.0" mnemonicParsing="false" onAction="#handleAdd" text="Añadir" AnchorPane.bottomAnchor="5.0" />
-                                                <Button layoutX="535.0" layoutY="161.0" mnemonicParsing="false" onAction="#handleDelete" text="Eliminar seleccionada" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+                                                <CheckBox fx:id="cCoche" layoutX="305.0" layoutY="167.0" mnemonicParsing="false" text="Dispone de coche" AnchorPane.bottomAnchor="9.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Dejar marcado si el participante puede ser conductor ese día, desmarcarlo en caso contrario" textAlignment="JUSTIFY" wrapText="true" />
+                                                    </tooltip>
+                                                </CheckBox>
+                                                <Button layoutX="425.0" layoutY="161.0" mnemonicParsing="false" onAction="#handleAdd" text="Añadir" AnchorPane.bottomAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Una vez seleccionado el día y el participante e introducido las horas de entrada y salida, así como si es posible que sea conductor ese día, debe usar este botón para añadir la nueva entrada al horario" textAlignment="JUSTIFY" wrapText="true" />
+                                                    </tooltip>
+                                                </Button>
+                                                <Button layoutX="535.0" layoutY="161.0" mnemonicParsing="false" onAction="#handleDelete" text="Eliminar seleccionada" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Use este botón para eliminar la entrada del horario que tenga seleccionada en este moemnto" wrapText="true" />
+                                                    </tooltip>
+                                                </Button>
                                             </children>
                                         </AnchorPane>
                                     </content>
@@ -119,6 +164,11 @@
                                                         <TableColumn fx:id="columnaDescripcionDia" prefWidth="158.0" text="Nombre o Descripción" />
                                                     </columns>
                                                 </TableView>
+                                    <Button layoutX="228.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleAddDiasSemana" text="Añadir los días de la semana (L-V)" AnchorPane.bottomAnchor="75.0">
+                                       <tooltip>
+                                          <Tooltip text="Rellena la tabla de días con los día de la semana" />
+                                       </tooltip>
+                                    </Button>
                                             </children>
                                         </AnchorPane>
                                     </content>
@@ -157,12 +207,16 @@
                                                         <Tooltip text="Elimina el Participante que se encuentre seleccionado en la tabla de participantes" />
                                                     </tooltip>
                                                 </Button>
-                                                <TableView fx:id="tablaParticipantes" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="165.0" prefWidth="244.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="380.0" AnchorPane.topAnchor="14.0">
+                                                <TableView fx:id="tablaParticipantes" editable="true" layoutX="14.0" layoutY="14.0" prefHeight="165.0" prefWidth="244.0" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="380.0" AnchorPane.topAnchor="14.0">
                                                     <columns>
                                                         <TableColumn fx:id="columnaIdParticipante" editable="false" prefWidth="33.0" text="Id" />
                                                         <TableColumn fx:id="columnaNombreParticipante" prefWidth="144.0" text="Nombre" />
                                                         <TableColumn fx:id="columnaPlazasCoche" prefWidth="60.0" text="Nº Plazas" />
+                                          <TableColumn fx:id="columnaLugaresParticipante" editable="false" prefWidth="75.0" text="Lugares" />
                                                     </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
                                                 </TableView>
                                                 <Label layoutX="281.0" layoutY="56.0" text="Nº de Plazas en su coche:" AnchorPane.rightAnchor="221.0" AnchorPane.topAnchor="56.0">
                                                     <padding>
@@ -170,7 +224,11 @@
                                                     </padding>
                                                 </Label>
                                                 <Label layoutX="477.0" layoutY="14.0" text="Añadir Lugar de encuentro:" AnchorPane.rightAnchor="43.0" AnchorPane.topAnchor="14.0" />
-                                                <ComboBox fx:id="cbLugares" layoutX="474.0" layoutY="31.0" prefHeight="25.0" prefWidth="163.0" AnchorPane.rightAnchor="43.0" />
+                                                <ComboBox fx:id="cbLugares" layoutX="474.0" layoutY="31.0" prefHeight="25.0" prefWidth="163.0" AnchorPane.rightAnchor="43.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Seleccione el nuevo lugar de encuentro a añadir al final de la lista de lugares de encuentro admitidos por el participante" textAlignment="JUSTIFY" wrapText="true" />
+                                                    </tooltip>
+                                                </ComboBox>
                                                 <ListView fx:id="lvLugaresEncuentro" layoutX="433.0" layoutY="67.0" prefHeight="112.0" prefWidth="164.0" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="41.0" AnchorPane.topAnchor="67.0">
                                                     <tooltip>
                                                         <Tooltip text="Lugares de encuentro ordenados por orden de preferencia" />
@@ -211,27 +269,60 @@
                 </BorderPane>
                 <BorderPane>
                     <top>
-                        <Label text="Asignación (Resultado):" BorderPane.alignment="CENTER" />
+                        <AnchorPane BorderPane.alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Asignación (Resultado):" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="0.0" />
+                                <Label fx:id="lEtiquetaCoste" layoutX="487.0" prefHeight="17.0" prefWidth="156.0" text="Coste total de la asignación:" visible="false" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="0.0" />
+                                <Label fx:id="lCoste" layoutX="734.0" text="0000" visible="false" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
+                                    <font>
+                                        <Font name="System Bold" size="12.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </AnchorPane>
                     </top>
                     <center>
-                        <TableView fx:id="tablaResultado" tableMenuButtonVisible="true" BorderPane.alignment="CENTER">
-                            <columns>
-                                <TableColumn fx:id="columnaDiaAsignacion" editable="false" prefWidth="-1.0" text="Dia" />
-                                <TableColumn fx:id="columnaConductores" editable="false" prefWidth="-1.0" text="Conductores" />
-                                <TableColumn fx:id="columnaPeIda" editable="false" prefWidth="-1.0" text="Puntos de Encuentro Ida" />
-                                <TableColumn fx:id="columnaPeVuelta" editable="false" prefWidth="-1.0" text="Puntos de Encuentro Vuelta" />
-                                <TableColumn fx:id="columnaCoste" editable="false" prefWidth="-1.0" text="Coste" />
-                            </columns>
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                            </columnResizePolicy>
+                  <SplitPane dividerPositions="0.6" BorderPane.alignment="CENTER">
+                     <items>
+                              <TableView fx:id="tablaResultado" tableMenuButtonVisible="true">
+                                  <columns>
+                                      <TableColumn fx:id="columnaDiaAsignacion" editable="false" prefWidth="-1.0" text="Dia" />
+                                      <TableColumn fx:id="columnaConductores" editable="false" prefWidth="-1.0" text="Conductores" />
+                                      <TableColumn fx:id="columnaPeIda" editable="false" prefWidth="-1.0" text="Lugares Ida" />
+                                      <TableColumn fx:id="columnaPeVuelta" editable="false" prefWidth="-1.0" text="Lugares Vuelta" />
+                                      <TableColumn fx:id="columnaCoste" editable="false" prefWidth="-1.0" text="Coste" />
+                                  </columns>
+                                  <columnResizePolicy>
+                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                  </columnResizePolicy>
+                              </TableView>
+                        <TableView fx:id="tablaResultadoLugares" tableMenuButtonVisible="true">
+                          <columns>
+                            <TableColumn fx:id="columnaParticipanteLugares" prefWidth="90.0" text="Participante" />
+                            <TableColumn fx:id="columnaLugaresIda" prefWidth="61.0" text="Ida" />
+                              <TableColumn fx:id="columnaLugaresVuelta" prefWidth="57.0" text="Vuelta" />
+                              <TableColumn fx:id="columnaLugaresConductor" prefWidth="123.0" text="Conduce" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
+                     </items>
+                  </SplitPane>
                     </center>
                     <bottom>
                         <ButtonBar minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
                             <buttons>
-                                <Button fx:id="bCalcular" mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación" />
-                                <Button fx:id="bCancelarCalculo" disable="true" mnemonicParsing="false" onAction="#handleCancelaCalculo" text="Cancela Cálculo" />
+                                <Button fx:id="bCalcular" mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación">
+                                    <tooltip>
+                                        <Tooltip text="Una vez introducidos todos los datos y configurados los horarios, use este botón para que la apliación realice la optimización y obtenga una asignación de conductores" textAlignment="JUSTIFY" wrapText="true" />
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="bCancelarCalculo" disable="true" mnemonicParsing="false" onAction="#handleCancelaCalculo" text="Cancela Cálculo">
+                                    <tooltip>
+                                        <Tooltip text="Pulse este botón para detener el cálculo y conservar la mejor solución encontrada hasta el momento" />
+                                    </tooltip>
+                                </Button>
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

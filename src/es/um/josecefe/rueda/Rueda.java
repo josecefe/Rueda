@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class Rueda {
 //    private static final String RUEDA_BASE = "ruedamurcia";
-    private static final String RUEDA_BASE = "ruedamurcia";
+    private static final String RUEDA_BASE = "ruedaalberca";
     private static final String RUEDABD = RUEDA_BASE+".db";
     private static final String RUEDAXML_HORARIOS = RUEDA_BASE+"_horarios.xml";
     private static final String RUEDAXML_ASIGNACION = RUEDA_BASE+"_asignacion.xml";

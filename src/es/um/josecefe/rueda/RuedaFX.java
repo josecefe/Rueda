@@ -135,12 +135,13 @@ public class RuedaFX extends Application {
      */
     public void cargaHorarios(File file) {
         try {
-            DatosRueda hs = PersistenciaXML.cargaDatosRueda(file);
+            PersistenciaXML.cargaDatosRueda(file, datosRueda);
             // Save the file path to the registry.
-            datosRueda.reemplazar(hs);
+            //datosRueda.reemplazar(hs);
             setLastFilePath(file);
 
         } catch (Exception e) { // catches ANY exception
+            e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("No se ha podido cargar los datos del fichero:\n" + file.getPath());

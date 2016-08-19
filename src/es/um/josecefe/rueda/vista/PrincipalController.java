@@ -27,7 +27,10 @@ import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -103,6 +106,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import javafx.util.Pair;
 import javafx.util.converter.DefaultStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
@@ -137,6 +141,12 @@ public class PrincipalController {
     TableColumn<Horario, Boolean> columnaCoche;
 
     @FXML
+    Label lCoste;
+
+    @FXML
+    Label lEtiquetaCoste;
+
+    @FXML
     TableView<Asignacion> tablaResultado;
 
     @FXML
@@ -153,6 +163,21 @@ public class PrincipalController {
 
     @FXML
     TableColumn<Asignacion, Integer> columnaCoste;
+    
+    @FXML
+    TableView<AsignacionParticipante> tablaResultadoLugares;
+    
+    @FXML
+    TableColumn<AsignacionParticipante, Participante> columnaParticipanteLugares;
+    
+    @FXML
+    TableColumn<AsignacionParticipante, Lugar> columnaLugaresIda;
+   
+    @FXML
+    TableColumn<AsignacionParticipante, Lugar> columnaLugaresVuelta;
+
+    @FXML
+    TableColumn<AsignacionParticipante, Boolean> columnaLugaresConductor;
 
     @FXML
     ProgressBar indicadorProgreso;
@@ -216,6 +241,9 @@ public class PrincipalController {
 
     @FXML
     TableColumn<Participante, Integer> columnaPlazasCoche;
+    
+    @FXML
+    TableColumn<Participante, List<Lugar>> columnaLugaresParticipante;
 
     @FXML
     TextField tfNombreParticipante;
@@ -254,7 +282,41 @@ public class PrincipalController {
         columnaPeIda.setCellValueFactory(new PropertyValueFactory<>("peIda"));
         columnaPeVuelta.setCellValueFactory(new PropertyValueFactory<>("peVuelta"));
         columnaCoste.setCellValueFactory(new PropertyValueFactory<>("coste"));
+        
+        tablaResultado.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Asignacion> ob, Asignacion o, Asignacion n) -> {
+            if (n != null) {
+                Map<Participante, AsignacionParticipante> mapa = new HashMap<>(datosRueda.getParticipantes().size());
+                for (Participante p : n.getConductores()) {
+                    AsignacionParticipante a = new AsignacionParticipante();
+                    a.setParticipante(p.toString());
+                    a.setConductor(true);
+                    mapa.put(p, a);
+                }
+                for (Pair<Participante, Lugar> e : n.getPeIda()){
+                    AsignacionParticipante a = mapa.getOrDefault(e.getKey(), new AsignacionParticipante());
+                    a.setParticipante(e.getKey().toString());
+                    a.setIda(e.getValue().toString());
+                    mapa.putIfAbsent(e.getKey(), a);
+                }
+                for (Pair<Participante, Lugar> e : n.getPeVuelta()){
+                    AsignacionParticipante a = mapa.getOrDefault(e.getKey(), new AsignacionParticipante());
+                    a.setParticipante(e.getKey().toString());
+                    a.setVuelta(e.getValue().toString());
+                    mapa.putIfAbsent(e.getKey(), a);
+                }
+                tablaResultadoLugares.setItems(FXCollections.observableArrayList(mapa.values()));
+            } else {
+                tablaResultadoLugares.setItems(null);
+            }
+        });
 
+        //Tabla Resultado Lugares
+        columnaParticipanteLugares.setCellValueFactory(new PropertyValueFactory<>("participante"));
+        columnaLugaresIda.setCellValueFactory(new PropertyValueFactory<>("ida"));
+        columnaLugaresVuelta.setCellValueFactory(new PropertyValueFactory<>("vuelta"));
+        columnaLugaresConductor.setCellValueFactory(new PropertyValueFactory<>("conductor"));
+        columnaLugaresConductor.setCellFactory(CheckBoxTableCell.forTableColumn(columnaLugaresConductor));
+        
         // Tabla de dias
         columnaIdDia.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaDescripcionDia.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
@@ -325,6 +387,7 @@ public class PrincipalController {
                 v.getRowValue().setPlazasCoche(plazasCoche);
             }
         });
+        columnaLugaresParticipante.setCellValueFactory(new PropertyValueFactory<>("puntosEncuentro"));
         tablaParticipantes.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Participante> ob, Participante o, Participante n) -> {
             if (n != null) {
                 lvLugaresEncuentro.setItems(n.puntosEncuentroProperty().get());
@@ -333,29 +396,32 @@ public class PrincipalController {
 
         // Spinner del nº de plazas
         sPlazas.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 9, 5));
-        
-        // Lista de lugares de encuentro de un participante
 
+        // Coste de la solución
+        lEtiquetaCoste.visibleProperty().bind(lCoste.visibleProperty());
     }
 
     public void setMainApp(RuedaFX mainApp) {
         this.mainApp = mainApp;
         this.stage = mainApp.getPrimaryStage();
         datosRueda = mainApp.getDatosRueda();
-        tablaHorario.setItems(datosRueda.getHorarios());
-        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getDias()));
-        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getParticipantes()));
-        tablaResultado.setItems(datosRueda.getAsignacion());
+        tablaHorario.setItems(datosRueda.horariosProperty());
+        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.diasProperty()));
+        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.participantesProperty()));
+        tablaResultado.setItems(datosRueda.asignacionProperty());
         // Combos
-        cbDia.setItems(datosRueda.getDias());
-        cbParticipante.setItems(datosRueda.getParticipantes());
-        cbLugares.setItems(datosRueda.getLugares());
+        cbDia.setItems(datosRueda.diasProperty());
+        cbParticipante.setItems(datosRueda.participantesProperty());
+        cbLugares.setItems(datosRueda.lugaresProperty());
         // Tabla de Dias
-        tablaDias.setItems(datosRueda.getDias());
+        tablaDias.setItems(datosRueda.diasProperty());
         // Tabla de Lugares
-        tablaLugares.setItems(datosRueda.getLugares());
+        tablaLugares.setItems(datosRueda.lugaresProperty());
         //Tabla de Participantes
-        tablaParticipantes.setItems(datosRueda.getParticipantes());
+        tablaParticipantes.setItems(datosRueda.participantesProperty());
+        // Etiqueta de coste
+        lCoste.textProperty().bind(datosRueda.costeAsignacionProperty().asString("%,d"));
+        lCoste.visibleProperty().bind(datosRueda.costeAsignacionProperty().greaterThan(0));
     }
 
     /**
@@ -454,7 +520,7 @@ public class PrincipalController {
 
         try {
             BackgroundImage fondo = new BackgroundImage(
-                    new Image(mainApp.getClass().getResourceAsStream("res/rueda.png")), BackgroundRepeat.NO_REPEAT,
+                    new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.jpg")), BackgroundRepeat.NO_REPEAT,
                     BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, false));
             //BackgroundFill bf = new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY);
             acercadeRoot.setBackground(new Background(fondo));
@@ -605,12 +671,11 @@ public class PrincipalController {
         resolutorService = new ResolutorService();
         resolutorService.setResolutor(new ResolutorV8(new HashSet<>(datosRueda.getHorarios())));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
-            datosRueda.setCosteAsignacion(resolutorService.getResolutor().getEstadisticas().get().getFitness());
             barraEstado.textProperty().unbind();
             barraEstado.setText("Calculo de asignación completado con un coste final de " + datosRueda.getCosteAsignacion());
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
-            datosRueda.setSolucion(resolutorService.getValue());
+            datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().get().getFitness());
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
             bCancelarCalculo.setDisable(true);
@@ -711,7 +776,7 @@ public class PrincipalController {
     @FXML
     void handleAddDia() {
         final String descripcion = tfDescripcionDia.getText();
-        if (descripcion.isEmpty() || datosRueda.getDias().stream().map(Dia::getDescripcion).anyMatch(d -> d.equalsIgnoreCase(descripcion))) {
+        if (descripcion.isEmpty() || compruebaDia(descripcion)) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nombre o descripción inválido");
             alert.setHeaderText("El nombre o descripción del día no es válido o ya está usado");
@@ -719,8 +784,24 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, tfDescripcionDia.getText()));
+        datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, descripcion));
         tfDescripcionDia.clear();
+    }
+    
+    private boolean compruebaDia(final String nombreDia) {
+        return datosRueda.getDias().stream().map(Dia::getDescripcion).anyMatch(d -> d.equalsIgnoreCase(nombreDia));
+    }
+    
+    @FXML
+    void handleAddDiasSemana() {
+        String[] dias = DateFormatSymbols.getInstance().getWeekdays();
+        for (int i : new int[]{Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY}) {
+            String diaProp = dias[i];
+            int intento = 1;
+            while (compruebaDia(diaProp))
+                    diaProp = dias[i] + (++intento);
+            datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, diaProp));
+        }
     }
 
     @FXML
@@ -840,27 +921,41 @@ public class PrincipalController {
             alert.showAndWait();
         }
     }
-    
+
     @FXML
     void handleAddLugarEncuentro() {
-        //TODO: Implementar correctamente
+        if (!lvLugaresEncuentro.getItems().contains(cbLugares.getValue())) {
+            lvLugaresEncuentro.getItems().add(cbLugares.getValue());
+        }
     }
-    
+
     @FXML
     void handleDeleteLugarEncuentro() {
-        //TODO: Implementar correctamente
+        lvLugaresEncuentro.getItems().remove(lvLugaresEncuentro.getSelectionModel().getSelectedItem());
     }
-    
+
     @FXML
     void handleUpLugarEncuentro() {
-        //TODO: Implementar correctamente
+        int pos = lvLugaresEncuentro.getSelectionModel().getSelectedIndex();
+        if (pos > 0) {
+            Lugar l = lvLugaresEncuentro.getSelectionModel().getSelectedItem();
+            lvLugaresEncuentro.getItems().remove(l);
+            lvLugaresEncuentro.getItems().add(pos - 1, l);
+            lvLugaresEncuentro.getSelectionModel().select(l);
+        }
     }
-    
+
     @FXML
     void handleDownLugarEncuentro() {
-        //TODO: Implementar correctamente
+        int pos = lvLugaresEncuentro.getSelectionModel().getSelectedIndex();
+        if (pos < lvLugaresEncuentro.getItems().size() - 1) {
+            Lugar l = lvLugaresEncuentro.getSelectionModel().getSelectedItem();
+            lvLugaresEncuentro.getItems().remove(l);
+            lvLugaresEncuentro.getItems().add(pos + 1, l);
+            lvLugaresEncuentro.getSelectionModel().select(l);
+        }
     }
-    
+
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {
 
         private final ObjectProperty<ResolutorV8> resolutor = new SimpleObjectProperty<>();

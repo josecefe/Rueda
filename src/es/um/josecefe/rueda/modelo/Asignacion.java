@@ -16,6 +16,7 @@
  */
 package es.um.josecefe.rueda.modelo;
 
+import java.util.List;
 import static java.util.stream.Collectors.toList;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -24,7 +25,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
 /**
@@ -62,36 +62,39 @@ public class Asignacion {
         return dia;
     }
 
-    public ObservableList<Participante> getConductores() {
+    public List<Participante> getConductores() {
         return conductores.get();
     }
 
-    public void setConductores(ObservableList<Participante> value) {
-        conductores.set(value);
+    public void setConductores(List<Participante> value) {
+        conductores.clear();
+        conductores.addAll(value);
     }
 
     public ListProperty<Participante> participantesProperty() {
         return conductores;
     }
 
-    public ObservableList<Pair<Participante, Lugar>> getPeIda() {
+    public List<Pair<Participante, Lugar>> getPeIda() {
         return peida.get();
     }
 
-    public void setPeIda(ObservableList<Pair<Participante, Lugar>> value) {
-        peida.set(value);
+    public void setPeIda(List<Pair<Participante, Lugar>> value) {
+        peida.clear();
+        peida.addAll(value);
     }
 
     public ListProperty<Pair<Participante, Lugar>> peIdaProperty() {
         return peida;
     }
 
-    public ObservableList<Pair<Participante, Lugar>> getPeVuelta() {
+    public List<Pair<Participante, Lugar>> getPeVuelta() {
         return pevuelta.get();
     }
 
-    public void setPeVuelta(ObservableList<Pair<Participante, Lugar>> value) {
-        pevuelta.set(value);
+    public void setPeVuelta(List<Pair<Participante, Lugar>> value) {
+        pevuelta.clear();
+        pevuelta.addAll(value);
     }
 
     public ListProperty<Pair<Participante, Lugar>> peVueltaProperty() {

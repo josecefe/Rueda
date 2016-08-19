@@ -228,6 +228,123 @@
    </object>
   </void>
  </object>
- <object class="java.util.ArrayList"/>
- <int>0</int>
+ <object class="java.util.ArrayList">
+  <void method="add">
+   <object class="es.um.josecefe.rueda.modelo.Asignacion" id="Asignacion0">
+    <void property="conductores">
+     <void method="add">
+      <object idref="Participante0"/>
+     </void>
+     <void method="add">
+      <object idref="Participante1"/>
+     </void>
+     <void method="add">
+      <object idref="Participante2"/>
+     </void>
+    </void>
+    <void property="dia">
+     <object idref="Dia0"/>
+    </void>
+    <void property="peIda">
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante1"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante2"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+    </void>
+    <void property="peVuelta">
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante1"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante2"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+    </void>
+   </object>
+  </void>
+  <void method="add">
+   <object class="es.um.josecefe.rueda.modelo.Asignacion" id="Asignacion1">
+    <void property="conductores">
+     <void method="add">
+      <object idref="Participante0"/>
+     </void>
+     <void method="add">
+      <object idref="Participante1"/>
+     </void>
+     <void method="add">
+      <object idref="Participante2"/>
+     </void>
+    </void>
+    <void property="dia">
+     <object idref="Dia1"/>
+    </void>
+    <void property="peIda">
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante1"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante2"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+    </void>
+    <void property="peVuelta">
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante1"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+     <void method="add">
+      <object class="javafx.util.Pair">
+       <object idref="Participante2"/>
+       <object idref="Lugar1"/>
+      </object>
+     </void>
+    </void>
+   </object>
+  </void>
+ </object>
+ <int>2000</int>
 </java>

@@ -180,7 +180,7 @@ public class Participante implements Comparable<Participante> {
             return false;
         }
         Participante other = (Participante) obj;
-        return getId() == other.getId();
+        return id.get() == other.id.get();
     }
 
     @Override

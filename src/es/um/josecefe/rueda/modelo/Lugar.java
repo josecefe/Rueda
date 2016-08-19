@@ -150,7 +150,7 @@ public class Lugar {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 97 * hash + this.getId();
+        hash = 97 * hash + id.get();
         return hash;
     }
 
@@ -166,7 +166,7 @@ public class Lugar {
             return false;
         }
         final Lugar other = (Lugar) obj;
-        return this.id == other.id;
+        return this.id.get() == other.id.get();
     }
 
     @Override

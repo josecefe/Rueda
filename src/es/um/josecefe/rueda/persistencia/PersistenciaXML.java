@@ -16,15 +16,16 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
+import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.DatosRueda;
+import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
 import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
-import java.beans.PersistenceDelegate;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
@@ -33,9 +34,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
 /**
@@ -51,23 +56,32 @@ public class PersistenciaXML {
 
             encoder.setExceptionListener(e -> e.printStackTrace());
             encoder.setPersistenceDelegate(Pair.class, new PairPersistenceDelegate());
-
-            encoder.writeObject(datosRueda);
-        } catch (FileNotFoundException ex) {
+            // Poco a poco
+            encoder.writeObject(new ArrayList<>(datosRueda.getDias()));
+            encoder.writeObject(new ArrayList<>(datosRueda.getLugares()));
+            encoder.writeObject(new ArrayList<>(datosRueda.getParticipantes()));
+            encoder.writeObject(new ArrayList<>(datosRueda.getHorarios()));
+            encoder.writeObject(new ArrayList<>(datosRueda.getAsignacion()));
+            encoder.writeObject((Integer)datosRueda.getCosteAsignacion());
+        } catch (Exception ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public static DatosRueda cargaDatosRueda(File xmlfile) {
-        DatosRueda datosRueda = null;
+    public static void cargaDatosRueda(File xmlfile, DatosRueda datosRueda) {
         try (XMLDecoder decoder = new XMLDecoder(
                 new BufferedInputStream(
                         new FileInputStream(xmlfile)))) {
-            datosRueda = (DatosRueda) decoder.readObject();
-        } catch (FileNotFoundException ex) {
+            decoder.setExceptionListener(e -> e.printStackTrace());
+            datosRueda.setDias((List<Dia>) decoder.readObject());
+            datosRueda.setLugares((List<Lugar>) decoder.readObject());
+            datosRueda.setParticipantes((List<Participante>) decoder.readObject());
+            datosRueda.setHorarios((List<Horario>) decoder.readObject());
+            datosRueda.setAsignacion((List<Asignacion>) decoder.readObject());
+            datosRueda.setCosteAsignacion((Integer) decoder.readObject());
+        } catch (Exception ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return datosRueda;
     }
 
     public static void guardaAsignacionRueda(String xmlfile, Map<Dia, ? extends AsignacionDia> solucionFinal) {

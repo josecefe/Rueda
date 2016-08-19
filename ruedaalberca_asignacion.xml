@@ -43,8 +43,8 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty0" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar0">
             <void property="id">
@@ -61,7 +61,7 @@
             </void>
            </object>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -76,12 +76,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty1" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -96,12 +96,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty2" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -116,12 +116,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty3" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -136,8 +136,8 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty4" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar1">
             <void property="id">
@@ -157,7 +157,7 @@
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -172,15 +172,15 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty5" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar1"/>
           </void>
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -195,12 +195,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty6" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -215,15 +215,15 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty7" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar1"/>
           </void>
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -238,12 +238,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty8" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>
@@ -258,12 +258,12 @@
         <void property="plazasCoche">
          <int>4</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty9" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
        </object>
       </void>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<java version="1.8.0_102" class="java.beans.XMLDecoder">
+<java version="1.8.0_92" class="java.beans.XMLDecoder">
  <object class="java.util.HashMap">
   <void method="put">
    <object class="es.um.josecefe.rueda.modelo.Dia">
@@ -37,8 +37,8 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty0" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object class="es.um.josecefe.rueda.modelo.Lugar" id="Lugar0">
             <void property="id">
@@ -55,7 +55,7 @@
             </void>
            </object>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -73,12 +73,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty1" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -96,12 +96,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty2" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -119,12 +119,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty3" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -139,12 +139,12 @@
         <void property="nombre">
          <string>Concha</string>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty4" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -162,12 +162,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty5" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -185,12 +185,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty6" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
@@ -208,12 +208,12 @@
         <void property="plazasCoche">
          <int>5</int>
         </void>
-        <void property="puntosEncuentro">
-         <object class="java.util.ArrayList">
+        <void id="SimpleListProperty7" property="puntosEncuentro">
+         <void property="value">
           <void method="add">
            <object idref="Lugar0"/>
           </void>
-         </object>
+         </void>
         </void>
         <void property="residencia">
          <object idref="Lugar0"/>
