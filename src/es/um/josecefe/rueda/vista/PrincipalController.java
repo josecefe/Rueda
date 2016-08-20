@@ -24,6 +24,10 @@ import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.resolutor.Resolutor;
+import es.um.josecefe.rueda.resolutor.ResolutorGA;
+import es.um.josecefe.rueda.resolutor.ResolutorJE;
+import es.um.josecefe.rueda.resolutor.ResolutorV7;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -52,7 +56,9 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
@@ -67,9 +73,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -107,7 +115,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.util.Pair;
-import javafx.util.converter.DefaultStringConverter;
+import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 
 /**
@@ -119,6 +127,12 @@ public class PrincipalController {
 
     private RuedaFX mainApp;
 
+    @FXML
+    private MenuItem mCalcular;
+
+    @FXML
+    private MenuItem mCancelarCalculo;
+    
     @FXML
     DatosRueda datosRueda;
 
@@ -163,16 +177,16 @@ public class PrincipalController {
 
     @FXML
     TableColumn<Asignacion, Integer> columnaCoste;
-    
+
     @FXML
     TableView<AsignacionParticipante> tablaResultadoLugares;
-    
+
     @FXML
     TableColumn<AsignacionParticipante, Participante> columnaParticipanteLugares;
-    
+
     @FXML
     TableColumn<AsignacionParticipante, Lugar> columnaLugaresIda;
-   
+
     @FXML
     TableColumn<AsignacionParticipante, Lugar> columnaLugaresVuelta;
 
@@ -241,7 +255,7 @@ public class PrincipalController {
 
     @FXML
     TableColumn<Participante, Integer> columnaPlazasCoche;
-    
+
     @FXML
     TableColumn<Participante, List<Lugar>> columnaLugaresParticipante;
 
@@ -256,6 +270,9 @@ public class PrincipalController {
 
     @FXML
     ListView<Lugar> lvLugaresEncuentro;
+    
+    @FXML
+    ChoiceBox<Resolutor> cbAlgoritmo;
 
     private Window stage;
     private boolean cerrandoAcercade;
@@ -282,7 +299,7 @@ public class PrincipalController {
         columnaPeIda.setCellValueFactory(new PropertyValueFactory<>("peIda"));
         columnaPeVuelta.setCellValueFactory(new PropertyValueFactory<>("peVuelta"));
         columnaCoste.setCellValueFactory(new PropertyValueFactory<>("coste"));
-        
+
         tablaResultado.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Asignacion> ob, Asignacion o, Asignacion n) -> {
             if (n != null) {
                 Map<Participante, AsignacionParticipante> mapa = new HashMap<>(datosRueda.getParticipantes().size());
@@ -292,13 +309,13 @@ public class PrincipalController {
                     a.setConductor(true);
                     mapa.put(p, a);
                 }
-                for (Pair<Participante, Lugar> e : n.getPeIda()){
+                for (Pair<Participante, Lugar> e : n.getPeIda()) {
                     AsignacionParticipante a = mapa.getOrDefault(e.getKey(), new AsignacionParticipante());
                     a.setParticipante(e.getKey().toString());
                     a.setIda(e.getValue().toString());
                     mapa.putIfAbsent(e.getKey(), a);
                 }
-                for (Pair<Participante, Lugar> e : n.getPeVuelta()){
+                for (Pair<Participante, Lugar> e : n.getPeVuelta()) {
                     AsignacionParticipante a = mapa.getOrDefault(e.getKey(), new AsignacionParticipante());
                     a.setParticipante(e.getKey().toString());
                     a.setVuelta(e.getValue().toString());
@@ -316,7 +333,7 @@ public class PrincipalController {
         columnaLugaresVuelta.setCellValueFactory(new PropertyValueFactory<>("vuelta"));
         columnaLugaresConductor.setCellValueFactory(new PropertyValueFactory<>("conductor"));
         columnaLugaresConductor.setCellFactory(CheckBoxTableCell.forTableColumn(columnaLugaresConductor));
-        
+
         // Tabla de dias
         columnaIdDia.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaDescripcionDia.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
@@ -399,6 +416,21 @@ public class PrincipalController {
 
         // Coste de la solución
         lEtiquetaCoste.visibleProperty().bind(lCoste.visibleProperty());
+        
+        // Algoritmos para la optimización
+        cbAlgoritmo.getItems().addAll(new ResolutorV7(), new ResolutorV8(), new ResolutorGA(), new ResolutorJE());
+        cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
+            @Override
+            public String toString(Resolutor r) {
+                return r.getClass().getSimpleName();
+            }
+
+            @Override
+            public Resolutor fromString(String string) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        cbAlgoritmo.getSelectionModel().select(1);
     }
 
     public void setMainApp(RuedaFX mainApp) {
@@ -520,7 +552,7 @@ public class PrincipalController {
 
         try {
             BackgroundImage fondo = new BackgroundImage(
-                    new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.jpg")), BackgroundRepeat.NO_REPEAT,
+                    new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.png")), BackgroundRepeat.NO_REPEAT,
                     BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, false));
             //BackgroundFill bf = new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY);
             acercadeRoot.setBackground(new Background(fondo));
@@ -669,13 +701,14 @@ public class PrincipalController {
     @FXML
     void handleCalculaAsignacion() {
         resolutorService = new ResolutorService();
-        resolutorService.setResolutor(new ResolutorV8(new HashSet<>(datosRueda.getHorarios())));
+        resolutorService.setResolutor(cbAlgoritmo.getValue());
+        resolutorService.setHorarios(new HashSet<Horario>(datosRueda.getHorarios()));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
             barraEstado.textProperty().unbind();
-            barraEstado.setText("Calculo de asignación completado con un coste final de " + datosRueda.getCosteAsignacion());
+            barraEstado.setText("Optimización finalizada, calculo de asignación realizado");
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
-            datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().get().getFitness());
+            datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
             bCancelarCalculo.setDisable(true);
@@ -687,6 +720,7 @@ public class PrincipalController {
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
         bCancelarCalculo.setDisable(false);
+        
         bCalcular.setDisable(true);
     }
 
@@ -787,19 +821,20 @@ public class PrincipalController {
         datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, descripcion));
         tfDescripcionDia.clear();
     }
-    
+
     private boolean compruebaDia(final String nombreDia) {
         return datosRueda.getDias().stream().map(Dia::getDescripcion).anyMatch(d -> d.equalsIgnoreCase(nombreDia));
     }
-    
+
     @FXML
     void handleAddDiasSemana() {
         String[] dias = DateFormatSymbols.getInstance().getWeekdays();
         for (int i : new int[]{Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY}) {
             String diaProp = dias[i];
             int intento = 1;
-            while (compruebaDia(diaProp))
-                    diaProp = dias[i] + (++intento);
+            while (compruebaDia(diaProp)) {
+                diaProp = dias[i] + (++intento);
+            }
             datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, diaProp));
         }
     }
@@ -958,18 +993,39 @@ public class PrincipalController {
 
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {
 
-        private final ObjectProperty<ResolutorV8> resolutor = new SimpleObjectProperty<>();
+        private final ObjectProperty<Resolutor> resolutor = new SimpleObjectProperty<>();
+        private final SetProperty<Horario> horarios = new SimpleSetProperty<Horario>();
 
-        public ResolutorV8 getResolutor() {
+        public ResolutorService() {
+        }
+        public ResolutorService(Resolutor r, Set<Horario> h) {
+            resolutor.set(r);
+            horarios.clear();
+            horarios.addAll(h);
+        }
+
+        public Resolutor getResolutor() {
             return resolutor.get();
         }
 
-        public void setResolutor(ResolutorV8 value) {
+        public void setResolutor(Resolutor value) {
             resolutor.set(value);
         }
 
-        public ObjectProperty resolutorProperty() {
+        public ObjectProperty<Resolutor> resolutorProperty() {
             return resolutor;
+        }
+
+        public Set<Horario> getHorarios() {
+            return horarios.get();
+        }
+
+        public void setHorarios(Set<Horario> value) {
+            horarios.set(FXCollections.observableSet(value));
+        }
+
+        public SetProperty<Horario> horariosProperty() {
+            return horarios;
         }
 
         @Override
@@ -979,11 +1035,11 @@ public class PrincipalController {
                 protected Map<Dia, ? extends AsignacionDia> call() throws Exception {
                     updateProgress(0, 1);
                     updateMessage("Iniciando la resolución...");
-                    resolutor.get().progresoProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                    getResolutor().getEstadisticas().progresoProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                         updateProgress(newValue.doubleValue(), 1.0);
-                        updateMessage("Calculando asignación: " + resolutor.get().getEstadisticas().get().toString());
+                        updateMessage("Calculando asignación: " + getResolutor().getEstadisticas().toString());
                     });
-                    return resolutor.get().resolver();
+                    return getResolutor().resolver(getHorarios());
                 }
             };
         }

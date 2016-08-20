@@ -13,13 +13,16 @@
    <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
     <void property="conductoresArray">
      <array class="boolean" length="10">
-      <void index="0">
+      <void index="1">
        <boolean>true</boolean>
       </void>
       <void index="3">
        <boolean>true</boolean>
       </void>
       <void index="4">
+       <boolean>true</boolean>
+      </void>
+      <void index="5">
        <boolean>true</boolean>
       </void>
       <void index="6">
@@ -366,16 +369,22 @@
       <void index="1">
        <boolean>true</boolean>
       </void>
+      <void index="3">
+       <boolean>true</boolean>
+      </void>
+      <void index="4">
+       <boolean>true</boolean>
+      </void>
       <void index="5">
+       <boolean>true</boolean>
+      </void>
+      <void index="7">
        <boolean>true</boolean>
       </void>
       <void index="8">
        <boolean>true</boolean>
       </void>
      </array>
-    </void>
-    <void property="coste">
-     <int>6</int>
     </void>
     <void property="participantes">
      <object idref="ParticipanteArray0"/>
@@ -400,11 +409,11 @@
       </void>
       <void method="put">
        <object idref="Participante4"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante5"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante6"/>
@@ -412,7 +421,7 @@
       </void>
       <void method="put">
        <object idref="Participante7"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante8"/>
@@ -440,11 +449,11 @@
       </void>
       <void method="put">
        <object idref="Participante4"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante5"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante6"/>
@@ -452,7 +461,7 @@
       </void>
       <void method="put">
        <object idref="Participante7"/>
-       <object idref="Lugar0"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante8"/>
@@ -474,6 +483,9 @@
    <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
     <void property="conductoresArray">
      <array class="boolean" length="10">
+      <void index="0">
+       <boolean>true</boolean>
+      </void>
       <void index="1">
        <boolean>true</boolean>
       </void>
@@ -484,6 +496,12 @@
        <boolean>true</boolean>
       </void>
       <void index="6">
+       <boolean>true</boolean>
+      </void>
+      <void index="8">
+       <boolean>true</boolean>
+      </void>
+      <void index="9">
        <boolean>true</boolean>
       </void>
      </array>
@@ -593,135 +611,16 @@
    <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
     <void property="conductoresArray">
      <array class="boolean" length="10">
-      <void index="3">
-       <boolean>true</boolean>
-      </void>
-      <void index="4">
-       <boolean>true</boolean>
-      </void>
-      <void index="8">
-       <boolean>true</boolean>
-      </void>
-      <void index="9">
-       <boolean>true</boolean>
-      </void>
-     </array>
-    </void>
-    <void property="coste">
-     <int>5</int>
-    </void>
-    <void property="participantes">
-     <object idref="ParticipanteArray0"/>
-    </void>
-    <void property="peIda">
-     <object class="java.util.HashMap">
-      <void method="put">
-       <object idref="Participante0"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante1"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante2"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante3"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante4"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante5"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante6"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante7"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante8"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante9"/>
-       <object idref="Lugar0"/>
-      </void>
-     </object>
-    </void>
-    <void property="peVuelta">
-     <object class="java.util.HashMap">
-      <void method="put">
-       <object idref="Participante0"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante1"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante2"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante3"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante4"/>
-       <object idref="Lugar1"/>
-      </void>
-      <void method="put">
-       <object idref="Participante5"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante6"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante7"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante8"/>
-       <object idref="Lugar0"/>
-      </void>
-      <void method="put">
-       <object idref="Participante9"/>
-       <object idref="Lugar0"/>
-      </void>
-     </object>
-    </void>
-   </object>
-  </void>
-  <void method="put">
-   <object class="es.um.josecefe.rueda.modelo.Dia">
-    <void property="descripcion">
-     <string>Viernes</string>
-    </void>
-    <void property="id">
-     <int>5</int>
-    </void>
-   </object>
-   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
-    <void property="conductoresArray">
-     <array class="boolean" length="10">
       <void index="0">
        <boolean>true</boolean>
       </void>
       <void index="2">
        <boolean>true</boolean>
       </void>
-      <void index="7">
+      <void index="3">
+       <boolean>true</boolean>
+      </void>
+      <void index="9">
        <boolean>true</boolean>
       </void>
      </array>
@@ -809,6 +708,131 @@
       <void method="put">
        <object idref="Participante7"/>
        <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante8"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante9"/>
+       <object idref="Lugar0"/>
+      </void>
+     </object>
+    </void>
+   </object>
+  </void>
+  <void method="put">
+   <object class="es.um.josecefe.rueda.modelo.Dia">
+    <void property="descripcion">
+     <string>Viernes</string>
+    </void>
+    <void property="id">
+     <int>5</int>
+    </void>
+   </object>
+   <object class="es.um.josecefe.rueda.modelo.AsignacionDiaV5">
+    <void property="conductoresArray">
+     <array class="boolean" length="10">
+      <void index="0">
+       <boolean>true</boolean>
+      </void>
+      <void index="2">
+       <boolean>true</boolean>
+      </void>
+      <void index="4">
+       <boolean>true</boolean>
+      </void>
+      <void index="6">
+       <boolean>true</boolean>
+      </void>
+      <void index="7">
+       <boolean>true</boolean>
+      </void>
+      <void index="8">
+       <boolean>true</boolean>
+      </void>
+     </array>
+    </void>
+    <void property="participantes">
+     <object idref="ParticipanteArray0"/>
+    </void>
+    <void property="peIda">
+     <object class="java.util.HashMap">
+      <void method="put">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante1"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante2"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante3"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante4"/>
+       <object idref="Lugar1"/>
+      </void>
+      <void method="put">
+       <object idref="Participante5"/>
+       <object idref="Lugar1"/>
+      </void>
+      <void method="put">
+       <object idref="Participante6"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante7"/>
+       <object idref="Lugar1"/>
+      </void>
+      <void method="put">
+       <object idref="Participante8"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante9"/>
+       <object idref="Lugar0"/>
+      </void>
+     </object>
+    </void>
+    <void property="peVuelta">
+     <object class="java.util.HashMap">
+      <void method="put">
+       <object idref="Participante0"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante1"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante2"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante3"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante4"/>
+       <object idref="Lugar1"/>
+      </void>
+      <void method="put">
+       <object idref="Participante5"/>
+       <object idref="Lugar1"/>
+      </void>
+      <void method="put">
+       <object idref="Participante6"/>
+       <object idref="Lugar0"/>
+      </void>
+      <void method="put">
+       <object idref="Participante7"/>
+       <object idref="Lugar1"/>
       </void>
       <void method="put">
        <object idref="Participante8"/>

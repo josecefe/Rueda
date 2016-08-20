@@ -5,15 +5,50 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+
 /**
  *
  * @author josec
  */
-public interface Estadisticas {
-
-    Estadisticas setFitness(int aptitud);
-
-    Estadisticas updateTime();
+public abstract class Estadisticas {
+    protected int fitness;
+    protected long ti; // Para el tiempo inicial
+    protected double tiempo;
+    protected final DoubleProperty progreso = new SimpleDoubleProperty(0);
     
-    int getFitness();
+    public Estadisticas setFitness(int aptitud) {
+        this.fitness = aptitud;
+        return this;
+    }
+    
+    public int getFitness() {
+        return fitness;
+    }
+    
+    public Estadisticas iniciaTiempo() {
+        ti = System.currentTimeMillis(); // Para el tiempo
+        return this;
+    }
+    
+    public Estadisticas actualizaProgreso() {
+        tiempo = (System.currentTimeMillis() - ti) / 1000.0;
+        progreso.set(getCompletado());
+        return this;
+    }
+    
+    public double getTiempo() {
+        return tiempo;
+    }
+    
+    public DoubleProperty progresoProperty() {
+        return progreso;
+    }
+
+    /**
+     * Indica el grado de completitud de la exploración de soluciones del algoritmo
+     * @return valor entre 0 y 1 indicando el grado de completitud
+     */
+    public abstract double getCompletado();
 }

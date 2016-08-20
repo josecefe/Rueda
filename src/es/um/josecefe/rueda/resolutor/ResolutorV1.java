@@ -32,18 +32,6 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -52,18 +40,18 @@ import static java.util.stream.Collectors.toMap;
 /**
  * ResolutorV1
  */
-public class ResolutorV1 implements Resolutor {
+public class ResolutorV1 extends Resolutor {
 
     private Set<Horario> horarios;
     private Dia[] dias;
     //Participante[] participantes;
     private Map<Dia, List<Set<Participante>>> solucionesCandidatas;
     private Map<Dia, AsignacionDiaV1> solucionFinal;
-    private EstadisticasV1 estadisticas;
+    private EstadisticasV1 estadisticas = new EstadisticasV1();
 
     @Override
-    public Optional<Estadisticas> getEstadisticas() {
-        return Optional.ofNullable(estadisticas);
+    public Estadisticas getEstadisticas() {
+        return estadisticas;
     }
 
     //Function<Nodo, Double> funcionCoste;
@@ -187,11 +175,11 @@ public class ResolutorV1 implements Resolutor {
 
     }
 
-    public ResolutorV1(Set<Horario> horarios) {
-        this.horarios = horarios;
+    public ResolutorV1() {
     }
 
     private void inicializa() {
+        continuar = true;
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
         solucionesCandidatas = new HashMap<>(dias.length);
         solucionFinal = null;
@@ -253,10 +241,10 @@ public class ResolutorV1 implements Resolutor {
     }
 
     @Override
-    public Map<Dia, ? extends AsignacionDia> resolver() {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
+        this.horarios = horarios;
         inicializa();
         // Preparamos el algoritmo
-        estadisticas = new EstadisticasV1(0);
         Nodo actual = new Nodo();
         Nodo mejor = actual;
         double C = actual.getCotaSuperior();
@@ -303,7 +291,7 @@ public class ResolutorV1 implements Resolutor {
         //Estadisticas finales
         estadisticas.expandidos = expandidos;
         estadisticas.generados = generados;
-        estadisticas.setFitness((int) (C * 1000)).updateTime();
+        estadisticas.setFitness((int) (C * 1000)).actualizaProgreso();
         System.out.println("Estadísticas finales");
         System.out.println("====================");
         System.out.println("Tiempo transcurrido (s) = " + (System.currentTimeMillis() - ti) / 1000.0);

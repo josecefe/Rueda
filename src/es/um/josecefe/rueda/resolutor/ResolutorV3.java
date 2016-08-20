@@ -33,20 +33,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -55,7 +41,7 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Resolutor
  */
-public class ResolutorV3 implements Resolutor {
+public class ResolutorV3 extends Resolutor {
 
     final static long CADA_EXPANDIDOS = 100000L;
     private Set<Horario> horarios;
@@ -66,18 +52,19 @@ public class ResolutorV3 implements Resolutor {
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
-    private EstadisticasV1 estadisticas;
+    private EstadisticasV1 estadisticas = new EstadisticasV1();
 
     @Override
-    public Optional<Estadisticas> getEstadisticas() {
-        return Optional.ofNullable(estadisticas);
+    public Estadisticas getEstadisticas() {
+        return estadisticas;
     }
 
-    public ResolutorV3(Set<Horario> horarios) {
-        this.horarios = horarios;
+    public ResolutorV3(){
+        
     }
 
     private void inicializa() {
+        continuar = true;
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
         participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
         solucionesCandidatas = new HashMap<>(dias.length);
@@ -152,9 +139,11 @@ public class ResolutorV3 implements Resolutor {
     }
 
     @Override
-    public Map<Dia, ? extends AsignacionDia> resolver() {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
+        this.horarios = horarios;
+        estadisticas.iniciaTiempo();
         inicializa();
-        estadisticas = new EstadisticasV1(totalPosiblesSoluciones);
+        estadisticas.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
         // Preparamos el algoritmo
         Nodo actual = new Nodo();
         Nodo mejor = actual;
@@ -167,7 +156,7 @@ public class ResolutorV3 implements Resolutor {
             actual = listaNodosVivos.poll();
             if (estadisticas.incExpandidos() % CADA_EXPANDIDOS == 0L) {
                     System.out.format("> LNV=%,d, ", listaNodosVivos.size());
-                    System.out.println(estadisticas.setFitness((int) (C * 1000)).updateTime());
+                    System.out.println(estadisticas.setFitness((int) (C * 1000)).actualizaProgreso());
                     System.out.println("-- Trabajando con " + actual);
             }
             if (actual.getCotaInferior() < C) { //Estrategia de poda: si la cotaInferior >= C no seguimos
@@ -199,7 +188,7 @@ public class ResolutorV3 implements Resolutor {
         } while (!listaNodosVivos.isEmpty());
 
         //Estadisticas finales
-        estadisticas.setFitness((int) (C * 1000)).updateTime();
+        estadisticas.setFitness((int) (C * 1000)).actualizaProgreso();
 
         System.out.println("====================");
         System.out.println("Estadísticas finales");

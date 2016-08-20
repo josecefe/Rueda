@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -41,7 +40,7 @@ import static java.util.stream.Collectors.toMap;
  * @author josec
  *
  */
-public class ResolutorGA implements Resolutor {
+public class ResolutorGA extends Resolutor {
 
     private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
@@ -57,32 +56,31 @@ public class ResolutorGA implements Resolutor {
     private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
-    private final Set<Horario> horarios;
-    private final Dia[] dias;
-    private final Participante[] participantes;
-    private final float[] coefConduccion;
+    private Set<Horario> horarios;
+    private Dia[] dias;
+    private Participante[] participantes;
+    private float[] coefConduccion;
     private Map<Dia, List<AsignacionDiaV5>> solCandidatasDiarias;
     private Map<Dia, AsignacionDia> solucionFinal;
     private int[] tamanosNivel;
     private double totalPosiblesSoluciones;
-    private final boolean[] participantesConCoche;
+    private boolean[] participantesConCoche;
     private int tamPoblacion;
     private double probMutacion;
     private int numGeneraciones;
     private long tiempoMaximo;
     private int objAptitud;
-    private EstadisticasGA estGlobal;
+    private EstadisticasGA estGlobal = new EstadisticasGA();
     private int tournamentSize;
     private int tamElite;
     private int tamExtranjero;
     private int maxEstancado;
 
-    public ResolutorGA(Set<Horario> horarios) {
-        this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, TAM_EXTRANJERO_DEF, MAX_ESTANCADO_DEF);
+    public ResolutorGA() {
+        this(TAM_POBLACION_DEF, PROB_MUTACION_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, TAM_EXTRANJERO_DEF, MAX_ESTANCADO_DEF);
     }
 
-    public ResolutorGA(Set<Horario> horarios, int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
-        this.horarios = horarios;
+    public ResolutorGA(int tamPoblacion, double probMutacion, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int tamExtranjero, int maxEstancado) {
         this.tamPoblacion = tamPoblacion;
         this.probMutacion = probMutacion;
         this.numGeneraciones = nGeneraciones;
@@ -92,21 +90,6 @@ public class ResolutorGA implements Resolutor {
         this.tamElite = tamElite;
         this.tamExtranjero = tamExtranjero;
         this.maxEstancado = maxEstancado;
-
-        dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
-        participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
-        participantesConCoche = new boolean[participantes.length];
-        for (int i = 0; i < participantes.length; i++) {
-            participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
-        }
-
-        Map<Participante, Long> vecesParticipa = horarios.stream().collect(groupingBy(Horario::getParticipante, counting()));
-        int maxVecesParticipa = (int) vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElse(0);
-
-        coefConduccion = new float[participantes.length];
-        for (int i = 0; i < coefConduccion.length; i++) {
-            coefConduccion[i] = (float) (maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
-        }
     }
 
     public void setProbMutacion(double probMutacion) {
@@ -126,6 +109,21 @@ public class ResolutorGA implements Resolutor {
     }
 
     private void inicializa() {
+        continuar = true;
+        dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
+        participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
+        participantesConCoche = new boolean[participantes.length];
+        for (int i = 0; i < participantes.length; i++) {
+            participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
+        }
+
+        Map<Participante, Long> vecesParticipa = horarios.stream().collect(groupingBy(Horario::getParticipante, counting()));
+        int maxVecesParticipa = (int) vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElse(0);
+
+        coefConduccion = new float[participantes.length];
+        for (int i = 0; i < coefConduccion.length; i++) {
+            coefConduccion[i] = (float) maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001f; // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+        }
         solucionFinal = null;
 
         // Vamos a trabajar día a día
@@ -220,8 +218,10 @@ public class ResolutorGA implements Resolutor {
         if (ESTADISTICAS) {
             tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
             totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
-            System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
-                    + totalPosiblesSoluciones);
+            if (DEBUG) {
+                System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
+                        + totalPosiblesSoluciones);
+            }
         }
     }
 
@@ -242,20 +242,24 @@ public class ResolutorGA implements Resolutor {
     }
 
     @Override
-    public Map<Dia, ? extends AsignacionDia> resolver() {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
+        this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        long ti = System.currentTimeMillis(); // Tiempo inicial
-        inicializa();
-
-        if (ESTADISTICAS && DEBUG) {
-            System.out.format("Tiempo inicializar =%,.2f s\n", (System.currentTimeMillis() - ti) / 1000.0);
+        if (ESTADISTICAS) {
+            estGlobal.iniciaTiempo();
         }
 
+        inicializa();
+
         if (ESTADISTICAS) {
-            estGlobal = new EstadisticasGA(numGeneraciones);
+            estGlobal.setNumGeneraciones(numGeneraciones);
+            estGlobal.actualizaProgreso();
+            if (DEBUG) {
+                System.out.format("Tiempo inicializar =%,.2f s\n", estGlobal.getTiempo());
+            }
         }
 
         List<Individuo> poblacion = Stream.generate(Individuo::new).limit(tamPoblacion).collect(toList());
@@ -267,7 +271,8 @@ public class ResolutorGA implements Resolutor {
         }
         int nGen = 0, estancado = 0;
         //TODO: AHORA VA EL ESQUEMA DEL GA
-        while (System.currentTimeMillis() - ti < tiempoMaximo && nGen++ < numGeneraciones && mejor.getAptitud() > objAptitud) {
+        long ti = System.currentTimeMillis();
+        while (System.currentTimeMillis() - ti < tiempoMaximo && nGen++ < numGeneraciones && mejor.getAptitud() > objAptitud && continuar) {
             // Paso 1 y 2: Seleccionar padres, combinar y después mutar...
             List<Individuo> elite = null;
             if (tamElite > 1) {
@@ -298,38 +303,46 @@ public class ResolutorGA implements Resolutor {
             if (tamExtranjero > 0) {
                 poblacion.addAll(Stream.generate(Individuo::new).limit(tamExtranjero).collect(toList()));
             }
-            // Paso 3: Elegir al mejor y TODO: actualizar estadisticas
+            // Paso 3: Elegir al mejor y actualizar estadisticas
             Individuo nuevoMejor = poblacion.stream().min(Individuo::compareTo).orElseGet(Individuo::new);
 
             if (nuevoMejor.compareTo(mejor) < 0) {
                 mejor = nuevoMejor;
+                if (ESTADISTICAS) {
+                    estGlobal.setFitness(mejor.getAptitud()).actualizaProgreso();
+                }
                 estancado = 0;
             } else if (++estancado >= maxEstancado) {
-                System.out.format("******Estamos estancados durante %,d generaciones, vamos a regenerar la población conservando solo el mejor****\n", estancado);
+                if (DEBUG) {
+                    System.out.format("******Estamos estancados durante %,d generaciones, vamos a regenerar la población conservando solo el mejor****\n", estancado);
+                }
                 poblacion = Stream.generate(Individuo::new).limit(tamPoblacion - 1).collect(toList());
                 poblacion.add(mejor);
                 maxEstancado += estancado; // Subimos el umbral para no regenerar en exceso
                 estancado = 0;
             }
 
-            if (DEBUG && nGen % IMP_CADA_CUANTAS_GEN == 0) {
-                System.out.format("Generación %d -> mejor=%s\n", nGen, mejor);
-                if (ESTADISTICAS) {
+            if (ESTADISTICAS && nGen % IMP_CADA_CUANTAS_GEN == 0) {
+                estGlobal.actualizaProgreso();
+                if (DEBUG) {
+                    System.out.format("Generación %d -> mejor=%s\n", nGen, mejor);
                     System.out.println(" - Est. población: " + poblacion.stream().mapToInt(ind -> ind.getAptitud()).summaryStatistics());
-                    System.out.println(" - Est. algoritmo:" + estGlobal.setFitness(mejor.getAptitud()).updateTime());
+                    System.out.println(" - Est. algoritmo:" + estGlobal);
                 }
             }
         }
 
         //Estadisticas finales
-        if (ESTADISTICAS && DEBUG) {
-            estGlobal.setFitness(mejor.getAptitud()).updateTime();
-            System.out.println("====================");
-            System.out.println("Estadísticas finales");
-            System.out.println("====================");
-            System.out.println(estGlobal);
-            System.out.println("Solución final=" + mejor);
-            System.out.println("-----------------------------------------------");
+        if (ESTADISTICAS) {
+            estGlobal.setFitness(mejor.getAptitud()).actualizaProgreso();
+            if (DEBUG) {
+                System.out.println("====================");
+                System.out.println("Estadísticas finales");
+                System.out.println("====================");
+                System.out.println(estGlobal);
+                System.out.println("Solución final=" + mejor);
+                System.out.println("-----------------------------------------------");
+            }
         }
         solucionFinal = mejor.getGenes();
         return solucionFinal;
@@ -341,8 +354,8 @@ public class ResolutorGA implements Resolutor {
     }
 
     @Override
-    public Optional<Estadisticas> getEstadisticas() {
-        return Optional.ofNullable(estGlobal);
+    public Estadisticas getEstadisticas() {
+        return estGlobal;
     }
 
     final private class Individuo implements Comparable<Individuo> {

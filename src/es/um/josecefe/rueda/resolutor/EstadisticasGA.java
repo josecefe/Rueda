@@ -23,38 +23,22 @@ import java.util.concurrent.atomic.DoubleAdder;
  *
  * @author josec
  */
-public final class EstadisticasGA implements Estadisticas {
+public final class EstadisticasGA extends Estadisticas {
     private final AtomicLong generaciones = new AtomicLong();
-    private final long ti = System.currentTimeMillis();
     private final DoubleAdder generados = new DoubleAdder();
-    private double tiempo = 0;
-    private final int numGeneraciones;
-    private int fitness;
+    private int numGeneraciones;
 
-    public EstadisticasGA(int numGeneraciones) {
+    public EstadisticasGA() {
+        
+    }
+
+    void setNumGeneraciones(int numGeneraciones) {
         this.numGeneraciones = numGeneraciones;
     }
 
     @Override
-    public EstadisticasGA updateTime() {
-        tiempo = (System.currentTimeMillis() - ti) / 1000.0;
-        return this;
-    }
-    
-    @Override
-    public EstadisticasGA setFitness(int aptitud) {
-        fitness = aptitud;
-        return this;
-    }
-
-    @Override
-    public int getFitness() {
-        return fitness;
-    }
-
-    @Override
     public String toString() {
-        final double porcentajeCompletado = (double) generaciones.get()* 100.0 / numGeneraciones ;
+        final double porcentajeCompletado = getCompletado() * 100.0; ;
         return String.format("t=%,.2f s, Fitness=%,d, Generación nº %,d (%,.0f gen/s), Individuos Generados=%,.0f (%,.0f g/s), Completado=%.3f%% (est. fin=%g s = %,.3f horas = %,.3f dias = %,.3f años)",
                 tiempo, fitness, generaciones.get(), generaciones.get() / tiempo, generados.sum(), generados.sum() / tiempo, 
                 porcentajeCompletado, (tiempo / porcentajeCompletado) * 100.0, (tiempo / porcentajeCompletado) / 36.0, (tiempo / porcentajeCompletado) / 864.0, (tiempo / porcentajeCompletado) / 315360.0);
@@ -64,11 +48,21 @@ public final class EstadisticasGA implements Estadisticas {
         return generaciones.incrementAndGet();
     }
 
-    void addGenerados(double nGenerados) {
+    EstadisticasGA addGenerados(double nGenerados) {
         generados.add(nGenerados);
+        return this;
     }
 
-    void setGeneracion(long generation) {
+    EstadisticasGA setGeneracion(long generation) {
         generaciones.set(generation);
+        return this;
+    }
+    
+    /**
+     * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
+     * @return Valor entre 0 y 1 indicando el tanto por uno explorado
+     */
+    public double getCompletado() {
+        return (double) generaciones.get() / numGeneraciones;
     }
 }

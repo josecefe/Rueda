@@ -23,21 +23,20 @@ import java.util.concurrent.atomic.DoubleAdder;
  *
  * @author josec
  */
-public final class EstadisticasV8 implements Estadisticas {
-    
+public final class EstadisticasV8 extends Estadisticas {
     AtomicLong expandidos = new AtomicLong();
-    long ti = System.currentTimeMillis();
     DoubleAdder descartados = new DoubleAdder();
     DoubleAdder terminales = new DoubleAdder();
     DoubleAdder generados = new DoubleAdder();
-    double tiempo = 0;
-    double nSoluciones;
-    private int fitness;
+    double totalPosiblesSoluciones;
 
-    public EstadisticasV8(double nSolucionesTotal) {
-        this.nSoluciones = nSolucionesTotal;
+    public EstadisticasV8(){
     }
 
+    void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
+        this.totalPosiblesSoluciones = totalPosiblesSoluciones;
+    }
+    
     EstadisticasV8 acumular(EstadisticasV8 otro) {
         expandidos.getAndAdd(otro.expandidos.get());
         generados.add(otro.generados.sum());
@@ -45,28 +44,7 @@ public final class EstadisticasV8 implements Estadisticas {
         terminales.add(otro.terminales.sum());
         return this;
     }
-
-    @Override
-    public EstadisticasV8 updateTime() {
-        tiempo = (System.currentTimeMillis() - ti) / 1000.0;
-        return this;
-    }
     
-    @Override
-    public EstadisticasV8 setFitness(int mejor) {
-        fitness = mejor;
-        return this;
-    }
-
-    @Override
-    public int getFitness() {
-        return fitness;
-    }
-
-    public double getTiempo() {
-        return tiempo;
-    }
-
     @Override
     public String toString() {
         double lPorcentajeArbol = getCompletado() * 100.0;
@@ -96,7 +74,6 @@ public final class EstadisticasV8 implements Estadisticas {
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
     public double getCompletado() {
-        return (descartados.sum() + terminales.sum()) / nSoluciones;
+        return (descartados.sum() + terminales.sum()) / totalPosiblesSoluciones;
     }
-    
 }

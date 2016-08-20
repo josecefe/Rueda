@@ -9,17 +9,18 @@ package es.um.josecefe.rueda.resolutor;
  *
  * @author josec
  */
-public final class EstadisticasV1 implements Estadisticas {
-
-    long ti = System.currentTimeMillis(); // Para el tiempo
+public final class EstadisticasV1 extends Estadisticas {
     long expandidos = 0;
-    double descartados = 0, terminales = 0, generados = 0, tiempo = 0, totalPosiblesSoluciones;
-    private int fitness;
+    double descartados = 0, terminales = 0, generados = 0, totalPosiblesSoluciones;
 
-    public EstadisticasV1(double totalPosiblesSoluciones) {
+    public EstadisticasV1() {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }
 
+    void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
+        this.totalPosiblesSoluciones = totalPosiblesSoluciones;
+    }
+    
     EstadisticasV1 acumular(EstadisticasV1 otro) {
         expandidos += otro.expandidos;
         generados += otro.generados;
@@ -27,31 +28,10 @@ public final class EstadisticasV1 implements Estadisticas {
         terminales += otro.terminales;
         return this;
     }
-
-    @Override
-    public EstadisticasV1 updateTime() {
-        tiempo = (System.currentTimeMillis() - ti) / 1000.0;
-        return this;
-    }
-    
-    @Override
-    public EstadisticasV1 setFitness(int mejor) {
-        fitness = mejor;
-        return this;
-    }
-
-    @Override
-    public int getFitness() {
-        return fitness;
-    }
-
-    public double getTiempo() {
-        return tiempo;
-    }
     
     @Override
     public String toString() {
-        final double porcentajeArbol = (descartados + terminales) / totalPosiblesSoluciones * 100.0;
+        final double porcentajeArbol = getCompletado() * 100.0;
         return String.format("t=%,.2f s, C=%,d NE=%,d (%,.0f ne/s), NG=%,.0f (%,.0f ng/s), SG=%,.0f, NP=%g, Completado=%.3f%% (est. fin=%g s = %,.3f horas = %,.3f dias = %,.3f años)",
                 tiempo, fitness, expandidos, expandidos / tiempo, generados, generados / tiempo,
                 terminales, descartados, porcentajeArbol, (tiempo / porcentajeArbol) * 100.0,
@@ -72,5 +52,13 @@ public final class EstadisticasV1 implements Estadisticas {
 
     void addDescartados(double nDescartados) {
         descartados += nDescartados;
+    }
+
+    /**
+     * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
+     * @return Valor entre 0 y 1 indicando el tanto por uno explorado
+     */
+    public double getCompletado() {
+        return (descartados + terminales) / totalPosiblesSoluciones;
     }
 }

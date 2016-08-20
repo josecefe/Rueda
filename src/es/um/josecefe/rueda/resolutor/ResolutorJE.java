@@ -9,7 +9,6 @@ import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
 import es.um.josecefe.rueda.modelo.Horario;
-import static java.lang.String.format;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +18,6 @@ import java.util.IntSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,10 +28,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.OptimizationData;
@@ -60,11 +54,16 @@ import org.jenetics.engine.Engine;
 import org.jenetics.engine.EvolutionResult;
 import org.jenetics.engine.EvolutionStatistics;
 import org.jenetics.engine.limit;
-import static org.jenetics.internal.math.random.indexes;
 import org.jenetics.internal.util.Equality;
 import org.jenetics.internal.util.Hash;
 import org.jenetics.internal.util.IntRef;
 import org.jenetics.util.RandomRegistry;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
+import static org.jenetics.internal.math.random.indexes;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -73,7 +72,7 @@ import org.jenetics.util.RandomRegistry;
  * @author josec
  *
  */
-public class ResolutorJE implements Resolutor {
+public class ResolutorJE extends Resolutor {
 
     // Depuración y estadisticas
     private final static boolean DEBUG = true;
@@ -82,16 +81,15 @@ public class ResolutorJE implements Resolutor {
     // Algoritmo genetico
     private final static int TAM_POBLACION_DEF = 100;
     private final static double PROB_MUTACION_DEF = 0.6;
-    private final static double PROB_MEJORA_DEF = 0.01;
-    private final static int TAM_TORNEO_DEF = 4;
+    private final static double PROB_MEJORA_DEF = 0.02;
+    private final static int TAM_TORNEO_DEF = 3;
     private final static int N_GENERACIONES_DEF = 200;
     private final static int TIEMPO_MAXIMO_DEF = 500;
-    private final static int OBJ_APTITUD_DEF = 0;
-    private final static int TAM_ELITE_DEF = 4;
+    private final static int TAM_ELITE_DEF = 3;
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 2;
 
     // Optimizador por busqueda local
-    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 300; //Multiplicar por nº de dias, originalmente 300
+    final private static int MAX_ITER_LOCAL_SEARCH_DEF = 200; //Multiplicar por nº de dias, originalmente 300
     final private static double STOP_FITNESS_DEF = 0;
     final private static boolean ACTIVE_CMA_DEF = true;
     final private static int DIAGONAL_ONLY_DEF = 0;
@@ -99,48 +97,47 @@ public class ResolutorJE implements Resolutor {
     private final static boolean ESTADISTICAS_OPT_LOCAL_DEF = false;
 
     // Variables del algoritmo
-    private final Set<Horario> horarios;
-    private final Dia[] dias;
-    private final Participante[] participantes;
-    private final float[] coefConduccion;
+    private Set<Horario> horarios;
+    private Dia[] dias;
+    private Participante[] participantes;
+    private float[] coefConduccion;
     private Map<Dia, List<AsignacionDiaV5>> solCandidatasDiarias;
     private Map<Dia, AsignacionDia> solucionFinal;
     private int[] tamanosNivel;
     private double totalPosiblesSoluciones;
-    private final boolean[] participantesConCoche;
+    private boolean[] participantesConCoche;
     private int tamPoblacion;
     private double probMutacion;
     private double probMejora;
     private int numGeneraciones;
     private long tiempoMaximo;
-    private int objAptitud;
-    private EstadisticasGA estGlobal;
+    private EstadisticasGA estGlobal = new EstadisticasGA();
     private int tamTorneo;
     private int tamElite;
     private int maxEstancado;
     private AsignacionDiaV5[][] solCanDiaMatrix;
 
-    public ResolutorJE(Set<Horario> horarios) {
-        this(horarios, TAM_POBLACION_DEF, PROB_MUTACION_DEF, PROB_MEJORA_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, OBJ_APTITUD_DEF, TAM_TORNEO_DEF, TAM_ELITE_DEF, MAX_ESTANCADO_DEF);
+    public ResolutorJE() {
+        this(TAM_POBLACION_DEF, PROB_MUTACION_DEF, PROB_MEJORA_DEF, N_GENERACIONES_DEF, TIEMPO_MAXIMO_DEF, 
+                TAM_TORNEO_DEF, TAM_ELITE_DEF, MAX_ESTANCADO_DEF);
     }
 
-    public ResolutorJE(Set<Horario> horarios, int tamPoblacion, double probMutacion, double probMejora, int nGeneraciones, long maxTime, int objAptitud, int tamTorneo, int tamElite, int maxEstancado) {
-        this.horarios = horarios;
-
-        dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
-        participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
-        
-        
-        this.tamPoblacion = tamPoblacion * dias.length;
+    public ResolutorJE(int tamPoblacion, double probMutacion, double probMejora, int nGeneraciones, long maxTime, int tamTorneo, int tamElite, int maxEstancado) {
+        this.tamPoblacion = tamPoblacion;
         this.probMutacion = probMutacion;
         this.probMejora = probMejora;
-        this.numGeneraciones = nGeneraciones * dias.length;
-        this.tiempoMaximo = maxTime * dias.length;
-        this.objAptitud = objAptitud;
+        this.numGeneraciones = nGeneraciones;
+        this.tiempoMaximo = maxTime;
         this.tamTorneo = tamTorneo;
-        this.tamElite = tamElite * dias.length;
-        this.maxEstancado = maxEstancado * dias.length;
-        
+        this.tamElite = tamElite;
+        this.maxEstancado = maxEstancado;
+
+    }
+
+    private void inicializa() {
+        continuar = true;
+        dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
+        participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
         participantesConCoche = new boolean[participantes.length];
         for (int i = 0; i < participantes.length; i++) {
             participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
@@ -153,9 +150,7 @@ public class ResolutorJE implements Resolutor {
         for (int i = 0; i < coefConduccion.length; i++) {
             coefConduccion[i] = (float) maxVecesParticipa / vecesParticipa.get(participantes[i]) - 0.001f; // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
         }
-    }
 
-    private void inicializa() {
         solucionFinal = null;
 
         // Vamos a trabajar día a día
@@ -254,8 +249,10 @@ public class ResolutorJE implements Resolutor {
         if (ESTADISTICAS) {
             tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
             totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
-            System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
-                    + totalPosiblesSoluciones);
+            if (DEBUG) {
+                System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
+                        + totalPosiblesSoluciones);
+            }
         }
     }
 
@@ -276,20 +273,24 @@ public class ResolutorJE implements Resolutor {
     }
 
     @Override
-    public Map<Dia, ? extends AsignacionDia> resolver() {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
+        this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        long ti = System.currentTimeMillis(); // Tiempo inicial
-        inicializa();
-
-        if (ESTADISTICAS && DEBUG) {
-            System.out.format("Tiempo inicializar =%,.2f s\n", (System.currentTimeMillis() - ti) / 1000.0);
+        if (ESTADISTICAS) {
+            estGlobal.iniciaTiempo();
         }
 
+        inicializa();
+
         if (ESTADISTICAS) {
-            estGlobal = new EstadisticasGA(numGeneraciones);
+            estGlobal.setNumGeneraciones(numGeneraciones * dias.length);
+            estGlobal.actualizaProgreso();
+            if (DEBUG) {
+                System.out.format("Tiempo inicializar =%,.2f s\n", estGlobal.getTiempo());
+            }
         }
 
         //Podemos intentar obtener una mejora de los individuos mediante la busqueda directa con optimizador directo
@@ -323,11 +324,11 @@ public class ResolutorJE implements Resolutor {
                 .offspringFraction(1.0 - (double) tamElite / tamPoblacion)
                 .alterers(
                         new Mutator<>(probMutacion),
-                        new GaussianMutator<>(probMutacion/5),
-                        new MeanAlterer<>(probMutacion/10),
-                        new MejoraPorBusqueda((double[] genes) -> optimizadorLocal.optimize(new InitialGuess(genes), objective, GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations).getPoint(), probMejora)
+                        new GaussianMutator<>(probMutacion / 5),
+                        new MeanAlterer<>(probMutacion / 10)
+                        //new MejoraPorBusqueda((double[] genes) -> optimizadorLocal.optimize(new InitialGuess(genes), objective, GoalType.MINIMIZE, bounds, sigma, popSize, maxEvaluations).getPoint(), probMejora)
                 )
-                .populationSize(tamPoblacion)
+                .populationSize(tamPoblacion * dias.length)
                 //.selector(new MonteCarloSelector<>())
                 //.selector(new RouletteWheelSelector<>())
                 .optimize(Optimize.MINIMUM)
@@ -337,28 +338,33 @@ public class ResolutorJE implements Resolutor {
                 .build();
 
         final Phenotype<IntegerGene, Integer> pt = engine.stream()
-                .limit(limit.bySteadyFitness(maxEstancado))
-                .limit(limit.byExecutionTime(Duration.ofSeconds(tiempoMaximo)))
-                .limit(numGeneraciones)
+                .limit(e -> continuar) // Mientras haya que continuar
+                .limit(limit.bySteadyFitness(maxEstancado * dias.length))
+                .limit(limit.byExecutionTime(Duration.ofSeconds(tiempoMaximo * dias.length)))
+                .limit(numGeneraciones * dias.length)
                 .peek(statistics)
                 .collect(EvolutionResult.toBestPhenotype());
 
         final int[] mejor = codec.decoder().apply(pt.getGenotype());
         solucionFinal = getSolucion(mejor);
-        System.out.println(statistics);
-        System.out.format("Resultado fitness=%d, genes=%s\n", pt.getFitness(), solucionFinal);
+        if (DEBUG) {
+            System.out.println(statistics);
+            System.out.format("Resultado fitness=%d, genes=%s\n", pt.getFitness(), solucionFinal);
+        }
 
         //Estadisticas finales
-        if (ESTADISTICAS && DEBUG) {
+        if (ESTADISTICAS) {
             estGlobal.setGeneracion(pt.getGeneration());
             estGlobal.addGenerados((engine.getOffspringCount() + engine.getSurvivorsCount()) * pt.getGeneration());
-            estGlobal.setFitness((int) pt.getFitness()).updateTime();
-            System.out.println("====================");
-            System.out.println("Estadísticas finales");
-            System.out.println("====================");
-            System.out.println(estGlobal);
-            System.out.println("Solución final=" + solucionFinal);
-            System.out.println("-----------------------------------------------");
+            estGlobal.setFitness((int) pt.getFitness()).actualizaProgreso();
+            if (DEBUG) {
+                System.out.println("====================");
+                System.out.println("Estadísticas finales");
+                System.out.println("====================");
+                System.out.println(estGlobal);
+                System.out.println("Solución final=" + solucionFinal);
+                System.out.println("-----------------------------------------------");
+            }
         }
 
         return solucionFinal;
@@ -370,8 +376,8 @@ public class ResolutorJE implements Resolutor {
     }
 
     @Override
-    public Optional<Estadisticas> getEstadisticas() {
-        return Optional.ofNullable(estGlobal);
+    public Estadisticas getEstadisticas() {
+        return estGlobal;
     }
 
     int calculaAptitud(int[] genes) {
@@ -397,10 +403,6 @@ public class ResolutorJE implements Resolutor {
     AsignacionDiaV5 getAsignacionDia(int dia, int valGen) {
         return solCanDiaMatrix[dia][valGen];
     }
-//
-//    AsignacionDiaV5 getAsignacionDia(int dia, double[] genes) {
-//        return solCanDiaMatrix[dia][(int)genes[dia]];
-//    }
 
     Map<Dia, AsignacionDia> getSolucion(int[] genes) {
         Map<Dia, AsignacionDia> sol = new HashMap<>(genes.length);
