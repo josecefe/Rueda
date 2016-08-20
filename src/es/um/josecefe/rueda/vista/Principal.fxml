@@ -84,8 +84,8 @@
                            <tooltip>
                               <Tooltip text="Amplia el horario duplicando los días y las entradas, para tratar de hacer una optimización cubriendo un periodo de tiempo mayor. Esta opción es útil si en un periodo de tiempo corto no se consigue una optimización aceptable. Incrementa de forma exponencial el tiempo requerido para hacer la optimización" textAlignment="JUSTIFY" wrapText="true" />
                            </tooltip></Button>
-                        <Separator prefWidth="100.0" />
-                        <Button mnemonicParsing="false" text="Acerca de..." />
+                        <Separator prefWidth="100.0" visible="false" />
+                        <Button mnemonicParsing="false" onAction="#handleAbout" text="Acerca de..." />
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

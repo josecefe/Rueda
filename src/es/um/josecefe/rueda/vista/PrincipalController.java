@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 josec
+ * Copyright (C) 2016 José Ceferino Ortega
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -553,8 +553,9 @@ public class PrincipalController {
         try {
             BackgroundImage fondo = new BackgroundImage(
                     new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.png")), BackgroundRepeat.NO_REPEAT,
-                    BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(100, 100, true, true, true, false));
-            //BackgroundFill bf = new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY);
+                    BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT
+                    //new BackgroundSize(100, 100, true, true, true, false)
+            );
             acercadeRoot.setBackground(new Background(fondo));
         } catch (Throwable th) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, th);
@@ -621,25 +622,6 @@ public class PrincipalController {
             Media audioMedia = new Media(mainApp.getClass().getResource("res/musica_acercade.mp3").toURI().toString());
 
             final int audioSpectrumNumBands = 2;
-//            final double anchoAS = acercadeRoot.getWidth() / (audioSpectrumNumBands * 4);
-//            final int altoAS = (int) (acercadeRoot.getHeight() - (textoSolidosBounds.getHeight() + textoAutorBounds.getHeight() + 160));
-//            final double yAS = textoSolidosBounds.getHeight() + 40;
-//            final String rellenoMusica = "linear-gradient(from 0px " + yAS + "px to 0px " + (yAS + altoAS) + "px, purple 0%, red  30% , orange 60%, yellow 75%,  green 90%, cyan 100%)";
-//            final Paint relleno = Paint.valueOf(rellenoMusica);
-//            final Rectangle rectAudioSpectrum[] = new Rectangle[audioSpectrumNumBands];
-//            for (int i = 0; i < audioSpectrumNumBands; i++) {
-//                Rectangle r = new Rectangle();
-//                r.setX(anchoAS * audioSpectrumNumBands + anchoAS * i * 2);
-//                r.setWidth(anchoAS);
-//                r.setY(0);
-//                r.setHeight(0); //Al principio no se veran
-//                r.setArcWidth(10);
-//                r.setArcHeight(10);
-//                r.setFill(relleno);
-//                rectAudioSpectrum[i] = r;
-//                acercadeRoot.getChildren().add(r);
-//            }
-//
             MediaPlayer audioMediaPlayer = new MediaPlayer(audioMedia);
             audioMediaPlayer.setVolume(0); //Al principio no se oirá
             //audioMediaPlayer.setAudioSpectrumInterval(0.02);
@@ -654,12 +636,6 @@ public class PrincipalController {
             fadeMusica.setOnFinished(of -> {
                 audioMediaPlayer.setAudioSpectrumListener(
                         (double timestamp, double duration, float[] magnitudes, float[] phases) -> {
-//                            for (int i = 0; i < audioSpectrumNumBands; i++) {
-//                                final double newHeight = ((60 + magnitudes[i]) / 30.0) * altoAS;
-//                                final double newY = yAS + altoAS - newHeight;
-//                                rectAudioSpectrum[i].setY(newY);
-//                                rectAudioSpectrum[i].setHeight(newHeight);
-//                            }
                             if (!cerrandoAcercade) {
                                 textoSolidos.setTranslateY(textoSolidosBounds.getHeight() + (60 + magnitudes[0]));
                                 textoAutor.setTranslateY((acercadeRoot.getHeight() - (60 + magnitudes[1])));
@@ -711,7 +687,9 @@ public class PrincipalController {
             datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
+            mCalcular.setDisable(false);
             bCancelarCalculo.setDisable(true);
+            mCancelarCalculo.setDisable(true);
         });
         barraEstado.textProperty().bind(resolutorService.messageProperty());
         indicadorProgreso.setProgress(0);
@@ -720,8 +698,10 @@ public class PrincipalController {
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
         bCancelarCalculo.setDisable(false);
+        mCancelarCalculo.setDisable(false);
         
         bCalcular.setDisable(true);
+        mCalcular.setDisable(true);
     }
 
     @FXML
