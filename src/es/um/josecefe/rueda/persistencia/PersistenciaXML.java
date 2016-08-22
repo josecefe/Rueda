@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.util.stream.Collectors.toList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
@@ -72,12 +73,17 @@ public class PersistenciaXML {
         try (XMLDecoder decoder = new XMLDecoder(
                 new BufferedInputStream(
                         new FileInputStream(xmlfile)))) {
-            decoder.setExceptionListener(e -> e.printStackTrace());
-            datosRueda.setDias((List<Dia>) decoder.readObject());
-            datosRueda.setLugares((List<Lugar>) decoder.readObject());
-            datosRueda.setParticipantes((List<Participante>) decoder.readObject());
-            datosRueda.setHorarios((List<Horario>) decoder.readObject());
-            datosRueda.setAsignacion((List<Asignacion>) decoder.readObject());
+            decoder.setExceptionListener(e -> Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, e));
+            List<?> ld = (List<?>) decoder.readObject();
+            datosRueda.setDias(ld.stream().map(e -> (Dia) e).collect(toList()));
+            List<?> ll = (List<?>) decoder.readObject();
+            datosRueda.setLugares(ll.stream().map(e -> (Lugar) e).collect(toList()));
+            List<?> lp = (List<?>) decoder.readObject();
+            datosRueda.setParticipantes(lp.stream().map(e -> (Participante) e).collect(toList()));
+            List<?> lh = (List<?>) decoder.readObject();
+            datosRueda.setHorarios(lh.stream().map(e -> (Horario) e).collect(toList()));
+            List<?> la = (List<?>) decoder.readObject();
+            datosRueda.setAsignacion(la.stream().map(e -> (Asignacion) e).collect(toList()));
             datosRueda.setCosteAsignacion((Integer) decoder.readObject());
         } catch (Exception ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
