@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 josec
+ * Copyright (C) 2016 josecefe
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,6 +167,27 @@ public class RuedaFX extends Application {
             alert.setContentText(e.toString());
             alert.showAndWait();
         }
+    }
+    
+    /**
+     * Saves the current horario data to the specified file.
+     *
+     * @param file
+     * @return indica si se completo con exito la operación
+     */
+    public boolean exportaAsignacion(File file) {
+        try {
+            PersistenciaXML.exportaAsignacion(file, datosRueda);
+            return true;
+            //Duda: ¿Guardar dónde se hizo la última exportación o no?
+        } catch (Exception e) { // catches ANY exception
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No se ha podido exportar la asignación al fichero:\n" + file.getPath());
+            alert.setContentText(e.toString());
+            alert.showAndWait();
+        }
+        return false;
     }
 
     /**

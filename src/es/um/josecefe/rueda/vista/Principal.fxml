@@ -38,6 +38,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Guardar" />
                         <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar como..." />
                         <MenuItem mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario" />
+                  <MenuItem fx:id="mExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Salir" />
                     </items>
@@ -80,7 +81,7 @@
                            <tooltip>
                               <Tooltip text="Guarda los datos en un fichero nuevo" />
                            </tooltip></Button>
-                                <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario">
+                                <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender...">
                            <tooltip>
                               <Tooltip text="Amplia el horario duplicando los días y las entradas, para tratar de hacer una optimización cubriendo un periodo de tiempo mayor. Esta opción es útil si en un periodo de tiempo corto no se consigue una optimización aceptable. Incrementa de forma exponencial el tiempo requerido para hacer la optimización" textAlignment="JUSTIFY" wrapText="true" />
                            </tooltip></Button>
@@ -329,6 +330,11 @@
                                         <Tooltip text="Pulse este botón para detener el cálculo y conservar la mejor solución encontrada hasta el momento" />
                                     </tooltip>
                                 </Button>
+                        <Button fx:id="bExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar...">
+                           <tooltip>
+                              <Tooltip text="Exporta el resultado de la optimización a un fichero HTML" />
+                           </tooltip>
+                        </Button>
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

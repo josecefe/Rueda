@@ -2,7 +2,6 @@ package es.um.josecefe.rueda.modelo;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Representa un lugar
@@ -14,9 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author josec
  *
  */
-@XmlRootElement(name = "lugar")
-public class Lugar {
-
+public class Lugar implements Comparable<Lugar> {
     private final SimpleIntegerProperty id;
     private final SimpleStringProperty nombre;
     private Double latitud;
@@ -172,6 +169,11 @@ public class Lugar {
     @Override
     public String toString() {
         return nombre.get();
+    }
+
+    @Override
+    public int compareTo(Lugar l) {
+        return Integer.compare(getId(), l.getId());
     }
 
 }

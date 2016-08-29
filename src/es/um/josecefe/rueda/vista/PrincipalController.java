@@ -117,6 +117,7 @@ import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import org.apache.commons.lang3.SystemUtils;
 
 /**
  * FXML Controller class
@@ -127,6 +128,8 @@ public class PrincipalController {
 
     private RuedaFX mainApp;
 
+    DatosRueda datosRueda;
+
     @FXML
     private MenuItem mCalcular;
 
@@ -134,7 +137,8 @@ public class PrincipalController {
     private MenuItem mCancelarCalculo;
     
     @FXML
-    DatosRueda datosRueda;
+    private MenuItem mExportar;
+    
 
     @FXML
     TableView<Horario> tablaHorario;
@@ -204,6 +208,9 @@ public class PrincipalController {
 
     @FXML
     Button bCancelarCalculo;
+    
+    @FXML
+    Button bExportar;
 
     @FXML
     ComboBox<Dia> cbDia;
@@ -454,6 +461,8 @@ public class PrincipalController {
         // Etiqueta de coste
         lCoste.textProperty().bind(datosRueda.costeAsignacionProperty().asString("%,d"));
         lCoste.visibleProperty().bind(datosRueda.costeAsignacionProperty().greaterThan(0));
+        mExportar.disableProperty().bind(datosRueda.costeAsignacionProperty().isEqualTo(0));
+        bExportar.disableProperty().bind(datosRueda.costeAsignacionProperty().isEqualTo(0));
     }
 
     /**
@@ -536,6 +545,41 @@ public class PrincipalController {
         }
     }
 
+    @FXML
+    void handleExportar() {
+        FileChooser fileChooser = new FileChooser();
+
+        // Set extension filter
+        if (mainApp.getLastFilePath() != null) {
+            fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
+        }
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Archivos HTML (*.html)", "*.html");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Show save file dialog
+        fileChooser.setTitle("Exportar resultado de la asignación");
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            // Make sure it has the correct extension
+            if (!file.getPath().endsWith(".html")) {
+                file = new File(file.getPath() + ".html");
+            }
+            if (mainApp.exportaAsignacion(file)) {
+                barraEstado.setText("Exportación completada con éxito");
+                String comando = (SystemUtils.IS_OS_WINDOWS ? "explorer" : "xdg-open") + " \""+file.getPath()+"\"";
+                try {
+                    Runtime.getRuntime().exec(comando);
+                } catch(Exception e) {
+                    System.err.println("Fallo al intentar ejecutar el comando "+comando);
+                    e.printStackTrace(System.err);
+                }
+            }
+            else
+                barraEstado.setText("Exportación cancelada");
+        }
+    }
     /**
      * Opens an about dialog.
      */
@@ -904,7 +948,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), null, Collections.EMPTY_LIST));
+        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), null, Collections.emptyList()));
         tfNombreParticipante.clear();
     }
 

@@ -9,7 +9,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * SQL: CREATE TABLE "horario" ( "participante" INTEGER NOT NULL REFERENCES
@@ -20,7 +19,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author josec
  *
  */
-@XmlRootElement(name = "horario")
 public class Horario implements Comparable<Horario> {
 
     private final ObjectProperty<Participante> participanteProperty;
