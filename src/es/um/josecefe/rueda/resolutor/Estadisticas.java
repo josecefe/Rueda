@@ -5,6 +5,7 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
+import java.time.Duration;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -15,7 +16,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 public abstract class Estadisticas {
     protected int fitness;
     protected long ti; // Para el tiempo inicial
-    protected double tiempo;
+    protected Duration tiempo;
     protected final DoubleProperty progreso = new SimpleDoubleProperty(0);
     
     public Estadisticas setFitness(int aptitud) {
@@ -33,12 +34,12 @@ public abstract class Estadisticas {
     }
     
     public Estadisticas actualizaProgreso() {
-        tiempo = (System.currentTimeMillis() - ti) / 1000.0;
+        tiempo = Duration.ofMillis(System.currentTimeMillis() - ti);
         progreso.set(getCompletado());
         return this;
     }
     
-    public double getTiempo() {
+    public Duration getTiempo() {
         return tiempo;
     }
     

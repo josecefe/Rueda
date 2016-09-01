@@ -16,6 +16,7 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 
@@ -48,9 +49,10 @@ public final class EstadisticasV8 extends Estadisticas {
     @Override
     public String toString() {
         double lPorcentajeArbol = getCompletado() * 100.0;
-        return String.format("t=%,.2f s, C=%,d, NE=%,d (%,.0f ne/s), NG=%,.0f (%,.0f ng/s), SG=%,.0f, NP=%g, Completado=%.3f%% (est. fin=%g s = %,.3f horas = %,.3f dias = %,.3f años)", 
-                tiempo, fitness,expandidos.get(), expandidos.get() / tiempo, generados.sum(), generados.sum() / tiempo, terminales.sum(), descartados.sum(), lPorcentajeArbol,
-                (tiempo / lPorcentajeArbol) * 100.0, (tiempo / lPorcentajeArbol) / 36.0, (tiempo / lPorcentajeArbol) / 864.0, (tiempo / lPorcentajeArbol) / 315360.0);
+        return String.format("t=%s, C=%,d, NE=%,d (%,.0f NE/s), NG=%,.0f (%,.0f NG/s), SG=%,.0f, NP=%g, Completado=%.3f%% (ETA=%s)", 
+                tiempo, fitness,expandidos.get(), expandidos.get()*1000.0 / tiempo.toMillis(), generados.sum(), generados.sum() * 1000.0 / tiempo.toMillis(), 
+                terminales.sum(), descartados.sum(), lPorcentajeArbol,
+                Duration.ofMillis((long)((tiempo.toMillis() / lPorcentajeArbol) * 100.0)));
     }
 
     long incExpandidos() {

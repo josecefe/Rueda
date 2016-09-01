@@ -38,7 +38,7 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Guardar" />
                         <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar como..." />
                         <MenuItem mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender horario" />
-                  <MenuItem fx:id="mExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar..." />
+                        <MenuItem fx:id="mExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Salir" />
                     </items>
@@ -66,27 +66,32 @@
                         <ButtonBar BorderPane.alignment="CENTER">
                             <buttons>
                                 <Button mnemonicParsing="false" onAction="#handleNew" text="Nuevo (limpiar)">
-                           <tooltip>
-                              <Tooltip text="Limpia todos los datos" />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Limpia todos los datos" />
+                                    </tooltip>
+                                </Button>
                                 <Button mnemonicParsing="false" onAction="#handleOpen" text="Cargar...">
-                           <tooltip>
-                              <Tooltip text="Carga (abre o lee) un fichero con todos los datos, reemplazando los actuales" textAlignment="JUSTIFY" wrapText="true" />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Carga (abre o lee) un fichero con todos los datos, reemplazando los actuales" textAlignment="JUSTIFY" wrapText="true" />
+                                    </tooltip>
+                                </Button>
                                 <Button mnemonicParsing="false" onAction="#handleSave" text="Guardar">
-                           <tooltip>
-                              <Tooltip text="Guarda todos los datos en el último fichero usado" />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Guarda todos los datos en el último fichero usado" />
+                                    </tooltip>
+                                </Button>
                                 <Button mnemonicParsing="false" onAction="#handleSaveAs" text="Guardar como...">
-                           <tooltip>
-                              <Tooltip text="Guarda los datos en un fichero nuevo" />
-                           </tooltip></Button>
+                                    <tooltip>
+                                        <Tooltip text="Guarda los datos en un fichero nuevo" />
+                                    </tooltip>
+                                </Button>
                                 <Button mnemonicParsing="false" onAction="#handleExtiendeHorario" text="Extender...">
-                           <tooltip>
-                              <Tooltip text="Amplia el horario duplicando los días y las entradas, para tratar de hacer una optimización cubriendo un periodo de tiempo mayor. Esta opción es útil si en un periodo de tiempo corto no se consigue una optimización aceptable. Incrementa de forma exponencial el tiempo requerido para hacer la optimización" textAlignment="JUSTIFY" wrapText="true" />
-                           </tooltip></Button>
-                        <Separator prefWidth="100.0" visible="false" />
-                        <Button mnemonicParsing="false" onAction="#handleAbout" text="Acerca de..." />
+                                    <tooltip>
+                                        <Tooltip text="Amplia el horario duplicando los días y las entradas, para tratar de hacer una optimización cubriendo un periodo de tiempo mayor. Esta opción es útil si en un periodo de tiempo corto no se consigue una optimización aceptable. Incrementa de forma exponencial el tiempo requerido para hacer la optimización" textAlignment="JUSTIFY" wrapText="true" />
+                                    </tooltip>
+                                </Button>
+                                <Separator prefWidth="100.0" visible="false" />
+                                <Button mnemonicParsing="false" onAction="#handleAbout" text="Acerca de..." />
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -169,11 +174,11 @@
                                                         <TableColumn fx:id="columnaDescripcionDia" prefWidth="158.0" text="Nombre o Descripción" />
                                                     </columns>
                                                 </TableView>
-                                    <Button layoutX="228.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleAddDiasSemana" text="Añadir los días de la semana (L-V)" AnchorPane.bottomAnchor="75.0">
-                                       <tooltip>
-                                          <Tooltip text="Rellena la tabla de días con los día de la semana" />
-                                       </tooltip>
-                                    </Button>
+                                                <Button layoutX="228.0" layoutY="165.0" mnemonicParsing="false" onAction="#handleAddDiasSemana" text="Añadir los días de la semana (L-V)" AnchorPane.bottomAnchor="75.0">
+                                                    <tooltip>
+                                                        <Tooltip text="Rellena la tabla de días con los día de la semana" />
+                                                    </tooltip>
+                                                </Button>
                                             </children>
                                         </AnchorPane>
                                     </content>
@@ -217,7 +222,7 @@
                                                         <TableColumn fx:id="columnaIdParticipante" editable="false" prefWidth="33.0" text="Id" />
                                                         <TableColumn fx:id="columnaNombreParticipante" prefWidth="144.0" text="Nombre" />
                                                         <TableColumn fx:id="columnaPlazasCoche" prefWidth="60.0" text="Nº Plazas" />
-                                          <TableColumn fx:id="columnaLugaresParticipante" editable="false" prefWidth="75.0" text="Lugares" />
+                                                        <TableColumn fx:id="columnaLugaresParticipante" editable="false" prefWidth="75.0" text="Lugares" />
                                                     </columns>
                                                     <columnResizePolicy>
                                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -287,39 +292,39 @@
                         </AnchorPane>
                     </top>
                     <center>
-                  <SplitPane dividerPositions="0.6" BorderPane.alignment="CENTER">
-                     <items>
-                              <TableView fx:id="tablaResultado" tableMenuButtonVisible="true">
-                                  <columns>
-                                      <TableColumn fx:id="columnaDiaAsignacion" editable="false" prefWidth="-1.0" text="Dia" />
-                                      <TableColumn fx:id="columnaConductores" editable="false" prefWidth="-1.0" text="Conductores" />
-                                      <TableColumn fx:id="columnaPeIda" editable="false" prefWidth="-1.0" text="Lugares Ida" />
-                                      <TableColumn fx:id="columnaPeVuelta" editable="false" prefWidth="-1.0" text="Lugares Vuelta" />
-                                      <TableColumn fx:id="columnaCoste" editable="false" prefWidth="-1.0" text="Coste" />
-                                  </columns>
-                                  <columnResizePolicy>
-                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                  </columnResizePolicy>
-                              </TableView>
-                        <TableView fx:id="tablaResultadoLugares" tableMenuButtonVisible="true">
-                          <columns>
-                            <TableColumn fx:id="columnaParticipanteLugares" prefWidth="90.0" text="Participante" />
-                            <TableColumn fx:id="columnaLugaresIda" prefWidth="61.0" text="Ida" />
-                              <TableColumn fx:id="columnaLugaresVuelta" prefWidth="57.0" text="Vuelta" />
-                              <TableColumn fx:id="columnaLugaresConductor" prefWidth="123.0" text="Conduce" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
-                     </items>
-                  </SplitPane>
+                        <SplitPane dividerPositions="0.6" BorderPane.alignment="CENTER">
+                            <items>
+                                <TableView fx:id="tablaResultado" tableMenuButtonVisible="true">
+                                    <columns>
+                                        <TableColumn fx:id="columnaDiaAsignacion" editable="false" prefWidth="-1.0" text="Dia" />
+                                        <TableColumn fx:id="columnaConductores" editable="false" prefWidth="-1.0" text="Conductores" />
+                                        <TableColumn fx:id="columnaPeIda" editable="false" prefWidth="-1.0" text="Lugares Ida" />
+                                        <TableColumn fx:id="columnaPeVuelta" editable="false" prefWidth="-1.0" text="Lugares Vuelta" />
+                                        <TableColumn fx:id="columnaCoste" editable="false" prefWidth="-1.0" text="Coste" />
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                </TableView>
+                                <TableView fx:id="tablaResultadoLugares" tableMenuButtonVisible="true">
+                                    <columns>
+                                        <TableColumn fx:id="columnaParticipanteLugares" prefWidth="90.0" text="Participante" />
+                                        <TableColumn fx:id="columnaLugaresIda" prefWidth="61.0" text="Ida" />
+                                        <TableColumn fx:id="columnaLugaresVuelta" prefWidth="57.0" text="Vuelta" />
+                                        <TableColumn fx:id="columnaLugaresConductor" prefWidth="123.0" text="Conduce" />
+                                    </columns>
+                                    <columnResizePolicy>
+                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                    </columnResizePolicy>
+                                </TableView>
+                            </items>
+                        </SplitPane>
                     </center>
                     <bottom>
                         <ButtonBar minHeight="-Infinity" minWidth="-Infinity" BorderPane.alignment="CENTER">
                             <buttons>
-                        <Label alignment="CENTER_RIGHT" text="Algoritmo:" />
-                        <ChoiceBox fx:id="cbAlgoritmo" />
+                                <Label alignment="CENTER_RIGHT" text="Algoritmo:" />
+                                <ChoiceBox fx:id="cbAlgoritmo" />
                                 <Button fx:id="bCalcular" mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación">
                                     <tooltip>
                                         <Tooltip text="Una vez introducidos todos los datos y configurados los horarios, use este botón para que la apliación realice la optimización y obtenga una asignación de conductores" textAlignment="JUSTIFY" wrapText="true" />
@@ -330,11 +335,11 @@
                                         <Tooltip text="Pulse este botón para detener el cálculo y conservar la mejor solución encontrada hasta el momento" />
                                     </tooltip>
                                 </Button>
-                        <Button fx:id="bExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar...">
-                           <tooltip>
-                              <Tooltip text="Exporta el resultado de la optimización a un fichero HTML" />
-                           </tooltip>
-                        </Button>
+                                <Button fx:id="bExportar" mnemonicParsing="false" onAction="#handleExportar" text="Exportar...">
+                                    <tooltip>
+                                        <Tooltip text="Exporta el resultado de la optimización a un fichero HTML" />
+                                    </tooltip>
+                                </Button>
                             </buttons>
                             <BorderPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

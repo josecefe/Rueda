@@ -289,7 +289,7 @@ public class ResolutorJE extends Resolutor {
             estGlobal.setNumGeneraciones(numGeneraciones * dias.length);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%,.2f s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
             }
         }
 

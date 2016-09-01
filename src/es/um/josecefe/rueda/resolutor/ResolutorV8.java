@@ -251,7 +251,7 @@ public class ResolutorV8 extends Resolutor {
             estGlobal.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%,.2f s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
             }
         }
 

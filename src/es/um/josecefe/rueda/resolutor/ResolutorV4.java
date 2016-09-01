@@ -201,7 +201,7 @@ public class ResolutorV4 extends Resolutor {
         estadisticas.iniciaTiempo();
         inicializa();
         estadisticas.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
-        System.out.format("Tiempo inicializar =%,.3f s\n", estadisticas.actualizaProgreso().getTiempo());
+        System.out.format("Tiempo inicializar =%s\n", estadisticas.actualizaProgreso().getTiempo());
         
         // Preparamos el algoritmo
         final Nodo RAIZ = new Nodo();

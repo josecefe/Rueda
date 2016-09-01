@@ -76,6 +76,7 @@ public class RuedaFX extends Application {
             // Show the scene containing the root layout.
             Scene scene = new Scene(Principal);
             primaryStage.setScene(scene);
+            primaryStage.setMaximized(true);
 
             primaryStage.show();
 

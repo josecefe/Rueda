@@ -174,7 +174,7 @@ public class PersistenciaXML {
                     .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
             HtmlTable<?> table = htmlView
                     .body().classAttr("container")
-                    .heading(1, escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+                    .heading(1, "<div style='color:blue;text-align:center'>" + escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)) + "</div>")
                     .div()
                     .table().classAttr("table table-bordered");
             HtmlTr<?> headerRow = table.tr();
@@ -203,8 +203,9 @@ public class PersistenciaXML {
 
                                     res.append(escapeHtml4(p.participante.toString()));
                                     if (conLugar) {
-                                        res.append(" - ");
+                                        res.append(" [");
                                         res.append(escapeHtml4(p.lugar.toString()));
+                                        res.append("]");
                                     }
 
                                     if (p.ida) {
@@ -219,8 +220,13 @@ public class PersistenciaXML {
                     tr.td().text(valor);
                 });
             });
-            
-            htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "),datosRueda.getCosteAsignacion()));
+
+            htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:center");
+            if (conLugar) {
+                htmlView.body().div().text("<hr>Leyenda: <b>Participante [Lugar]</b> --> Conductor; <i>Participante [Lugar]</i> --> Ida; Participante [Lugar] --> Vuelta").addAttr("style", "color:green;text-align:center");
+            } else {
+                htmlView.body().div().text("<hr>Leyenda: <b>Participante</b> --> Conductor; <i>Participante</i> --> Ida; Participante --> Vuelta").addAttr("style", "color:green;text-align:center");
+            }
             htmlView.setPrintStream(out);
             htmlView.write();
         } catch (Exception ex) {

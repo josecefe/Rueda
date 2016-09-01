@@ -5,23 +5,25 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
+import java.time.Duration;
+
 /**
  *
  * @author josec
  */
 public final class EstadisticasV1 extends Estadisticas {
-    long expandidos = 0;
-    double descartados = 0, terminales = 0, generados = 0, totalPosiblesSoluciones;
+    protected long expandidos = 0;
+    protected double descartados = 0, terminales = 0, generados = 0;
+    protected double totalPosiblesSoluciones;
 
     public EstadisticasV1() {
-        this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }
 
-    void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
+    protected void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }
     
-    EstadisticasV1 acumular(EstadisticasV1 otro) {
+    protected EstadisticasV1 acumular(EstadisticasV1 otro) {
         expandidos += otro.expandidos;
         generados += otro.generados;
         descartados += otro.descartados;
@@ -32,25 +34,24 @@ public final class EstadisticasV1 extends Estadisticas {
     @Override
     public String toString() {
         final double porcentajeArbol = getCompletado() * 100.0;
-        return String.format("t=%,.2f s, C=%,d NE=%,d (%,.0f ne/s), NG=%,.0f (%,.0f ng/s), SG=%,.0f, NP=%g, Completado=%.3f%% (est. fin=%g s = %,.3f horas = %,.3f dias = %,.3f años)",
-                tiempo, fitness, expandidos, expandidos / tiempo, generados, generados / tiempo,
-                terminales, descartados, porcentajeArbol, (tiempo / porcentajeArbol) * 100.0,
-                (tiempo / porcentajeArbol) / 36.0, (tiempo / porcentajeArbol) / 864.0, (tiempo / porcentajeArbol) / 315360.0);
+        return String.format("t=%s s, C=%,d NE=%,d (%,.0f NE/s), NG=%,.0f (%,.0f NG/s), SG=%,.0f, NP=%g, Completado=%.3f%% (ETA=%s)",
+                tiempo, fitness, expandidos, expandidos * 1000.0 / tiempo.toMillis(), generados, generados * 1000.0 / tiempo.toMillis(),
+                terminales, descartados, porcentajeArbol, Duration.ofMillis((long)((tiempo.toMillis()/ porcentajeArbol) * 100)));
     }
 
-    long incExpandidos() {
+    protected long incExpandidos() {
         return ++expandidos;
     }
 
-    void addGenerados(double nGenerados) {
+    protected void addGenerados(double nGenerados) {
         generados += nGenerados;
     }
 
-    void addTerminales(double nTerminales) {
+    protected void addTerminales(double nTerminales) {
         terminales += nTerminales;
     }
 
-    void addDescartados(double nDescartados) {
+    protected void addDescartados(double nDescartados) {
         descartados += nDescartados;
     }
 
@@ -58,6 +59,7 @@ public final class EstadisticasV1 extends Estadisticas {
      * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
+    @Override
     public double getCompletado() {
         return (descartados + terminales) / totalPosiblesSoluciones;
     }

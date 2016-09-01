@@ -255,7 +255,7 @@ public class ResolutorV7 extends Resolutor {
             estGlobal.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%,.3f s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
             }
         }
         // Preparamos el algoritmo
