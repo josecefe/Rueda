@@ -33,6 +33,9 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -217,7 +220,7 @@ public class ResolutorV5 extends Resolutor {
         estadisticas.iniciaTiempo();
         inicializa();
         estadisticas.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
-        System.out.format("Tiempo inicializar =%s\n", estadisticas.actualizaProgreso().getTiempo());
+        System.out.format("Tiempo inicializar =%s\n", estadisticas.actualizaProgreso().getTiempoString());
         
         // Preparamos el algoritmo
         final Nodo RAIZ = new Nodo();

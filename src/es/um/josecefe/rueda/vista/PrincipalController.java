@@ -118,6 +118,7 @@ import javafx.util.Pair;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * FXML Controller class
@@ -135,10 +136,9 @@ public class PrincipalController {
 
     @FXML
     private MenuItem mCancelarCalculo;
-    
+
     @FXML
     private MenuItem mExportar;
-    
 
     @FXML
     TableView<Horario> tablaHorario;
@@ -208,7 +208,7 @@ public class PrincipalController {
 
     @FXML
     Button bCancelarCalculo;
-    
+
     @FXML
     Button bExportar;
 
@@ -277,7 +277,7 @@ public class PrincipalController {
 
     @FXML
     ListView<Lugar> lvLugaresEncuentro;
-    
+
     @FXML
     ChoiceBox<Resolutor> cbAlgoritmo;
 
@@ -423,7 +423,7 @@ public class PrincipalController {
 
         // Coste de la solución
         lEtiquetaCoste.visibleProperty().bind(lCoste.visibleProperty());
-        
+
         // Algoritmos para la optimización
         cbAlgoritmo.getItems().addAll(new ResolutorV7(), new ResolutorV8(), new ResolutorGA(), new ResolutorJE());
         cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
@@ -568,18 +568,19 @@ public class PrincipalController {
             }
             if (mainApp.exportaAsignacion(file)) {
                 barraEstado.setText("Exportación completada con éxito");
-                String comando = (SystemUtils.IS_OS_WINDOWS ? "explorer" : "xdg-open") + " \""+file.getPath()+"\"";
+                String comando = (SystemUtils.IS_OS_WINDOWS ? "explorer" : "xdg-open") + " \"" + file.getPath() + "\"";
                 try {
                     Runtime.getRuntime().exec(comando);
-                } catch(Exception e) {
-                    System.err.println("Fallo al intentar ejecutar el comando "+comando);
+                } catch (Exception e) {
+                    System.err.println("Fallo al intentar ejecutar el comando " + comando);
                     e.printStackTrace(System.err);
                 }
-            }
-            else
+            } else {
                 barraEstado.setText("Exportación cancelada");
+            }
         }
     }
+
     /**
      * Opens an about dialog.
      */
@@ -598,7 +599,7 @@ public class PrincipalController {
             BackgroundImage fondo = new BackgroundImage(
                     new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.png")), BackgroundRepeat.NO_REPEAT,
                     BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT
-                    //new BackgroundSize(100, 100, true, true, true, false)
+            //new BackgroundSize(100, 100, true, true, true, false)
             );
             acercadeRoot.setBackground(new Background(fondo));
         } catch (Throwable th) {
@@ -720,15 +721,39 @@ public class PrincipalController {
 
     @FXML
     void handleCalculaAsignacion() {
+        if (!datosRueda.validar()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Estado de los datos incoherente");
+            alert.setHeaderText("Ha fallado la validación de los datos");
+            alert.setContentText(datosRueda.getMensajeValidacion());
+            alert.showAndWait();
+            return;
+        }
         resolutorService = new ResolutorService();
         resolutorService.setResolutor(cbAlgoritmo.getValue());
         resolutorService.setHorarios(new HashSet<Horario>(datosRueda.getHorarios()));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
             barraEstado.textProperty().unbind();
-            barraEstado.setText("Optimización finalizada, calculo de asignación realizado");
+            if (resolutorService.getValue() == null || resolutorService.getValue().size() == 0) {
+                barraEstado.setText("Optimización finalizada, NO HAY SOLUCIÓN");
+            } else {
+                barraEstado.setText("Optimización finalizada, calculo de asignación realizado");
+            }
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
             datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
+            stage.getScene().setCursor(Cursor.DEFAULT);
+            bCalcular.setDisable(false);
+            mCalcular.setDisable(false);
+            bCancelarCalculo.setDisable(true);
+            mCancelarCalculo.setDisable(true);
+        });
+        resolutorService.setOnFailed((WorkerStateEvent e) -> {
+            barraEstado.textProperty().unbind();
+            barraEstado.setText("Optimización finalizada con fracaso, cálculo de asignación NO realizado. Compruebe los datos de entrada.");
+            indicadorProgreso.progressProperty().unbind();
+            indicadorProgreso.setProgress(0);
+
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
             mCalcular.setDisable(false);
@@ -743,7 +768,7 @@ public class PrincipalController {
         resolutorService.start();
         bCancelarCalculo.setDisable(false);
         mCancelarCalculo.setDisable(false);
-        
+
         bCalcular.setDisable(true);
         mCalcular.setDisable(true);
     }
@@ -1022,6 +1047,7 @@ public class PrincipalController {
 
         public ResolutorService() {
         }
+
         public ResolutorService(Resolutor r, Set<Horario> h) {
             resolutor.set(r);
             horarios.clear();

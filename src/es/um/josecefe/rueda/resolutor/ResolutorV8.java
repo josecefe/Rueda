@@ -34,6 +34,9 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -251,7 +254,7 @@ public class ResolutorV8 extends Resolutor {
             estGlobal.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempoString());
             }
         }
 
@@ -446,7 +449,7 @@ public class ResolutorV8 extends Resolutor {
                 costeEstimado = cotaSuperior = cotaInferior = maximo * 1000 + (maximo - minimo) * 100 + costeAcumulado;
             } else {
                 cotaInferior = maxCI * 1000 + (maxCI - minCS) * 100 + costeAcumulado + mejorCosteDia[indiceDia + 1];
-                cotaSuperior = maxCS * 1000 + (maxCS - minCI) * 100 + costeAcumulado + peorCosteDia[indiceDia + 1];
+                cotaSuperior = maxCS * 1000 + (maxCS - minCI) * 100 + costeAcumulado + peorCosteDia[indiceDia + 1] + 1; // Añadimos el 1 para evitar un bug que nos haría perder una solución
                 costeEstimado = (int) (cotaInferior * pesoCotaInferior + cotaSuperior * (1 - pesoCotaInferior));
             }
             if (DEBUG && (cotaInferior < padre.cotaInferior || cotaSuperior > padre.cotaSuperior || cotaSuperior < cotaInferior)) {

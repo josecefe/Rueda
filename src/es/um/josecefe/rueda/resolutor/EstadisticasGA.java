@@ -19,6 +19,7 @@ package es.um.josecefe.rueda.resolutor;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
  *
@@ -41,8 +42,8 @@ public final class EstadisticasGA extends Estadisticas {
     public String toString() {
         final double porcentajeCompletado = getCompletado() * 100.0;
         return String.format("t=%s, Fitness=%,d, Generación nº %,d (%,.0f gen/s), Individuos Generados=%,.0f (%,.0f g/s), Completado=%.3f%% (ETA=%s)",
-                tiempo, fitness, generaciones.get(), generaciones.get() * 1000.0 / tiempo.toMillis(), generados.sum(), generados.sum() * 1000.0 / tiempo.toMillis(), 
-                porcentajeCompletado, Duration.ofMillis((long)((tiempo.toMillis() / porcentajeCompletado) * 100.0)));
+                getTiempoString(), fitness, generaciones.get(), generaciones.get() * 1000.0 / tiempo, generados.sum(), generados.sum() * 1000.0 / tiempo, 
+                porcentajeCompletado, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeCompletado) * 100.0)));
     }
 
     long incGeneracion() {

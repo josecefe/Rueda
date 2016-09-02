@@ -6,6 +6,7 @@
 package es.um.josecefe.rueda.resolutor;
 
 import java.time.Duration;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
  *
@@ -35,8 +36,8 @@ public final class EstadisticasV1 extends Estadisticas {
     public String toString() {
         final double porcentajeArbol = getCompletado() * 100.0;
         return String.format("t=%s s, C=%,d NE=%,d (%,.0f NE/s), NG=%,.0f (%,.0f NG/s), SG=%,.0f, NP=%g, Completado=%.3f%% (ETA=%s)",
-                tiempo, fitness, expandidos, expandidos * 1000.0 / tiempo.toMillis(), generados, generados * 1000.0 / tiempo.toMillis(),
-                terminales, descartados, porcentajeArbol, Duration.ofMillis((long)((tiempo.toMillis()/ porcentajeArbol) * 100)));
+                getTiempoString(), fitness, expandidos, expandidos * 1000.0 / tiempo, generados, generados * 1000.0 / tiempo,
+                terminales, descartados, porcentajeArbol, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeArbol) * 100)));
     }
 
     protected long incExpandidos() {

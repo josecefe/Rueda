@@ -64,6 +64,12 @@ import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
 import static org.jenetics.internal.math.random.indexes;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
+import static org.jenetics.internal.math.random.indexes;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -289,7 +295,7 @@ public class ResolutorJE extends Resolutor {
             estGlobal.setNumGeneraciones(numGeneraciones * dias.length);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempoString());
             }
         }
 

@@ -24,7 +24,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  *
@@ -38,6 +37,7 @@ public class DatosRueda {
     private final ListProperty<Horario> horarios = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Asignacion> asignaciones = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final IntegerProperty costeAsignacion = new SimpleIntegerProperty();
+    private String mensajeValidacion;
 
     public List<Dia> getDias() {
         return dias.get();
@@ -154,5 +154,31 @@ public class DatosRueda {
             resolver.entrySet().stream().map(entry -> new Asignacion(entry.getKey(), entry.getValue())).collect(() -> asignaciones, (c, e) -> c.add(e), (c, ce) -> c.addAll(ce));
         }
         setCosteAsignacion(costeTotal);
+    }
+
+    /**
+     * Permite comprobar la coherencia de los datos actuales. Si el estado es
+     * incoherente, indica la causa a través de getMensajeValidacion
+     *
+     * @return true si el estado de los datos permiten ejecutar la resolución
+     * (son coherentes), false en otro caso (ver getMensajeValidacion)
+     */
+    public boolean validar() {
+        if (getHorarios().stream().map(Horario::getParticipante).anyMatch(p -> p.getPuntosEncuentro().size() < 1)) {
+            mensajeValidacion = "Hay participantes sin lugares de encuentro definidos";
+            return false;
+        }
+        mensajeValidacion = "";
+        return true;
+
+    }
+
+    /** 
+     * Obtiene el último mensaje de validación producido por la última llamada a validar
+     * 
+     * @return mensaje de validación si ésta fue negativa, en blanco si fue positiva
+     */
+    public String getMensajeValidacion() {
+        return mensajeValidacion;
     }
 }

@@ -36,6 +36,9 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -255,7 +258,7 @@ public class ResolutorV7 extends Resolutor {
             estGlobal.setTotalPosiblesSoluciones(totalPosiblesSoluciones);
             estGlobal.actualizaProgreso();
             if (DEBUG) {
-                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempo());
+                System.out.format("Tiempo inicializar =%s\n", estGlobal.getTiempoString());
             }
         }
         // Preparamos el algoritmo
@@ -464,7 +467,7 @@ public class ResolutorV7 extends Resolutor {
                 //cotaSuperior = 2 * maxCS - minCI;
 
                 cotaInferior = maxCI + (maxCI - minCS) / 10.0 + (costeAcumulado + mejorCosteDia[indiceDia + 1]) / 1000.0;
-                cotaSuperior = maxCS + (maxCS - minCI) / 10.0 + (costeAcumulado + peorCosteDia[indiceDia + 1]) / 1000.0;
+                cotaSuperior = maxCS + (maxCS - minCI) / 10.0 + (costeAcumulado + peorCosteDia[indiceDia + 1] + 1) / 1000.0; // Nota: Añadimos el +1 para evitar el problema de que al estimar perdamos una solución buena
                 costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior * (1 - pesoCotaInferior);
 //                costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior*(1-pesoCotaInferior)
 //                        + (costeAcumulado + mejorCosteDia[indiceDia + 1] * pesoCotaInferior 
