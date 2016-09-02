@@ -5,7 +5,6 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.time.Duration;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import org.apache.commons.lang3.time.DurationFormatUtils;

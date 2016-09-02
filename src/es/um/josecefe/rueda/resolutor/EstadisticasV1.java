@@ -5,7 +5,6 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.time.Duration;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**

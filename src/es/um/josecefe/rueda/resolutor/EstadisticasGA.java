@@ -16,7 +16,6 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.DoubleAdder;
 import org.apache.commons.lang3.time.DurationFormatUtils;
