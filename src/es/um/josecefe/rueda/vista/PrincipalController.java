@@ -733,10 +733,10 @@ public class PrincipalController {
         }
         resolutorService = new ResolutorService();
         resolutorService.setResolutor(cbAlgoritmo.getValue());
-        resolutorService.setHorarios(new HashSet<Horario>(datosRueda.getHorarios()));
+        resolutorService.setHorarios(new HashSet<>(datosRueda.getHorarios()));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
             barraEstado.textProperty().unbind();
-            if (resolutorService.getValue() == null || resolutorService.getValue().size() == 0) {
+            if (resolutorService.getValue() == null || resolutorService.getValue().isEmpty()) {
                 barraEstado.setText("Optimización finalizada, NO HAY SOLUCIÓN");
                 datosRueda.setSolucion(null, 0);
             } else {
@@ -765,8 +765,8 @@ public class PrincipalController {
             mCancelarCalculo.setDisable(true);
         });
         barraEstado.textProperty().bind(resolutorService.messageProperty());
-        indicadorProgreso.setProgress(0);
-        indicadorProgreso.progressProperty().bind(resolutorService.progressProperty());
+        indicadorProgreso.setProgress(-1);
+        indicadorProgreso.progressProperty().bind(resolutorService.progressProperty().subtract(0.01));
         datosRueda.asignacionProperty().clear(); // Borramos todo antes de empezar
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
