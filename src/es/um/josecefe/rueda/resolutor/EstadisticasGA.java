@@ -38,6 +38,13 @@ public final class EstadisticasGA extends Estadisticas {
     }
 
     @Override
+    public Estadisticas inicia() {
+        generaciones.set(0);
+        generados.reset();
+        return super.inicia(); 
+    }
+
+    @Override
     public String toString() {
         final double porcentajeCompletado = getCompletado() * 100.0;
         return String.format("t=%s, Fitness=%,d, Generación nº %,d (%,.0f gen/s), Individuos Generados=%,.0f (%,.0f g/s), Completado=%.3f%% (ETA=%s)",

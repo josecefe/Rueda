@@ -119,6 +119,8 @@ import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * FXML Controller class
@@ -736,12 +738,14 @@ public class PrincipalController {
             barraEstado.textProperty().unbind();
             if (resolutorService.getValue() == null || resolutorService.getValue().size() == 0) {
                 barraEstado.setText("Optimización finalizada, NO HAY SOLUCIÓN");
+                datosRueda.setSolucion(null, 0);
             } else {
-                barraEstado.setText("Optimización finalizada, calculo de asignación realizado");
+                barraEstado.setText("Optimización finalizada, calculo de asignación realizado en "+resolutorService.getResolutor().getEstadisticas().getTiempoString());
+                datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
             }
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
-            datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
+            
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
             mCalcular.setDisable(false);

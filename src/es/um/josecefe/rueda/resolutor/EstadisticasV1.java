@@ -19,6 +19,13 @@ public final class EstadisticasV1 extends Estadisticas {
     public EstadisticasV1() {
     }
 
+    @Override
+    public Estadisticas inicia() {
+        descartados = terminales = generados = expandidos = 0L;
+        return super.inicia(); 
+    }
+
+    
     protected void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }

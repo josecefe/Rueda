@@ -39,12 +39,14 @@ import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
 
 /**
- * @author josec
+ * ResolutorV8
+ * 
+ * Versión paralela del resolutor -> No implementa LNV, sino que sigue una estrategia no guiada, solo podada (la estimación es innecesaria)
+ * 
+ *@author josec
  *
  */
-/**
- * Resolutor
- */
+
 public class ResolutorV8 extends Resolutor {
 
     private final static boolean DEBUG = false;
@@ -59,7 +61,6 @@ public class ResolutorV8 extends Resolutor {
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
-    //private Map<Dia, double[]> estadisticasDia;
     private int[][] maxVecesCondDia;
     private int[][] minVecesCondDia;
     private int[] peorCosteDia;
@@ -200,6 +201,8 @@ public class ResolutorV8 extends Resolutor {
                     }
                 }
             }
+            Collections.shuffle(solucionesDia); //Barajamos las soluciones parciales
+            solucionesDia.sort(null); //Ordenamos la soluciones parciales tras el barajado
             return solucionesDia;
         }));
 
@@ -245,7 +248,7 @@ public class ResolutorV8 extends Resolutor {
         }
 
         if (ESTADISTICAS) {
-            estGlobal.iniciaTiempo();
+            estGlobal.inicia();
         }
 
         inicializa();

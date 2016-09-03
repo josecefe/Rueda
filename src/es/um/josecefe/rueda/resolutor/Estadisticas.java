@@ -28,7 +28,7 @@ public abstract class Estadisticas {
         return fitness;
     }
     
-    public Estadisticas iniciaTiempo() {
+    public Estadisticas inicia() {
         ti = System.currentTimeMillis(); // Para el tiempo
         return this;
     }

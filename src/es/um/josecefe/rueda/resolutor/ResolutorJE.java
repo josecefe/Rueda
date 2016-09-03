@@ -70,6 +70,18 @@ import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
 import static org.jenetics.internal.math.random.indexes;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
+import static org.jenetics.internal.math.random.indexes;
+import static java.lang.String.format;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
+import static org.jenetics.internal.math.random.indexes;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -286,7 +298,7 @@ public class ResolutorJE extends Resolutor {
         }
 
         if (ESTADISTICAS) {
-            estGlobal.iniciaTiempo();
+            estGlobal.inicia();
         }
 
         inicializa();

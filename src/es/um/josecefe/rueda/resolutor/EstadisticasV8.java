@@ -35,6 +35,15 @@ public final class EstadisticasV8 extends Estadisticas {
     public EstadisticasV8() {
     }
 
+    @Override
+    public Estadisticas inicia() {
+        expandidos.set(0);
+        descartados.reset();
+        terminales.reset();
+        generados.reset();
+        return super.inicia(); 
+    }
+
     void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }

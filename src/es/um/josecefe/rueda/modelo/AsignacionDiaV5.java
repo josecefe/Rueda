@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionDia {
     private Participante[] participantes;
     private boolean[] conductores;
+    private int numConductores;
     private Map<Participante, Lugar> peIda, peVuelta;
     private int coste;
 
@@ -41,6 +42,7 @@ public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionD
         this.conductores = new boolean[participantes.length];
         for (int i=0; i<participantes.length; i++)
             this.conductores[i]=conductores.contains(participantes[i]);
+        this.numConductores = conductores.size();
         this.peIda=puntoEncuentroIda;
         this.peVuelta=puntoEncuentroVuelta;
         this.coste=coste;
@@ -80,7 +82,7 @@ public class AsignacionDiaV5 implements Comparable<AsignacionDiaV5>, AsignacionD
 
     @Override
     public int compareTo(AsignacionDiaV5 o) {
-        return Integer.compare(coste, o.coste);
+        return Integer.compare(numConductores * 1000 + coste, o.numConductores * 1000 + o.coste);
     }
 
     @Override

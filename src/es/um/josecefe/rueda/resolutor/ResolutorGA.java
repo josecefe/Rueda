@@ -36,6 +36,14 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.toConcurrentMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
@@ -253,7 +261,7 @@ public class ResolutorGA extends Resolutor {
         }
 
         if (ESTADISTICAS) {
-            estGlobal.iniciaTiempo();
+            estGlobal.inicia();
         }
 
         inicializa();

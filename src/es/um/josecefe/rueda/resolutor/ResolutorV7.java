@@ -36,9 +36,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -49,7 +46,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorV7 extends Resolutor {
 
-    private final static boolean DEBUG = true;
+    private final static boolean DEBUG = false;
     private final static boolean ESTADISTICAS = true;
     private final static long CADA_EXPANDIDOS = 100000L;
     private Set<Horario> horarios;
@@ -204,6 +201,8 @@ public class ResolutorV7 extends Resolutor {
                     }
                 }
             }
+            Collections.shuffle(solucionesDia); //Barajamos las soluciones parciales
+            solucionesDia.sort(null); //Ordenamos la soluciones parciales tras el barajado
             return solucionesDia;
         }));
 
@@ -249,7 +248,7 @@ public class ResolutorV7 extends Resolutor {
         }
 
         if (ESTADISTICAS) {
-            estGlobal.iniciaTiempo();
+            estGlobal.inicia();
         }
 
         inicializa();

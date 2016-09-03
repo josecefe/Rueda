@@ -33,6 +33,10 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -250,7 +254,7 @@ public class ResolutorV2 extends Resolutor {
 
     @Override
     public Map<Dia, AsignacionDiaV1> resolver(Set<Horario> horarios) {
-        estadisticas.iniciaTiempo();
+        estadisticas.inicia();
         this.horarios = horarios;
         inicializa();
         estadisticas.setTotalPosiblesSoluciones(totalNodos);
