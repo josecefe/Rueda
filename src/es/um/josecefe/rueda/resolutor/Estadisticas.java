@@ -29,18 +29,22 @@ public abstract class Estadisticas {
     }
     
     public Estadisticas inicia() {
-        ti = System.currentTimeMillis(); // Para el tiempo
+        ti = System.currentTimeMillis(); // Tiempo inicial
+        fitness = Integer.MAX_VALUE;
+        if (!progreso.isBound())
+            progreso.set(0);
         return this;
     }
     
     public Estadisticas actualizaProgreso() {
         tiempo = System.currentTimeMillis() - ti;
-        progreso.set(getCompletado());
+        if (!progreso.isBound())
+            progreso.set(getCompletado());
         return this;
     }
     
     public String getTiempoString() {
-        return DurationFormatUtils.formatDurationHMS(tiempo);
+        return DurationFormatUtils.formatDurationHMS(getTiempo());
     }
     
     public long getTiempo() {

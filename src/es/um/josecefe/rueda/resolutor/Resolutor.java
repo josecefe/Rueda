@@ -9,7 +9,6 @@ import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**

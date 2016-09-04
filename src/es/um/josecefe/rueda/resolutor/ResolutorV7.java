@@ -44,11 +44,15 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Resolutor
  */
-public class ResolutorV7 extends Resolutor {
+public class ResolutorV7 extends ResolutorAcotado {
 
     private final static boolean DEBUG = false;
     private final static boolean ESTADISTICAS = true;
-    private final static long CADA_EXPANDIDOS = 100000L;
+    private final static int CADA_EXPANDIDOS = 1000;
+    private final static int CADA_MILIS_EST = 1000;
+    
+    private static final double PESO_COTA_INFERIOR_DEF = 0.5;
+    
     private Set<Horario> horarios;
     private Dia[] dias;
     private Participante[] participantes;
@@ -68,6 +72,7 @@ public class ResolutorV7 extends Resolutor {
     private double cotaInferiorCorte;
     private Nodo RAIZ;
     private EstadisticasV1 estGlobal = new EstadisticasV1();
+    private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV7() {
 
@@ -234,14 +239,17 @@ public class ResolutorV7 extends Resolutor {
 
     @Override
     public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios) {
-        return resolver(horarios, 0.5);
+        return resolver(horarios, Integer.MAX_VALUE);
     }
 
-    public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, double pesoCotaInf) {
-        return resolver(horarios, Double.POSITIVE_INFINITY, Math.min(1, Math.max(0, pesoCotaInf)));
-    }
-
-    public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, double cotaInfCorte, double pesoCotaInf) {
+    /**
+     * 
+     * @param horarios
+     * @param cotaInfCorte
+     * @return 
+     */
+    @Override
+    public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, int cotaInfCorte) {
         this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
@@ -261,11 +269,11 @@ public class ResolutorV7 extends Resolutor {
             }
         }
         // Preparamos el algoritmo
-        pesoCotaInferior = pesoCotaInf;
+        pesoCotaInferior = PESO_COTA_INFERIOR_DEF;
         RAIZ = new Nodo();
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = cotaInfCorte; //Lo tomamos como cota superior
+        cotaInferiorCorte = (cotaInfCorte + 1.0)/ 1000.0; //Lo tomamos como cota superior
         ArrayDeque<Nodo> pilaNodosVivos = new ArrayDeque<>(); // Inicialmente es una cola LIFO (pila)
         Collection<Nodo> LNV = pilaNodosVivos;
         Supplier<Nodo> opPull = pilaNodosVivos::removeLast; //Para controlar si es pila o cola, inicialmente pila
@@ -274,7 +282,8 @@ public class ResolutorV7 extends Resolutor {
         // Bucle principal
         do {
             actual = opPull.get();
-            if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L) {
+            if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L && System.currentTimeMillis() - ultMilisEst > CADA_MILIS_EST) {
+                ultMilisEst = System.currentTimeMillis();
                 estGlobal.setFitness((int) (cotaInferiorCorte * 1000)).actualizaProgreso();
                 if (DEBUG) {
                     System.out.format("> LNV=%,d, ", LNV.size());

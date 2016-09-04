@@ -25,10 +25,6 @@ import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.Resolutor;
-import es.um.josecefe.rueda.resolutor.ResolutorGA;
-import es.um.josecefe.rueda.resolutor.ResolutorJE;
-import es.um.josecefe.rueda.resolutor.ResolutorV7;
-import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.text.DateFormatSymbols;
@@ -45,7 +41,6 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -119,8 +114,6 @@ import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * FXML Controller class
@@ -128,6 +121,12 @@ import static java.util.stream.Collectors.toMap;
  * @author josec
  */
 public class PrincipalController {
+    private static final String[] RESOLUTORES = new String[]{
+        "es.um.josecefe.rueda.resolutor.ResolutorV7",
+        "es.um.josecefe.rueda.resolutor.ResolutorV8",
+        "es.um.josecefe.rueda.resolutor.ResolutorGA",
+        "es.um.josecefe.rueda.resolutor.ResolutorJE",
+        "es.um.josecefe.rueda.resolutor.ResolutorCombinado"};
 
     private RuedaFX mainApp;
 
@@ -427,7 +426,16 @@ public class PrincipalController {
         lEtiquetaCoste.visibleProperty().bind(lCoste.visibleProperty());
 
         // Algoritmos para la optimización
-        cbAlgoritmo.getItems().addAll(new ResolutorV7(), new ResolutorV8(), new ResolutorGA(), new ResolutorJE());
+        for (String resolutor : RESOLUTORES) {
+            try {
+                Class<?> resolutorCls = Class.forName(resolutor);
+                Resolutor resolutorIns = (Resolutor) resolutorCls.newInstance();
+                cbAlgoritmo.getItems().add(resolutorIns);
+            } catch(Exception e) {
+                System.err.printf("Imposible instanciar el resolutor %s:\n", resolutor);
+                e.printStackTrace();
+            }
+        }
         cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
             @Override
             public String toString(Resolutor r) {

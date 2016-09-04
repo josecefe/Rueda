@@ -23,9 +23,6 @@ import java.util.Set;
 import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Clase principal de la aplicación Rueda
@@ -118,7 +115,7 @@ public class Rueda {
             if (r.getSolucionFinal() != null) {
                 int C = r.getEstadisticas().getFitness() + 1; //Uno más para que encuentre la misma solución por lo menos...
                 System.out.format("Fase 2: Ampliado %s tomando como entrada %,d como mejor coste máximo:\n", r2.getClass().getSimpleName(), C);
-                System.out.println(r2.resolver(horariosAmpliado, C, 0.5));
+                System.out.println(r2.resolver(horariosAmpliado, C));
             } else {
                 System.out.format("Fase 2: Ampliado %s sin tener información adicional:\n", r2.getClass().getSimpleName());
                 System.out.println(r2.resolver(horariosAmpliado));

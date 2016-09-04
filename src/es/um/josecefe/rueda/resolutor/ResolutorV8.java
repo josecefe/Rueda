@@ -34,9 +34,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toConcurrentMap;
 import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * ResolutorV8
@@ -47,11 +44,16 @@ import static java.util.stream.Collectors.toMap;
  *
  */
 
-public class ResolutorV8 extends Resolutor {
+public class ResolutorV8 extends ResolutorAcotado {
 
     private final static boolean DEBUG = false;
+    
     private final static boolean ESTADISTICAS = true;
-    private final static long CADA_EXPANDIDOS = 1000000L;
+    private final static int CADA_EXPANDIDOS_EST = 1000;
+    private final static int CADA_MILIS_EST = 1000;
+    
+    private static final double PESO_COTA_INFERIOR_DEF = 0.5;
+    
     private Set<Horario> horarios;
     private Dia[] dias;
     private Participante[] participantes;
@@ -70,6 +72,7 @@ public class ResolutorV8 extends Resolutor {
     private AtomicInteger cotaInferiorCorte;
     private Nodo RAIZ;
     private EstadisticasV8 estGlobal = new EstadisticasV8();
+    private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV8() {
 
@@ -234,14 +237,10 @@ public class ResolutorV8 extends Resolutor {
 
     @Override
     public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
-        return resolver(horarios, 0.5);
+        return resolver(horarios, Integer.MAX_VALUE - 1);
     }
 
-    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, double pesoCotaInf) {
-        return resolver(horarios, Integer.MAX_VALUE, Math.min(1, Math.max(0, pesoCotaInf)));
-    }
-
-    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaInfCorte, double pesoCotaInf) {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaInfCorte) {
         this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
@@ -262,11 +261,11 @@ public class ResolutorV8 extends Resolutor {
         }
 
         // Preparamos el algoritmo
-        pesoCotaInferior = pesoCotaInf;
+        pesoCotaInferior = PESO_COTA_INFERIOR_DEF;
         RAIZ = new Nodo();
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = new AtomicInteger(cotaInfCorte); //Lo tomamos como cota superior
+        cotaInferiorCorte = new AtomicInteger(cotaInfCorte + 1); //Lo tomamos como cota superior
 
         mejor = branchAndBound(actual, mejor).orElse(mejor); //Cogemos el nuevo mejor
 
@@ -294,8 +293,8 @@ public class ResolutorV8 extends Resolutor {
 
     private Optional<Nodo> branchAndBound(Nodo actual, Nodo mejorPadre) {
         Nodo mejor = mejorPadre;
-        //Estadisticas estGlobal = new EstadisticasV8(nSoluciones);
-        if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L) {
+        if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L && System.currentTimeMillis() - ultMilisEst > CADA_MILIS_EST ) {
+            ultMilisEst = System.currentTimeMillis();
             estGlobal.setFitness(cotaInferiorCorte.get());
             estGlobal.actualizaProgreso();
             if (DEBUG) {
