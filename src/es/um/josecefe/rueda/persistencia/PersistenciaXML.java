@@ -16,6 +16,10 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
+import es.um.josecefe.rueda.RuedaFX;
+import static es.um.josecefe.rueda.Version.COPYRIGHT;
+import static es.um.josecefe.rueda.Version.TITLE;
+import static es.um.josecefe.rueda.Version.VERSION;
 import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.DatosRueda;
@@ -223,14 +227,15 @@ public class PersistenciaXML {
 
             htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:center");
             if (conLugar) {
-                htmlView.body().div().text("<hr>Leyenda: <b>Participante [Lugar]</b> --> Conductor; <i>Participante [Lugar]</i> --> Ida; Participante [Lugar] --> Vuelta").addAttr("style", "color:green;text-align:center");
+                htmlView.body().hr().div().text("<hr>Leyenda: <i><b>Conductor [Lugar de Ida]</b></i> | <i>Pasajero [Lugar de Ida]</i> | <b>Conductor [Lugar de Vuelta]</b> | Pasajero [Lugar de Vuelta]").addAttr("style", "color:green;text-align:center");
             } else {
-                htmlView.body().div().text("<hr>Leyenda: <b>Participante</b> --> Conductor; <i>Participante</i> --> Ida; Participante --> Vuelta").addAttr("style", "color:green;text-align:center");
+                htmlView.body().hr().div().text("Leyenda: <i><b>Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
             }
+            htmlView.body().hr().div().text("Generado con <b>"+TITLE+" "+VERSION+"<b> <i>"+COPYRIGHT+"</i>").addAttr("style", "color:royalblue;text-align:right");
             htmlView.setPrintStream(out);
             htmlView.write();
         } catch (Exception ex) {
-            Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, "Problemas generando la exportación a HTML: ", ex);
         }
     }
 

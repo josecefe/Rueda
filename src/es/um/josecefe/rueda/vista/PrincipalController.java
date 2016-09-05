@@ -17,6 +17,9 @@
 package es.um.josecefe.rueda.vista;
 
 import es.um.josecefe.rueda.RuedaFX;
+import static es.um.josecefe.rueda.Version.COPYRIGHT;
+import static es.um.josecefe.rueda.Version.TITLE;
+import static es.um.josecefe.rueda.Version.VERSION;
 import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.DatosRueda;
@@ -122,7 +125,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 
 /**
@@ -445,9 +447,8 @@ public class PrincipalController {
                 Class<?> resolutorCls = Class.forName(resolutor);
                 Resolutor resolutorIns = (Resolutor) resolutorCls.newInstance();
                 cbAlgoritmo.getItems().add(resolutorIns);
-            } catch (Exception e) {
-                System.err.printf("Imposible instanciar el resolutor %s:\n", resolutor);
-                e.printStackTrace();
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Imposible instanciar el resolutor "+resolutor, e);
             }
         }
         cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
@@ -653,25 +654,29 @@ public class PrincipalController {
         blend.setBottomInput(ds);
         blend.setTopInput(lighting);
 
-        Text textoSolidos = new Text("Optimizador de Rueda");
+        Text textoSolidos = new Text(TITLE);
         textoSolidos.setFont(Font.font("", FontWeight.BOLD, 76));
         textoSolidos.setFill(Color.RED);
         textoSolidos.setEffect(blend);
         textoSolidos.setCache(true);
 
-        Text textoAutor = new Text("(c)2016 José Ceferino Ortega");
+        Text textoAutor = new Text(COPYRIGHT);
         textoAutor.setFont(Font.font("", FontWeight.BOLD, FontPosture.ITALIC, 55));
         textoAutor.setFill(Color.AQUAMARINE);
         textoAutor.setEffect(blend);
         textoAutor.setCache(true);
 
-        String creditosString = "";
+        String creditosString = String.format("%s %s - %s\n=====================================\n\n",TITLE,VERSION, COPYRIGHT);
         try (BufferedReader recursoCreditos = new BufferedReader(new InputStreamReader(mainApp.getClass().getResourceAsStream("res/creditos.txt")))) {
-            creditosString = recursoCreditos.lines().collect(Collectors.joining("\n"));
+            creditosString += recursoCreditos.lines().collect(Collectors.joining("\n"));
         } catch (Exception ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        creditosString=creditosString.replaceFirst("%java-version%", System.getProperty("java.version")).replaceFirst("%java-vendor%",System.getProperty("java.vendor"));
+        creditosString=creditosString
+                .replaceFirst("%java-version%", System.getProperty("java.version"))
+                .replaceFirst("%java-vendor%",System.getProperty("java.vendor"))
+                .replaceFirst("%os-name%",System.getProperty("os.name"))
+                .replaceFirst("%os-version%",System.getProperty("os.version"));
         Text textoCreditos = new Text(creditosString);
         textoCreditos.setTextAlignment(TextAlignment.CENTER);
         textoCreditos.setFont(Font.font("", FontWeight.BOLD, 22));
@@ -706,7 +711,7 @@ public class PrincipalController {
         textoCreditos.setX((acercadeRoot.getWidth() - textoCreditosBounds.getWidth()) / 2);
         textoCreditos.setY(acercadeRoot.getHeight());
 
-        TranslateTransition scrollTextoCreditos = new TranslateTransition(Duration.millis(20000), textoCreditos);
+        TranslateTransition scrollTextoCreditos = new TranslateTransition(Duration.millis(30000), textoCreditos);
         //scrollTextoCreditos.setFromY(acercadeRoot.getHeight());
         scrollTextoCreditos.setToY(-Math.max(textoCreditosBounds.getHeight() + (acercadeRoot.getHeight() - textoCreditosBounds.getHeight()) / 2, textoCreditosBounds.getHeight()));
         scrollTextoCreditos.setDelay(Duration.seconds(3));
@@ -811,9 +816,10 @@ public class PrincipalController {
                 alert.setTitle("Algo ha fallado");
                 alert.setHeaderText("Fallo la optimización");
                 alert.setContentText("El cálculo no ha ido bien. Revise los datos de entrada y\nsi el problema persiste, revise la instalación de la aplicación");
+                
+                final Throwable ex = resolutorService.getException();
 
-                Throwable ex = resolutorService.getException();
-                ex.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.INFO, "Problema intentando calcular una asignación: ", ex);
 
                 // Create expandable Exception.
                 StringWriter sw = new StringWriter();

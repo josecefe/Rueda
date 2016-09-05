@@ -16,6 +16,9 @@
  */
 package es.um.josecefe.rueda;
 
+import static es.um.josecefe.rueda.Version.COPYRIGHT;
+import static es.um.josecefe.rueda.Version.TITLE;
+import static es.um.josecefe.rueda.Version.VERSION;
 import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.vista.PrincipalController;
@@ -38,10 +41,6 @@ import javafx.stage.Window;
  * @author josec
  */
 public class RuedaFX extends Application {
-
-    private static final String COPYRIGHT = "(C)2016 José Ceferino Ortega Carretero";
-    private static final String TITLE = "Optimizador de la Rueda";
-
     private Stage primaryStage;
     private final DatosRueda datosRueda;
     private BorderPane Principal;
@@ -62,7 +61,7 @@ public class RuedaFX extends Application {
     public void start(Stage pStage) {
         try {
             primaryStage = pStage;
-            primaryStage.setTitle(TITLE + " - " + COPYRIGHT);
+            primaryStage.setTitle(TITLE + " " + VERSION + " - " + COPYRIGHT);
             primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("res/rueda.png")));
 
             FXMLLoader loader = new FXMLLoader();
@@ -142,7 +141,7 @@ public class RuedaFX extends Application {
             setLastFilePath(file);
 
         } catch (Exception e) { // catches ANY exception
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.WARNING, "No se ha podido cargar los datos del fichero:\n" + file.getPath(), e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("No se ha podido cargar los datos del fichero:\n" + file.getPath());
@@ -162,9 +161,10 @@ public class RuedaFX extends Application {
             // Save the file path to the registry.
             setLastFilePath(file);
         } catch (Exception e) { // catches ANY exception
+            Logger.getLogger(getClass().getName()).log(Level.WARNING, "No se ha podido guardar los datos en el fichero:\n" + file.getPath(), e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setHeaderText("No se ha podido guarda los datos al fichero:\n" + file.getPath());
+            alert.setHeaderText("No se ha podido guardar los datos en el fichero:\n" + file.getPath());
             alert.setContentText(e.toString());
             alert.showAndWait();
         }
@@ -182,9 +182,10 @@ public class RuedaFX extends Application {
             return true;
             //Duda: ¿Guardar dónde se hizo la última exportación o no?
         } catch (Exception e) { // catches ANY exception
+            Logger.getLogger(getClass().getName()).log(Level.WARNING, "No se ha podido exportar la asignación en el fichero:\n" + file.getPath(), e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setHeaderText("No se ha podido exportar la asignación al fichero:\n" + file.getPath());
+            alert.setHeaderText("No se ha podido exportar la asignación en el fichero:\n" + file.getPath());
             alert.setContentText(e.toString());
             alert.showAndWait();
         }
