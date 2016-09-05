@@ -1,0 +1,10 @@
+Se distribuye bajo licencia GNU GENERAL PUBLIC LICENSE v. 3: https://www.gnu.org/licenses/gpl.html
+
+Contiene librerias y recursos de terceras partes:
+
+Música de fondo: 
+ * Happy People by Martijn de Boer (NiGiD) (c) copyright 2016 Licensed under a Creative Commons Attribution Noncommercial  (3.0) license. http://dig.ccmixter.org/files/NiGiD/54377 Ft: Stefan Kartenberg
+
+Librerias:
+* Commons Lang (https://commons.apache.org/proper/commons-lang/): Licencia Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
+* HtmlFlow (https://github.com/fmcarvalho/HtmlFlow):  GNU GENERAL PUBLIC LICENSE v. 3: https://github.com/fmcarvalho/HtmlFlow/blob/master/LICENSE

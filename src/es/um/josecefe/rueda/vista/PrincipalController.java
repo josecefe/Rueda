@@ -16,6 +16,7 @@
  */
 package es.um.josecefe.rueda.vista;
 
+import com.sun.prism.paint.Paint;
 import es.um.josecefe.rueda.RuedaFX;
 import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
@@ -25,10 +26,18 @@ import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.Resolutor;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Collections;
@@ -42,6 +51,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -120,6 +130,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
@@ -132,7 +145,6 @@ public class PrincipalController {
         "es.um.josecefe.rueda.resolutor.ResolutorV7",
         "es.um.josecefe.rueda.resolutor.ResolutorV8",
         "es.um.josecefe.rueda.resolutor.ResolutorGA",
-        "es.um.josecefe.rueda.resolutor.ResolutorJE",
         "es.um.josecefe.rueda.resolutor.ResolutorCombinado"};
 
     private RuedaFX mainApp;
@@ -662,7 +674,19 @@ public class PrincipalController {
         textoAutor.setEffect(blend);
         textoAutor.setCache(true);
 
-        acercadeRoot.getChildren().addAll(textoAutor, textoSolidos);
+        String creditosString = "";
+        try (BufferedReader recursoCreditos = new BufferedReader(new InputStreamReader(mainApp.getClass().getResourceAsStream("res/creditos.txt")))) {
+            creditosString = recursoCreditos.lines().collect(Collectors.joining("\n"));
+        } catch (Exception ex) {
+            Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        creditosString += "\n\nJava: java.version="+System.getProperty("java.version")+" - java.vendor="+System.getProperty("java.vendor");
+        Text textoCreditos = new Text(creditosString);
+        textoCreditos.setTextAlignment(TextAlignment.CENTER);
+        textoCreditos.setFont(Font.font("", FontWeight.BOLD, 22));
+        textoCreditos.setFill(Color.ROYALBLUE);
+
+        acercadeRoot.getChildren().addAll(textoCreditos, textoAutor, textoSolidos);
         Scene scene = new Scene(acercadeRoot, 1280, 720);
         scene.setFill(null);
         acercadeStage.setScene(scene);
@@ -683,6 +707,20 @@ public class PrincipalController {
         entradaTextoAutor.setFromY(acercadeRoot.getHeight() + textoAutorBounds.getHeight());
         entradaTextoAutor.setToY(acercadeRoot.getHeight() - 20);
 
+        textoCreditos.setTextOrigin(VPos.TOP);
+        textoCreditos.setWrappingWidth(Math.max(textoAutorBounds.getWidth(), textoSolidosBounds.getWidth()));
+        Bounds textoCreditosBounds = textoCreditos.getBoundsInLocal();
+        textoCreditos.setX((acercadeRoot.getWidth() - textoCreditosBounds.getWidth()) / 2);
+        textoCreditos.setY(acercadeRoot.getHeight());
+        //final Rectangle rectangleClip = new Rectangle(0, textoSolidosBounds.getHeight() + 20, acercadeRoot.getWidth(), acercadeRoot.getHeight() - textoSolidosBounds.getHeight() - 40);
+        final Rectangle rectangleClip = new Rectangle(0, 0, acercadeRoot.getWidth(), acercadeRoot.getHeight());
+        rectangleClip.setFill(Color.YELLOW);
+        //textoCreditos.setClip(rectangleClip);
+        TranslateTransition scrollTextoCreditos = new TranslateTransition(Duration.millis(20000), textoCreditos);
+        //scrollTextoCreditos.setFromY(acercadeRoot.getHeight());
+        scrollTextoCreditos.setToY(-Math.max(textoCreditosBounds.getHeight() + (acercadeRoot.getHeight() - textoCreditosBounds.getHeight()) / 2, textoCreditosBounds.getHeight()));
+        scrollTextoCreditos.setDelay(Duration.seconds(3));
+
         Animation fadeMusica;
         try {
             // La musica
@@ -691,7 +729,6 @@ public class PrincipalController {
             final int audioSpectrumNumBands = 2;
             MediaPlayer audioMediaPlayer = new MediaPlayer(audioMedia);
             audioMediaPlayer.setVolume(0); //Al principio no se oirá
-            //audioMediaPlayer.setAudioSpectrumInterval(0.02);
             audioMediaPlayer.setAudioSpectrumNumBands(audioSpectrumNumBands);
             audioMediaPlayer.setCycleCount(Timeline.INDEFINITE);
 
@@ -709,7 +746,7 @@ public class PrincipalController {
                             }
                         });
             });
-        } catch (URISyntaxException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             fadeMusica = new PauseTransition(Duration.seconds(3));
         }
@@ -722,6 +759,7 @@ public class PrincipalController {
         acercadeRoot.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent emc) -> {
             if (!cerrandoAcercade) {
                 cerrandoAcercade = true;
+                scrollTextoCreditos.stop();
                 transiciones.setRate(-2);
                 transiciones.play();
                 transiciones.setOnFinished(ef -> acercadeStage.close());
@@ -729,6 +767,7 @@ public class PrincipalController {
         });
 
         transiciones.play();
+        scrollTextoCreditos.play();
 
         acercadeStage.showAndWait();
     }

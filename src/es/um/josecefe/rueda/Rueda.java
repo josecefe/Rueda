@@ -5,7 +5,6 @@ package es.um.josecefe.rueda;
 
 import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
-import es.um.josecefe.rueda.resolutor.ResolutorJE;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.resolutor.ResolutorV8;
 import es.um.josecefe.rueda.resolutor.Resolutor;
@@ -79,8 +78,7 @@ public class Rueda {
                 //                new ResolutorV6(),
                 new ResolutorV7(),
                 new ResolutorV8(),
-                new ResolutorGA(),
-                new ResolutorJE()
+                new ResolutorGA()
         );
         if (COMPARANDO) {
             resolutores.forEach(r -> {
@@ -104,7 +102,7 @@ public class Rueda {
         }
         if (AMPLIADO) {
             Set<Horario> horariosAmpliado = duplicarHorario(horarios);
-            Resolutor r = new ResolutorJE();
+            Resolutor r = new ResolutorGA();
             ResolutorV8 r2 = new ResolutorV8();
 
             System.out.println("\n**********************************\n");
