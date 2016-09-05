@@ -46,36 +46,45 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorV7 extends ResolutorAcotado {
 
-    private final static boolean DEBUG = false;
+    final static boolean DEBUG = false;
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS = 1000;
     private final static int CADA_MILIS_EST = 1000;
-    
+
+    private static final boolean CON_CAMBIO_DE_ESTRATEGIA = false;
+
     private static final double PESO_COTA_INFERIOR_DEF = 0.5;
-    
+
     private Set<Horario> horarios;
-    private Dia[] dias;
-    private Participante[] participantes;
-    private double[] coefConduccion;
+    Dia[] dias;
+    Participante[] participantes;
+    double[] coefConduccion;
     private Map<Dia, List<AsignacionDiaV5>> solucionesCandidatas;
     private Map<Dia, AsignacionDiaV5> solucionFinal;
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
-    //private Map<Dia, double[]> estadisticasDia;
-    private int[][] maxVecesCondDia;
+    int[][] maxVecesCondDia;
     private int[][] minVecesCondDia;
     private int[] peorCosteDia;
     private int[] mejorCosteDia;
-    private boolean[] participantesConCoche;
-    private double pesoCotaInferior;
-    private double cotaInferiorCorte;
+    boolean[] participantesConCoche;
+    double pesoCotaInferior = PESO_COTA_INFERIOR_DEF;
+    private double cotaInferiorCorte = Double.POSITIVE_INFINITY;
     private Nodo RAIZ;
     private EstadisticasV1 estGlobal = new EstadisticasV1();
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV7() {
 
+    }
+
+    public double getPesoCotaInferior() {
+        return pesoCotaInferior;
+    }
+
+    public void setPesoCotaInferior(double pesoCotaInferior) {
+        this.pesoCotaInferior = pesoCotaInferior;
     }
 
     private void inicializa() {
@@ -243,10 +252,10 @@ public class ResolutorV7 extends ResolutorAcotado {
     }
 
     /**
-     * 
+     *
      * @param horarios
      * @param cotaInfCorte
-     * @return 
+     * @return
      */
     @Override
     public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, int cotaInfCorte) {
@@ -269,14 +278,22 @@ public class ResolutorV7 extends ResolutorAcotado {
             }
         }
         // Preparamos el algoritmo
-        pesoCotaInferior = PESO_COTA_INFERIOR_DEF;
         RAIZ = new Nodo();
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = (cotaInfCorte + 1.0)/ 1000.0; //Lo tomamos como cota superior
-        ArrayDeque<Nodo> pilaNodosVivos = new ArrayDeque<>(); // Inicialmente es una cola LIFO (pila)
-        Collection<Nodo> LNV = pilaNodosVivos;
-        Supplier<Nodo> opPull = pilaNodosVivos::removeLast; //Para controlar si es pila o cola, inicialmente pila
+        cotaInferiorCorte = (cotaInfCorte + 1.0) / 1000.0; //Lo tomamos como cota superior
+        Collection<Nodo> LNV;
+        Supplier<Nodo> opPull;
+        pesoCotaInferior = 0.1; //Primero buscamos en profundidad
+        if (CON_CAMBIO_DE_ESTRATEGIA) {
+            ArrayDeque<Nodo> pilaNodosVivos = new ArrayDeque<>(); // Inicialmente es una cola LIFO (pila)
+            LNV = pilaNodosVivos;
+            opPull = pilaNodosVivos::removeLast; //Para controlar si es pila o cola, inicialmente pila
+        } else {
+            PriorityQueue<Nodo> colaNodosVivos = new PriorityQueue<>();
+            LNV = colaNodosVivos;
+            opPull = colaNodosVivos::poll;
+        }
         LNV.add(actual);
 
         // Bucle principal
@@ -302,12 +319,22 @@ public class ResolutorV7 extends ResolutorAcotado {
                     Optional<Nodo> mejorHijo = actual.generaHijos(true).min(Nodo::compareTo); //true para paralelo
                     if (mejorHijo.isPresent() && mejorHijo.get().compareTo(mejor) < 0) {
                         if (mejor == RAIZ) {
-                            PriorityQueue<Nodo> colaNodosVivos = new PriorityQueue<>(LNV);
-                            LNV = colaNodosVivos;
-                            opPull = colaNodosVivos::poll;
-                            if (DEBUG) {
-                                System.out.println("---- CAMBIANDO A COLA DE PRIORIDAD");
+                            pesoCotaInferior = 0.55; //Después buscamos más en anchura
+                            PriorityQueue<Nodo> colaNodosVivos;
+                            if (CON_CAMBIO_DE_ESTRATEGIA) {
+                                colaNodosVivos = new PriorityQueue<>(LNV);
+                                if (DEBUG) {
+                                    System.out.println("---- CAMBIANDO A COLA DE PRIORIDAD");
+                                }
+                            } else {
+                                colaNodosVivos = new PriorityQueue<>(LNV.size());
+                                colaNodosVivos.addAll(LNV);
+                                if (DEBUG) {
+                                    System.out.println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS");
+                                }
                             }
+                            opPull = colaNodosVivos::poll;
+                            LNV = colaNodosVivos;
                         }
 
                         mejor = mejorHijo.get();
@@ -406,16 +433,15 @@ public class ResolutorV7 extends ResolutorAcotado {
         private final double costeAcumulado;
         private final double cotaInferior;
         private final double cotaSuperior;
-        private final double costeEstimado;
-        //private final boolean valida;
+        private final boolean terminal;
 
         Nodo() {
             eleccion = Collections.emptyList();
-            vecesConductor = new int[participantes.length];
+            vecesConductor = null;
             costeAcumulado = cotaInferior = 0;
-            costeEstimado = cotaSuperior = Double.POSITIVE_INFINITY;
+            cotaSuperior = Double.POSITIVE_INFINITY;
             indiceDia = -1;
-            //valida = false;
+            terminal = false;
         }
 
         Nodo(Nodo padre, AsignacionDiaV5 nuevaAsignacion) {
@@ -424,12 +450,12 @@ public class ResolutorV7 extends ResolutorAcotado {
             eleccion.addAll(padre.eleccion);
             eleccion.add(nuevaAsignacion);
             costeAcumulado = padre.costeAcumulado + nuevaAsignacion.getCoste();
-            vecesConductor = Arrays.copyOf(padre.vecesConductor, padre.vecesConductor.length);
+            vecesConductor = padre.vecesConductor != null ? Arrays.copyOf(padre.vecesConductor, padre.vecesConductor.length) : new int[participantes.length];
 
             boolean[] conductores = nuevaAsignacion.getConductoresArray();
             long maximo = 0, maxCS = 0, maxCI = 0;
             long minimo = Long.MAX_VALUE, minCI = Long.MAX_VALUE, minCS = Long.MAX_VALUE;
-            final boolean terminal = dias.length == indiceDia + 1;
+            terminal = dias.length == indiceDia + 1;
             //int sum = 0;
             //nuevaAsignacion.getConductores().stream().forEachOrdered(ic -> ++vecesConductor[ic]);
             for (int i = 0; i < vecesConductor.length; i++) {
@@ -468,26 +494,10 @@ public class ResolutorV7 extends ResolutorAcotado {
                 }
             }
             if (terminal) { //Es terminal
-                costeEstimado = cotaSuperior = cotaInferior = maximo + (maximo - minimo) / 10.0 + costeAcumulado / 1000.0;
-                //valida = (minimo == maximo);
+                cotaSuperior = cotaInferior = maximo + (maximo - minimo) / 10.0 + costeAcumulado / 1000.0;
             } else {
-                //cotaInferior = 2 * maxCI - minCS;
-                //cotaSuperior = 2 * maxCS - minCI;
-
                 cotaInferior = maxCI + (maxCI - minCS) / 10.0 + (costeAcumulado + mejorCosteDia[indiceDia + 1]) / 1000.0;
                 cotaSuperior = maxCS + (maxCS - minCI) / 10.0 + (costeAcumulado + peorCosteDia[indiceDia + 1] + 1) / 1000.0; // Nota: Añadimos el +1 para evitar el problema de que al estimar perdamos una solución buena
-                costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior * (1 - pesoCotaInferior);
-//                costeEstimado = cotaInferior * pesoCotaInferior + cotaSuperior*(1-pesoCotaInferior)
-//                        + (costeAcumulado + mejorCosteDia[indiceDia + 1] * pesoCotaInferior 
-//                        + peorCosteDia[indiceDia + 1] * (1 - pesoCotaInferior)) / 1000.0;
-
-//                if (costeEstimado > cotaSuperior || costeEstimado < cotaInferior) //
-//                {
-//                    System.out.format("¡¡¡LIADA!!!: nivel=%d, max=%d, min=%d, maxCI=%d, minCI=%d, maxCS=%d, minCS=%d, inferior=%.3f, superior=%.3f, estimado=%.3f",
-//                            indiceDia, maximo, minimo, maxCI, minCI, maxCS, minCS, cotaInferior, cotaSuperior, costeEstimado);
-//                }
-//costeEstimado = 2 * maxCS - minCS + ((costeAcumulado + mejorCosteDia[indiceDia + 1])+(costeAcumulado + peorCosteDia[indiceDia + 1]))/2000.0;
-//valida = false;
             }
         }
 
@@ -500,7 +510,7 @@ public class ResolutorV7 extends ResolutorAcotado {
         }
 
         double getCosteEstimado() {
-            return costeEstimado;
+            return terminal ? cotaInferior : cotaInferior * pesoCotaInferior + cotaSuperior * (1 - pesoCotaInferior);
         }
 
         List<AsignacionDiaV5> getEleccion() {
@@ -519,7 +529,7 @@ public class ResolutorV7 extends ResolutorAcotado {
         @Override
         public int compareTo(Nodo o) {
             //return Double.compare(getCosteEstimado(), o.getCosteEstimado());
-            return Double.compare(costeEstimado, o.costeEstimado);
+            return Double.compare(getCosteEstimado(), o.getCosteEstimado());
         }
 
         @Override

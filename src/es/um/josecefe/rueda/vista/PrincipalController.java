@@ -26,6 +26,8 @@ import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.Resolutor;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -114,6 +116,10 @@ import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
 import static java.util.stream.Collectors.toMap;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
 /**
  * FXML Controller class
@@ -121,6 +127,7 @@ import static java.util.stream.Collectors.toMap;
  * @author josec
  */
 public class PrincipalController {
+
     private static final String[] RESOLUTORES = new String[]{
         "es.um.josecefe.rueda.resolutor.ResolutorV7",
         "es.um.josecefe.rueda.resolutor.ResolutorV8",
@@ -350,6 +357,7 @@ public class PrincipalController {
             final String descripcion = v.getNewValue();
             if (descripcion.isEmpty() || datosRueda.getDias().stream().map(Dia::getDescripcion).anyMatch(d -> d.equalsIgnoreCase(descripcion))) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.initOwner(stage);
                 alert.setTitle("nombre o descripción inválido");
                 alert.setHeaderText("El nombre o descripción del día no es válido o ya está usado");
                 alert.setContentText("Por favor, introduzca un nombre o descripción de día que no este en uso");
@@ -368,6 +376,7 @@ public class PrincipalController {
             final String nombre = v.getNewValue();
             if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.initOwner(stage);
                 alert.setTitle("Nombre de Lugar inválido");
                 alert.setHeaderText("El nombre del Lugar de encuentro no es válido o ya está en uso");
                 alert.setContentText("Por favor, introduzca un nombre de Lugar de encuentro que no esté en uso");
@@ -386,6 +395,7 @@ public class PrincipalController {
             final String nombre = v.getNewValue();
             if (nombre.isEmpty() || datosRueda.getParticipantes().stream().map(Participante::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.initOwner(stage);
                 alert.setTitle("Nombre inválido");
                 alert.setHeaderText("El nombre del Participante no es válido o ya está en uso");
                 alert.setContentText("Por favor, introduzca un nombre de Participante que no esté en uso");
@@ -401,6 +411,7 @@ public class PrincipalController {
             final int plazasCoche = v.getNewValue();
             if (plazasCoche < 0 || plazasCoche > 9) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.initOwner(stage);
                 alert.setTitle("Nº de plazas incorrecto");
                 alert.setHeaderText("El nº de plazas debe estar entre 0 y 9");
                 alert.setContentText("Cada participante tiene asociado un nº de plazas disponibles en su vehículo que "
@@ -431,7 +442,7 @@ public class PrincipalController {
                 Class<?> resolutorCls = Class.forName(resolutor);
                 Resolutor resolutorIns = (Resolutor) resolutorCls.newInstance();
                 cbAlgoritmo.getItems().add(resolutorIns);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 System.err.printf("Imposible instanciar el resolutor %s:\n", resolutor);
                 e.printStackTrace();
             }
@@ -481,6 +492,7 @@ public class PrincipalController {
     @FXML
     void handleNew() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(stage);
         alert.setTitle("Nuevo horario");
         alert.setHeaderText("Eliminar todos los datos actuales y empezar un nuevo horario");
         alert.setContentText("Atención: usando esta función perderá la configuración del horario actual que no haya guardado. "
@@ -733,6 +745,7 @@ public class PrincipalController {
     void handleCalculaAsignacion() {
         if (!datosRueda.validar()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Estado de los datos incoherente");
             alert.setHeaderText("Ha fallado la validación de los datos");
             alert.setContentText(datosRueda.getMensajeValidacion());
@@ -748,12 +761,12 @@ public class PrincipalController {
                 barraEstado.setText("Optimización finalizada, NO HAY SOLUCIÓN");
                 datosRueda.setSolucion(null, 0);
             } else {
-                barraEstado.setText("Optimización finalizada, calculo de asignación realizado en "+resolutorService.getResolutor().getEstadisticas().getTiempoString());
+                barraEstado.setText("Optimización finalizada, calculo de asignación realizado en " + resolutorService.getResolutor().getEstadisticas().getTiempoString());
                 datosRueda.setSolucion(resolutorService.getValue(), resolutorService.getResolutor().getEstadisticas().getFitness());
             }
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
-            
+
             stage.getScene().setCursor(Cursor.DEFAULT);
             bCalcular.setDisable(false);
             mCalcular.setDisable(false);
@@ -762,6 +775,45 @@ public class PrincipalController {
         });
         resolutorService.setOnFailed((WorkerStateEvent e) -> {
             barraEstado.textProperty().unbind();
+            if (resolutorService.getException() != null) {
+
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.initOwner(stage);
+                alert.setTitle("Algo ha fallado");
+                alert.setHeaderText("Fallo la optimización");
+                alert.setContentText("El cálculo no ha ido bien. Revise los datos de entrada y\nsi el problema persiste, revise la instalación de la aplicación");
+
+                Throwable ex = resolutorService.getException();
+                ex.printStackTrace();
+
+                // Create expandable Exception.
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                ex.printStackTrace(pw);
+                String exceptionText = sw.toString();
+
+                Label label = new Label("La traza de la excepción fue:");
+
+                TextArea textArea = new TextArea(exceptionText);
+                textArea.setEditable(false);
+                textArea.setWrapText(true);
+
+                textArea.setMaxWidth(Double.MAX_VALUE);
+                textArea.setMaxHeight(Double.MAX_VALUE);
+                GridPane.setVgrow(textArea, Priority.ALWAYS);
+                GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+                GridPane expContent = new GridPane();
+                expContent.setMaxWidth(Double.MAX_VALUE);
+                expContent.add(label, 0, 0);
+                expContent.add(textArea, 0, 1);
+
+                // Set expandable Exception into the dialog pane.
+                alert.getDialogPane().setExpandableContent(expContent);
+
+                alert.showAndWait();
+
+            }
             barraEstado.setText("Optimización finalizada con fracaso, cálculo de asignación NO realizado. Compruebe los datos de entrada.");
             indicadorProgreso.progressProperty().unbind();
             indicadorProgreso.setProgress(0);
@@ -772,6 +824,7 @@ public class PrincipalController {
             bCancelarCalculo.setDisable(true);
             mCancelarCalculo.setDisable(true);
         });
+
         barraEstado.textProperty().bind(resolutorService.messageProperty());
         indicadorProgreso.setProgress(-1);
         indicadorProgreso.progressProperty().bind(resolutorService.progressProperty().subtract(0.01));
@@ -800,6 +853,7 @@ public class PrincipalController {
     @FXML
     void handleExtiendeHorario() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initOwner(stage);
         alert.setTitle("Extender horario");
         alert.setHeaderText("Duplica el nº de días y extiende el horario");
         alert.setContentText("Atención: usando esta función perderá la configuración del horario actual, "
@@ -847,6 +901,7 @@ public class PrincipalController {
         }
         if (mensaje != null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Entrada no añadida al horario");
             alert.setHeaderText("No se ha podido añadir la entrada al horario");
             alert.setContentText(mensaje);
@@ -861,6 +916,7 @@ public class PrincipalController {
             tablaHorario.getItems().remove(selectedIndex);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nada seleccionado");
             alert.setHeaderText("No ha seleccionado ninguna entrada en la tabla de horarios");
             alert.setContentText("Por favor, seleccione una entrada del horario para eliminarla");
@@ -873,6 +929,7 @@ public class PrincipalController {
         final String descripcion = tfDescripcionDia.getText();
         if (descripcion.isEmpty() || compruebaDia(descripcion)) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nombre o descripción inválido");
             alert.setHeaderText("El nombre o descripción del día no es válido o ya está usado");
             alert.setContentText("Por favor, introduzca un nombre o descripción de día que no este en uso");
@@ -908,6 +965,7 @@ public class PrincipalController {
             final Dia ds = tablaDias.getItems().get(selectedIndex);
             if (datosRueda.getHorarios().stream().map(Horario::getDia).anyMatch(d -> d.equals(ds))) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initOwner(stage);
                 alert.setTitle("Dia en uso");
                 alert.setHeaderText("El día seleccionado está siendo usado");
                 alert.setContentText("El día seleccionado está en uso, si continua se eliminarán todas las entradas del horario que lo usen. ¿Desea continuar?");
@@ -922,6 +980,7 @@ public class PrincipalController {
             tablaDias.getItems().remove(selectedIndex);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nada seleccionado");
             alert.setHeaderText("No ha seleccionado Día de la tabla");
             alert.setContentText("Por favor, seleccione un Día para eliminarlo");
@@ -934,6 +993,7 @@ public class PrincipalController {
         final String nombre = tfNombreLugar.getText();
         if (nombre.isEmpty() || datosRueda.getLugares().stream().map(Lugar::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nombre de Lugar inválido");
             alert.setHeaderText("El nombre del Lugar no es válido o ya está usado");
             alert.setContentText("Por favor, introduzca un nombre de Lugar que no este en uso");
@@ -952,6 +1012,7 @@ public class PrincipalController {
             final Lugar ds = tablaLugares.getItems().get(selectedIndex);
             if (datosRueda.getParticipantes().stream().map(Participante::getPuntosEncuentro).flatMap(List::stream).anyMatch(d -> d.equals(ds))) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initOwner(stage);
                 alert.setTitle("Lugar en uso");
                 alert.setHeaderText("El Lugar seleccionado está en uso");
                 alert.setContentText("El Lugar seleccionado está en uso como punto de encuentro de algún participante. Si continua se eliminarán todos los puntos de encuentro que lo usen. ¿Desea continuar?");
@@ -967,6 +1028,7 @@ public class PrincipalController {
             tablaLugares.getItems().remove(selectedIndex);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nada seleccionado");
             alert.setHeaderText("No ha seleccionado ninguno Lugar");
             alert.setContentText("Por favor, seleccione un Lugar para eliminarlo");
@@ -979,6 +1041,7 @@ public class PrincipalController {
         final String nombre = tfNombreParticipante.getText();
         if (nombre.isEmpty() || datosRueda.getParticipantes().stream().map(Participante::getNombre).anyMatch(d -> d.equalsIgnoreCase(nombre))) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nombre de Participante inválido");
             alert.setHeaderText("El nombre del Participante no es válido o ya está en suo");
             alert.setContentText("Por favor, introduzca un nombre de Participante que no esté en uso");
@@ -997,6 +1060,7 @@ public class PrincipalController {
             final Participante ps = tablaParticipantes.getItems().get(selectedIndex);
             if (datosRueda.getHorarios().stream().map(Horario::getParticipante).anyMatch(d -> d.equals(ps))) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.initOwner(stage);
                 alert.setTitle("Participante con horario asignado");
                 alert.setHeaderText("El Participante seleccionado tiene entradas en el horario");
                 alert.setContentText("El Participante seleccionado tiene datos en el horario. Si continua se eliminarán todas las entradas del horario que lo referencien. ¿Desea continuar?");
@@ -1011,6 +1075,7 @@ public class PrincipalController {
             tablaParticipantes.getItems().remove(selectedIndex);
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.initOwner(stage);
             alert.setTitle("Nada seleccionado");
             alert.setHeaderText("No ha seleccionado ninguno Participante");
             alert.setContentText("Por favor, seleccione un Participante para eliminarlo");
@@ -1055,7 +1120,7 @@ public class PrincipalController {
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {
 
         private final ObjectProperty<Resolutor> resolutor = new SimpleObjectProperty<>();
-        private final SetProperty<Horario> horarios = new SimpleSetProperty<Horario>();
+        private final SetProperty<Horario> horarios = new SimpleSetProperty<>();
 
         public ResolutorService() {
         }
