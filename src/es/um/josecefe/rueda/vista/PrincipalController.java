@@ -671,12 +671,12 @@ public class PrincipalController {
         } catch (Exception ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        creditosString += "\n\nJava: java.version=" + System.getProperty("java.version") + " - java.vendor=" + System.getProperty("java.vendor");
+        creditosString=creditosString.replaceFirst("%java-version%", System.getProperty("java.version")).replaceFirst("%java-vendor%",System.getProperty("java.vendor"));
         Text textoCreditos = new Text(creditosString);
         textoCreditos.setTextAlignment(TextAlignment.CENTER);
         textoCreditos.setFont(Font.font("", FontWeight.BOLD, 22));
         textoCreditos.setFill(Color.ROYALBLUE);
-        textoCreditos.setEffect(ds);
+        textoCreditos.setEffect(blend);
         textoCreditos.setCache(true);
 
         acercadeRoot.getChildren().addAll(textoCreditos, textoAutor, textoSolidos);
