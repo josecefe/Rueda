@@ -16,7 +16,6 @@
  */
 package es.um.josecefe.rueda.vista;
 
-import com.sun.prism.paint.Paint;
 import es.um.josecefe.rueda.RuedaFX;
 import es.um.josecefe.rueda.modelo.Asignacion;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
@@ -26,18 +25,11 @@ import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.Participante;
 import es.um.josecefe.rueda.resolutor.Resolutor;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Collections;
@@ -132,7 +124,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
@@ -680,11 +671,13 @@ public class PrincipalController {
         } catch (Exception ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        creditosString += "\n\nJava: java.version="+System.getProperty("java.version")+" - java.vendor="+System.getProperty("java.vendor");
+        creditosString += "\n\nJava: java.version=" + System.getProperty("java.version") + " - java.vendor=" + System.getProperty("java.vendor");
         Text textoCreditos = new Text(creditosString);
         textoCreditos.setTextAlignment(TextAlignment.CENTER);
         textoCreditos.setFont(Font.font("", FontWeight.BOLD, 22));
         textoCreditos.setFill(Color.ROYALBLUE);
+        textoCreditos.setEffect(ds);
+        textoCreditos.setCache(true);
 
         acercadeRoot.getChildren().addAll(textoCreditos, textoAutor, textoSolidos);
         Scene scene = new Scene(acercadeRoot, 1280, 720);
@@ -712,10 +705,7 @@ public class PrincipalController {
         Bounds textoCreditosBounds = textoCreditos.getBoundsInLocal();
         textoCreditos.setX((acercadeRoot.getWidth() - textoCreditosBounds.getWidth()) / 2);
         textoCreditos.setY(acercadeRoot.getHeight());
-        //final Rectangle rectangleClip = new Rectangle(0, textoSolidosBounds.getHeight() + 20, acercadeRoot.getWidth(), acercadeRoot.getHeight() - textoSolidosBounds.getHeight() - 40);
-        final Rectangle rectangleClip = new Rectangle(0, 0, acercadeRoot.getWidth(), acercadeRoot.getHeight());
-        rectangleClip.setFill(Color.YELLOW);
-        //textoCreditos.setClip(rectangleClip);
+
         TranslateTransition scrollTextoCreditos = new TranslateTransition(Duration.millis(20000), textoCreditos);
         //scrollTextoCreditos.setFromY(acercadeRoot.getHeight());
         scrollTextoCreditos.setToY(-Math.max(textoCreditosBounds.getHeight() + (acercadeRoot.getHeight() - textoCreditosBounds.getHeight()) / 2, textoCreditosBounds.getHeight()));
