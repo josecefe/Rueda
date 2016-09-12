@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -72,6 +74,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -85,6 +88,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
@@ -102,7 +106,9 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -110,6 +116,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -120,12 +127,6 @@ import javafx.util.Pair;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
-import static java.util.stream.Collectors.toMap;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.text.TextAlignment;
 
 /**
  * FXML Controller class
@@ -667,7 +668,7 @@ public class PrincipalController {
         textoAutor.setCache(true);
 
         String creditosString = String.format("%s %s - %s\n=====================================\n\n",TITLE,VERSION, COPYRIGHT);
-        try (BufferedReader recursoCreditos = new BufferedReader(new InputStreamReader(mainApp.getClass().getResourceAsStream("res/creditos.txt")))) {
+        try (BufferedReader recursoCreditos = new BufferedReader(new InputStreamReader(mainApp.getClass().getResourceAsStream("res/creditos.txt"), StandardCharsets.UTF_8))) {
             creditosString += recursoCreditos.lines().collect(Collectors.joining("\n"));
         } catch (Exception ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
