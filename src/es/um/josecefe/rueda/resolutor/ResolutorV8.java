@@ -143,7 +143,7 @@ public class ResolutorV8 extends ResolutorAcotado {
                     // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
                     List<Iterable<Lugar>> posiblesLugares = Stream.of(participantesDia).map(Participante::getPuntosEncuentro).
                             collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-                    posiblesLugares.addAll(selCond.stream().map(Participante::getPuntosEncuentro).
+                    posiblesLugares.addAll(selCond.stream().sorted().map(Participante::getPuntosEncuentro).
                             collect(ArrayList::new, ArrayList::add, ArrayList::addAll));
 
                     int mejorCoste = Integer.MAX_VALUE;

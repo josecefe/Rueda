@@ -141,7 +141,7 @@
                                                     </tooltip>
                                                 </TextField>
                                                 <Label layoutX="258.0" layoutY="143.0" text="Salida:" AnchorPane.bottomAnchor="33.0" />
-                                                <CheckBox fx:id="cCoche" layoutX="305.0" layoutY="167.0" mnemonicParsing="false" text="Dispone de coche" AnchorPane.bottomAnchor="9.0">
+                                                <CheckBox fx:id="cCoche" layoutX="305.0" layoutY="167.0" mnemonicParsing="false" selected="true" text="Dispone de coche" AnchorPane.bottomAnchor="9.0">
                                                     <tooltip>
                                                         <Tooltip text="Dejar marcado si el participante puede ser conductor ese día, desmarcarlo en caso contrario" textAlignment="JUSTIFY" wrapText="true" />
                                                     </tooltip>

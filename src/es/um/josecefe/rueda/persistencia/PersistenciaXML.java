@@ -16,7 +16,6 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
-import es.um.josecefe.rueda.RuedaFX;
 import static es.um.josecefe.rueda.Version.COPYRIGHT;
 import static es.um.josecefe.rueda.Version.TITLE;
 import static es.um.josecefe.rueda.Version.VERSION;
@@ -164,7 +163,7 @@ public class PersistenciaXML {
                         pIda.lugar = r.get().getValue();
                         celdaIda.add(pIda);
                     }
-                    Optional<Pair<Participante, Lugar>> s = a.getPeIda().stream().filter(p -> p.getKey() == pIda.participante).findFirst();
+                    Optional<Pair<Participante, Lugar>> s = a.getPeVuelta().stream().filter(p -> p.getKey() == pVuelta.participante).findFirst();
                     if (s.isPresent()) {
                         pVuelta.lugar = s.get().getValue();
                         celdaVuelta.add(pVuelta);
@@ -175,7 +174,7 @@ public class PersistenciaXML {
             HtmlView<?> htmlView = new HtmlView<>();
             htmlView.head()
                     .title(escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
-                    .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css");
+                    .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
             HtmlTable<?> table = htmlView
                     .body().classAttr("container")
                     .heading(1, "<div style='color:blue;text-align:center'>" + escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)) + "</div>")
@@ -183,7 +182,7 @@ public class PersistenciaXML {
                     .table().classAttr("table table-bordered");
             HtmlTr<?> headerRow = table.tr();
             headerRow.th().text("Hora");
-            datosRueda.getDias().stream().forEachOrdered(d -> headerRow.th().text(d.toString()));
+            datosRueda.getDias().stream().forEachOrdered(d -> headerRow.th().text(escapeHtml4(d.toString())));
             horasActivas.stream().sorted().forEachOrdered(hora -> {
                 HtmlTr<?> tr = table.tr();
                 tr.td().text(hora.toString()); //Hora
@@ -198,13 +197,12 @@ public class PersistenciaXML {
                                 .sorted((p1, p2) -> p1.ida == p2.ida ? 0 : p1.ida ? -1 : 1) // Teniendo en cuenta si es ida o vuelta
                                 .map(p -> {
                                     StringBuilder res = new StringBuilder();
-                                    if (p.conduce) {
-                                        res.append("<b>");
-                                    }
                                     if (p.ida) {
                                         res.append("<i>");
                                     }
-
+                                    if (p.conduce) {
+                                        res.append("<b>").append(escapeHtml4("*"));
+                                    }
                                     res.append(escapeHtml4(p.participante.toString()));
                                     if (conLugar) {
                                         res.append(" [");
@@ -212,11 +210,12 @@ public class PersistenciaXML {
                                         res.append("]");
                                     }
 
-                                    if (p.ida) {
-                                        res.append("</i>");
-                                    }
+                                    
                                     if (p.conduce) {
                                         res.append("</b>");
+                                    }
+                                    if (p.ida) {
+                                        res.append("</i>");
                                     }
                                     return res.toString();
                                 }).collect(Collectors.joining("<br>\n"));
@@ -227,9 +226,9 @@ public class PersistenciaXML {
 
             htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:center");
             if (conLugar) {
-                htmlView.body().hr().div().text("<hr>Leyenda: <i><b>Conductor [Lugar de Ida]</b></i> | <i>Pasajero [Lugar de Ida]</i> | <b>Conductor [Lugar de Vuelta]</b> | Pasajero [Lugar de Vuelta]").addAttr("style", "color:green;text-align:center");
+                htmlView.body().hr().div().text("<hr>Leyenda: <i><b>*Conductor [Lugar de Ida]</b></i> | <i>Pasajero [Lugar de Ida]</i> | <b>*Conductor [Lugar de Vuelta]</b> | Pasajero [Lugar de Vuelta]").addAttr("style", "color:green;text-align:center");
             } else {
-                htmlView.body().hr().div().text("Leyenda: <i><b>Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
+                htmlView.body().hr().div().text("Leyenda: <i><b>*Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>*Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
             }
             htmlView.body().hr().div().text("Generado con <b>"+TITLE+" "+VERSION+"<b> <i>"+COPYRIGHT+"</i>").addAttr("style", "color:royalblue;text-align:right");
             htmlView.setPrintStream(out);

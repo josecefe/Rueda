@@ -24,7 +24,8 @@ public class Version {
 
     public static final String COPYRIGHT = "(C)2016 Jose Ceferino Ortega Carretero";
     public static final String TITLE = "Optimizador de la Rueda";
-    public static final String VERSION = "1.05";
+    public static final String VERSION = "1.06";
+    public static final String DATE = "20160917";
     
     private Version() {}
 

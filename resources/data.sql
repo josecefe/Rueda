@@ -1,1 +1,0 @@
-insert into horario (participante, dia, entrada, salida, coche) select participante, 5, 1, 6, coche from horario where dia = 1 and participante <> 8;
