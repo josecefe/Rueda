@@ -27,12 +27,14 @@ import java.util.Set;
  * Clase ResolutorCombinado. Es un resolutor que se basa en dos, uno primero
  * tipicamente de tipo no exhaustivo que da una solución buena pero normalmente
  * no optima y un segundo de tipo exhaustivo, que tomando como base la solución
- * del primero para realizar descartes en el arbol de soluciones, intenta dar una
- * solución óptima en un tiempo de ejecución mejor que si se ejecutarse a ciegas
- * 
+ * del primero para realizar descartes en el arbol de soluciones, intenta dar
+ * una solución óptima en un tiempo de ejecución mejor que si se ejecutarse a
+ * ciegas
+ *
  * @author josec
  */
 public class ResolutorCombinado extends Resolutor {
+
     private Resolutor primero;
     private ResolutorAcotado segundo;
     private final EstadisticasCombinado estadisticas;
@@ -48,18 +50,18 @@ public class ResolutorCombinado extends Resolutor {
         resolutorGA.setTamPoblacion(200);
         resolutorGA.setNumGeneraciones(200);
         this.primero = resolutorGA;
-        
+
         this.segundo = new ResolutorV7();
         estadisticas = new EstadisticasCombinado(primero.getEstadisticas(), segundo.getEstadisticas());
     }
 
     /**
-     * Crea una nueva instancia de la clase, tomando como resolutores a los 
-     * dos que se le pasan. El primero debe ser un Resolutor de rápida ejecución,
+     * Crea una nueva instancia de la clase, tomando como resolutores a los dos
+     * que se le pasan. El primero debe ser un Resolutor de rápida ejecución,
      * tipicamente no exhaustivo (algoritmo evolutivo o voraz) y un segundo
      * resolutor de tipo exhustivo que tomará la solución del primero como base
      * para realizar una busqueda guiada.
-     * 
+     *
      * @param primero Resolutor no exhaustivo de rápida ejecución
      * @param segundo Resolutor actotado, generalmente exhaustivo
      */
@@ -86,14 +88,15 @@ public class ResolutorCombinado extends Resolutor {
         this.segundo = segundo;
         estadisticas.setSegunda(segundo.getEstadisticas());
     }
-    
+
     /**
      * Resuelve el problema mediante la aplicación sucesiva del resolutor
      * primero y segundo, tomando el segundo como cota superior del fitness de
      * la solución el resultado del primero.
-     * 
+     *
      * @param horarios Datos de entrada
-     * @return null o Collections.emptyMap() si no hay solución, una solución válida en otro caso
+     * @return null o Collections.emptyMap() si no hay solución, una solución
+     * válida en otro caso
      */
     @Override
     public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios) {
@@ -104,7 +107,7 @@ public class ResolutorCombinado extends Resolutor {
         estadisticas.actualizaProgreso();
         Map<Dia, ? extends AsignacionDia> solucion2 = segundo.resolver(horarios, estadisticas1.getFitness());
         Estadisticas estadisticas2 = segundo.getEstadisticas();
-        if (solucion2!=null && !solucion2.isEmpty() && estadisticas2.getFitness() < estadisticas1.getFitness()) {
+        if (solucion2 != null && !solucion2.isEmpty() && estadisticas2.getFitness() < estadisticas1.getFitness()) {
             solucion = solucion2;
             estadisticas.setFitness(estadisticas2.getFitness());
         }
@@ -117,7 +120,7 @@ public class ResolutorCombinado extends Resolutor {
         primero.parar();
         segundo.parar();
     }
-    
+
     @Override
     public Estadisticas getEstadisticas() {
         return estadisticas;
@@ -126,5 +129,12 @@ public class ResolutorCombinado extends Resolutor {
     @Override
     public Map<Dia, ? extends AsignacionDia> getSolucionFinal() {
         return solucion;
-    }    
+    }
+
+    @Override
+    public void setEstrategia(Estrategia estrategia) {
+        super.setEstrategia(estrategia);
+        primero.setEstrategia(estrategia);
+        segundo.setEstrategia(estrategia);
+    }
 }
