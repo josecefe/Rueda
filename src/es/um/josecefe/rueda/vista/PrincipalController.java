@@ -294,6 +294,9 @@ public class PrincipalController {
 
     @FXML
     ChoiceBox<Resolutor> cbAlgoritmo;
+    
+    @FXML
+    ChoiceBox<Resolutor.Estrategia> cbEstrategia;
 
     private Window stage;
     private boolean cerrandoAcercade;
@@ -464,6 +467,21 @@ public class PrincipalController {
             }
         });
         cbAlgoritmo.getSelectionModel().select(1);
+        
+        cbEstrategia.getItems().addAll(Resolutor.Estrategia.values());
+        cbEstrategia.setConverter(new StringConverter<Resolutor.Estrategia>() {
+            @Override
+            public String toString(Resolutor.Estrategia e) {
+                return e.toString();
+            }
+
+            @Override
+            public Resolutor.Estrategia fromString(String string) {
+                return Resolutor.Estrategia.valueOf(string);
+            }
+        });
+        
+        cbEstrategia.getSelectionModel().select(0);
     }
 
     public void setMainApp(RuedaFX mainApp) {
@@ -788,6 +806,8 @@ public class PrincipalController {
             return;
         }
         resolutorService = new ResolutorService();
+        Resolutor r = cbAlgoritmo.getValue();
+        r.setEstrategia(cbEstrategia.getValue());
         resolutorService.setResolutor(cbAlgoritmo.getValue());
         resolutorService.setHorarios(new HashSet<>(datosRueda.getHorarios()));
         resolutorService.setOnSucceeded((WorkerStateEvent e) -> {
@@ -1202,6 +1222,7 @@ public class PrincipalController {
                         updateProgress(newValue.doubleValue(), 1.0);
                         updateMessage("Calculando asignación: " + getResolutor().getEstadisticas().toString());
                     });
+                    
                     return getResolutor().resolver(getHorarios());
                 }
             };

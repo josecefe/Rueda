@@ -282,8 +282,8 @@
                         <AnchorPane BorderPane.alignment="CENTER_LEFT">
                             <children>
                                 <Label text="Asignación (Resultado):" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="0.0" />
-                                <Label fx:id="lEtiquetaCoste" layoutX="487.0" prefHeight="17.0" prefWidth="156.0" text="Coste total de la asignación:" visible="false" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="0.0" />
-                                <Label fx:id="lCoste" layoutX="734.0" text="0000" visible="false" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
+                                <Label fx:id="lEtiquetaCoste" layoutX="487.0" prefHeight="17.0" prefWidth="156.0" text="Coste total de la asignación:" visible="false" AnchorPane.rightAnchor="80.0" AnchorPane.topAnchor="0.0" />
+                                <Label fx:id="lCoste" layoutX="734.0" text="0000000" visible="false" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="0.0">
                                     <font>
                                         <Font name="System Bold" size="12.0" />
                                     </font>
@@ -325,6 +325,8 @@
                             <buttons>
                                 <Label alignment="CENTER_RIGHT" text="Algoritmo:" />
                                 <ChoiceBox fx:id="cbAlgoritmo" />
+                        <Label alignment="CENTER_RIGHT" text="Estrategia:" textAlignment="RIGHT" />
+                        <ChoiceBox fx:id="cbEstrategia" prefWidth="150.0" />
                                 <Button fx:id="bCalcular" mnemonicParsing="false" onAction="#handleCalculaAsignacion" text="Calcular asignación">
                                     <tooltip>
                                         <Tooltip text="Una vez introducidos todos los datos y configurados los horarios, use este botón para que la apliación realice la optimización y obtenga una asignación de conductores" textAlignment="JUSTIFY" wrapText="true" />

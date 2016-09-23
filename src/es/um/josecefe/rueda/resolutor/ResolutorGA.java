@@ -372,6 +372,10 @@ public class ResolutorGA extends Resolutor {
 
     final private class Individuo implements Comparable<Individuo> {
 
+        private static final int PESO_MAXIMO_VECES_CONDUCTOR = 1000000;
+        private static final int PESO_TOTAL_CONDUCTORES = 1000;
+        private static final int PESO_DIF_MAX_MIN_VECES_CONDUCTOR = 100;
+
         private final Map<Dia, AsignacionDia> genes;
         private final int aptitud;
 
@@ -390,7 +394,11 @@ public class ResolutorGA extends Resolutor {
         private int calculaAptitud(Map<Dia, AsignacionDia> genes) {
             Map<Participante, Integer> vecesCoche = genes.values().stream().flatMap(a -> a.getConductores().stream()).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
             IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i])).summaryStatistics();
-            return est.getMax() * 1000 + (est.getMax() - est.getMin()) * 100 + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
+            int apt = est.getMax() * PESO_MAXIMO_VECES_CONDUCTOR + (est.getMax() - est.getMin()) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
+            if (getEstrategia() == Estrategia.MINCONDUCTORES)
+                apt += est.getSum() * PESO_TOTAL_CONDUCTORES;
+            
+            return apt;
         }
 
         /**

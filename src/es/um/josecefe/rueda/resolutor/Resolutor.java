@@ -16,6 +16,23 @@ import java.util.Set;
  * @author josec
  */
 public abstract class Resolutor {
+    public enum Estrategia {
+        /**
+         * Estrategia equilibrado persigue conseguir que todos el mundo sea
+         * el mismo número de veces conductor, minimizando a la vez el número
+         * de veces que se es conductor. Da lugar a asignaciones justas pero 
+         * puede que muy desaprovechadas.
+         */
+        EQUILIBRADO, 
+        /**
+         * No busca un equilibrio entre conductores, sino la mejor distribución
+         * de los mismos para minimizar su número absoluto (da lugar a situaciones
+         * injustas)
+         */
+        MINCONDUCTORES
+    }
+    
+    protected Estrategia estrategia = Estrategia.EQUILIBRADO;
     protected boolean continuar;
     /**
      * Resuelve el problema de optimización de la rueda dado un horario de entrada.
@@ -38,7 +55,28 @@ public abstract class Resolutor {
      */
     public abstract Map<Dia, ? extends AsignacionDia> getSolucionFinal();
     
+    /**
+     * Permite detener el algoritmo y obtener el resultado actual (si hay alguno), que puede no se óptimo.
+     */
     public void parar() {
         continuar = false;
     }
+
+    /**
+     * Permite consultar la estrategía actual del algoritmo
+     * @return La estrategia seguida para optimizar
+     */
+    public Estrategia getEstrategia() {
+        return estrategia;
+    }
+
+    /** 
+     * Fija la estrategia de optimización
+     * 
+     * @param estrategia Tipo de estrategia a seguir para la optimización
+     */
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
+    }
+
 }
