@@ -133,7 +133,6 @@ public class ResolutorCombinado extends Resolutor {
 
     @Override
     public void setEstrategia(Estrategia estrategia) {
-        super.setEstrategia(estrategia);
         primero.setEstrategia(estrategia);
         segundo.setEstrategia(estrategia);
     }

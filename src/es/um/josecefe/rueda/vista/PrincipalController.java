@@ -139,7 +139,8 @@ public class PrincipalController {
         "es.um.josecefe.rueda.resolutor.ResolutorV7",
         "es.um.josecefe.rueda.resolutor.ResolutorV8",
         "es.um.josecefe.rueda.resolutor.ResolutorGA",
-        "es.um.josecefe.rueda.resolutor.ResolutorCombinado"};
+        "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
+        "es.um.josecefe.rueda.resolutor.ResolutorIterativo"};
 
     private RuedaFX mainApp;
 
@@ -533,7 +534,7 @@ public class PrincipalController {
     @FXML
     void handleOpen() {
         FileChooser fileChooser = new FileChooser();
-        if (mainApp.getLastFilePath() != null) {
+        if (mainApp.getLastFilePath() != null && mainApp.getLastFilePath().getParentFile().isDirectory()) {
             fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
         }
         // Set extension filter
@@ -571,7 +572,7 @@ public class PrincipalController {
         FileChooser fileChooser = new FileChooser();
 
         // Set extension filter
-        if (mainApp.getLastFilePath() != null) {
+        if (mainApp.getLastFilePath() != null && mainApp.getLastFilePath().getParentFile().isDirectory()) {
             fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
         }
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
@@ -595,8 +596,9 @@ public class PrincipalController {
         FileChooser fileChooser = new FileChooser();
 
         // Set extension filter
-        if (mainApp.getLastFilePath() != null) {
+        if (mainApp.getLastFilePath() != null && mainApp.getLastFilePath().getParentFile().isDirectory()) {
             fileChooser.setInitialDirectory(mainApp.getLastFilePath().getParentFile());
+            fileChooser.setInitialFileName(mainApp.getLastFilePath().getName().replace(".xml", ".html"));
         }
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "Archivos HTML (*.html)", "*.html");

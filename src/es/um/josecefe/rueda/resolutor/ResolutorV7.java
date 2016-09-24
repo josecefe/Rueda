@@ -259,10 +259,9 @@ public class ResolutorV7 extends ResolutorAcotado {
     public Estadisticas getEstadisticas() {
         return estGlobal;
     }
-
+    
     @Override
     public void setEstrategia(Estrategia estrategia) {
-        super.setEstrategia(estrategia);
-        contexto.estrategia = getEstrategia();
+        contexto.estrategia = estrategia;
     }
 }
