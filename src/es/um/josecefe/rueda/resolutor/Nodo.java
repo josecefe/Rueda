@@ -17,6 +17,10 @@
 package es.um.josecefe.rueda.resolutor;
 
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_DIF_MAX_MIN_VECES_CONDUCTOR;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_MAXIMO_VECES_CONDUCTOR;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_TOTAL_CONDUCTORES;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,10 +32,6 @@ import java.util.stream.Stream;
 
 final class Nodo implements Comparable<Nodo> {
     final static boolean DEBUG = true;
-    
-    private static final int PESO_MAXIMO_VECES_CONDUCTOR = 1000000;
-    private static final int PESO_TOTAL_CONDUCTORES = 1000;
-    private static final int PESO_DIF_MAX_MIN_VECES_CONDUCTOR = 100;
 
     private final List<AsignacionDiaV5> eleccion;
     private final int[] vecesConductor;

@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,14 +171,14 @@ public class PersistenciaXML {
                     }
                 });
             }
-            //TODO: Guardar como HTML
+            //Ahora generamos la tabla en HTML
             HtmlView<?> htmlView = new HtmlView<>();
             htmlView.head()
                     .title(escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
                     .linkCss("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
             HtmlTable<?> table = htmlView
                     .body().classAttr("container")
-                    .heading(1, "<div style='color:blue;text-align:center'>" + escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)) + "</div>")
+                    .heading(3, escapeHtml4("Asignación Rueda - " + LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT))))
                     .div()
                     .table().classAttr("table table-bordered");
             HtmlTr<?> headerRow = table.tr();
@@ -224,12 +225,48 @@ public class PersistenciaXML {
                 });
             });
 
-            htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:center");
+            // Leyenda
             if (conLugar) {
-                htmlView.body().hr().div().text("<hr>Leyenda: <i><b>*Conductor [Lugar de Ida]</b></i> | <i>Pasajero [Lugar de Ida]</i> | <b>*Conductor [Lugar de Vuelta]</b> | Pasajero [Lugar de Vuelta]").addAttr("style", "color:green;text-align:center");
+                htmlView.body().div().text("Leyenda: <i><b>*Conductor [Lugar de Ida]</b></i> | <i>Pasajero [Lugar de Ida]</i> | <b>*Conductor [Lugar de Vuelta]</b> | Pasajero [Lugar de Vuelta]").addAttr("style", "color:green;text-align:center");
             } else {
-                htmlView.body().hr().div().text("Leyenda: <i><b>*Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>*Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
+                htmlView.body().div().text("Leyenda: <i><b>*Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>*Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
             }
+            
+            // Coste
+            htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:right");
+            
+            // Cuadro de conductor/dias           
+            htmlView.body().heading(4, escapeHtml4("Cuadro de conductor/días"));
+            HtmlTable<?> tabla = htmlView.body().table().classAttr("table table-bordered");
+            HtmlTr<?> cabecera = tabla.tr();
+            cabecera.th().text(escapeHtml4("Conductor"));
+            cabecera.th().text(escapeHtml4("Días"));
+            cabecera.th().text(escapeHtml4("Total"));
+            datosRueda.getParticipantes().stream().sorted().forEachOrdered(participante -> {
+                List<Dia> dias=datosRueda.getAsignacion().stream().filter(a -> a.getConductores().contains(participante)).map(Asignacion::getDia).sorted().collect(toList());
+                if (dias.size()>0) {
+                    HtmlTr<?> tr = tabla.tr();
+                    tr.td().text(escapeHtml4(participante.getNombre()));
+                    tr.td().text(escapeHtml4(dias.toString()));
+                    tr.td().text(String.valueOf(dias.size()));
+                }
+            });
+            
+            // Cuadro de dia/conductores        
+            htmlView.body().heading(4, escapeHtml4("Cuadro de día/conductores"));
+            HtmlTable<?> tablaDias = htmlView.body().table().classAttr("table table-bordered");
+            HtmlTr<?> cabeceraDias = tablaDias.tr();
+            cabeceraDias.th().text(escapeHtml4("Día"));
+            cabeceraDias.th().text(escapeHtml4("Conductores"));
+            cabeceraDias.th().text(escapeHtml4("Total"));
+            datosRueda.getAsignacion().stream().sorted().forEachOrdered(a -> {
+                    HtmlTr<?> tr = tablaDias.tr();
+                    tr.td().text(escapeHtml4(a.getDia().getDescripcion()));
+                    tr.td().text(escapeHtml4(a.getConductores().toString()));
+                    tr.td().text(String.valueOf(a.getConductores().size()));
+            });
+            
+            // Pie de pagina
             htmlView.body().hr().div().text("Generado con <b>"+TITLE+" "+VERSION+"<b> <i>"+COPYRIGHT+"</i>").addAttr("style", "color:royalblue;text-align:right");
             htmlView.setPrintStream(out);
             htmlView.write();

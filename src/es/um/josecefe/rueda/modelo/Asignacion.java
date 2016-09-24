@@ -31,7 +31,7 @@ import javafx.util.Pair;
  *
  * @author josec
  */
-public class Asignacion {
+public class Asignacion implements Comparable<Asignacion> {
 
     private final ObjectProperty<Dia> dia = new SimpleObjectProperty<>();
     private final ListProperty<Participante> conductores = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -111,5 +111,10 @@ public class Asignacion {
 
     public IntegerProperty costeProperty() {
         return coste;
+    }
+
+    @Override
+    public int compareTo(Asignacion o) {
+        return getDia().compareTo(o.getDia());
     }
 }

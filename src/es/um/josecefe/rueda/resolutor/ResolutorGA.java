@@ -9,6 +9,9 @@ import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Lugar;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
 import es.um.josecefe.rueda.modelo.Horario;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_DIF_MAX_MIN_VECES_CONDUCTOR;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_MAXIMO_VECES_CONDUCTOR;
+import static es.um.josecefe.rueda.resolutor.Pesos.PESO_TOTAL_CONDUCTORES;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,18 +31,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toConcurrentMap;
@@ -371,11 +362,6 @@ public class ResolutorGA extends Resolutor {
     }
 
     final private class Individuo implements Comparable<Individuo> {
-
-        private static final int PESO_MAXIMO_VECES_CONDUCTOR = 1000000;
-        private static final int PESO_TOTAL_CONDUCTORES = 1000;
-        private static final int PESO_DIF_MAX_MIN_VECES_CONDUCTOR = 100;
-
         private final Map<Dia, AsignacionDia> genes;
         private final int aptitud;
 

@@ -51,7 +51,7 @@ public class ResolutorCombinado extends Resolutor {
         resolutorGA.setNumGeneraciones(200);
         this.primero = resolutorGA;
 
-        this.segundo = new ResolutorV7();
+        this.segundo = new ResolutorV8();
         estadisticas = new EstadisticasCombinado(primero.getEstadisticas(), segundo.getEstadisticas());
     }
 
