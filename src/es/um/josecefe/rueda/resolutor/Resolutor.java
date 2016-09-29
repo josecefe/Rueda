@@ -32,7 +32,7 @@ public abstract class Resolutor {
         MINCONDUCTORES
     }
     
-    protected Estrategia estrategia = Estrategia.EQUILIBRADO;
+    
     protected boolean continuar;
     /**
      * Resuelve el problema de optimización de la rueda dado un horario de entrada.
@@ -62,21 +62,10 @@ public abstract class Resolutor {
         continuar = false;
     }
 
-    /**
-     * Permite consultar la estrategía actual del algoritmo
-     * @return La estrategia seguida para optimizar
-     */
-    public Estrategia getEstrategia() {
-        return estrategia;
-    }
-
     /** 
      * Fija la estrategia de optimización
      * 
      * @param estrategia Tipo de estrategia a seguir para la optimización
      */
-    public void setEstrategia(Estrategia estrategia) {
-        this.estrategia = estrategia;
-    }
-
+    public abstract void setEstrategia(Estrategia estrategia);
 }

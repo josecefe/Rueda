@@ -59,6 +59,8 @@ public class ResolutorGA extends Resolutor {
     private final static int TAM_EXTRANJERO_DEF = TAM_ELITE_DEF;
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
+    protected Estrategia estrategia = Estrategia.EQUILIBRADO;
+    
     private Set<Horario> horarios;
     private Dia[] dias;
     private Participante[] participantes;
@@ -381,7 +383,7 @@ public class ResolutorGA extends Resolutor {
             Map<Participante, Integer> vecesCoche = genes.values().stream().flatMap(a -> a.getConductores().stream()).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
             IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i])).summaryStatistics();
             int apt = est.getMax() * PESO_MAXIMO_VECES_CONDUCTOR + (est.getMax() - est.getMin()) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
-            if (getEstrategia() == Estrategia.MINCONDUCTORES)
+            if (estrategia == Estrategia.MINCONDUCTORES)
                 apt += est.getSum() * PESO_TOTAL_CONDUCTORES;
             
             return apt;
@@ -460,5 +462,15 @@ public class ResolutorGA extends Resolutor {
             return String.format("Individuo{aptitud=%,d, genes=%s}", getAptitud(), getGenes());
         }
 
+    }
+    
+    /** 
+     * Fija la estrategia de optimización
+     * 
+     * @param estrategia Tipo de estrategia a seguir para la optimización
+     */
+    @Override
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
     }
 }
