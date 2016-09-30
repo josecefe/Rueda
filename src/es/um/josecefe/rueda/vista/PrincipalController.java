@@ -467,7 +467,7 @@ public class PrincipalController {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
-        cbAlgoritmo.getSelectionModel().select(1);
+        cbAlgoritmo.getSelectionModel().select(Runtime.getRuntime().availableProcessors() >= 4 ? 1 : 0);
         
         cbEstrategia.getItems().addAll(Resolutor.Estrategia.values());
         cbEstrategia.setConverter(new StringConverter<Resolutor.Estrategia>() {

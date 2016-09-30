@@ -56,7 +56,8 @@ class ContextoResolucion {
     int[][] minVecesCondDia;
     int[] peorCosteDia;
     int[] mejorCosteDia;
-    double pesoCotaInferior;
+    int pesoCotaInferiorNum; //Numerador de la fracción al ponderar la cota inferior respecto de la cota superior (el resto) para calcular el coste estimado
+    int pesoCotaInferiorDen; //Denominador de la fracción al ponderar las cotas inferior y superior para calcular el coste estimado
     Resolutor.Estrategia estrategia;
 
     void inicializa(final Set<Horario> horarios) {
@@ -154,6 +155,7 @@ class ContextoResolucion {
                                 && plazasNecesariasVuelta.entrySet().stream().allMatch(e -> e.getValue().entrySet().stream().allMatch(ll -> ll.getValue() <= plazasDisponiblesVuelta.get(e.getKey()).getOrDefault(ll.getKey(), 0)))) {
                             // Calculamos coste
                             int coste = Stream.of(participantesDia).filter(p -> !selCond.contains(p)).mapToInt(e -> e.getPuntosEncuentro().indexOf(lugaresIda.get(e)) + e.getPuntosEncuentro().indexOf(lugaresVuelta.get(e))).sum();//Omitimos los conductores
+                            //int coste = Stream.of(participantesDia).mapToInt(e -> e.getPuntosEncuentro().indexOf(lugaresIda.get(e)) + e.getPuntosEncuentro().indexOf(lugaresVuelta.get(e))).sum();
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste;

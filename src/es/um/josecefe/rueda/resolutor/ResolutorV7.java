@@ -3,26 +3,22 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * @author josec
@@ -39,6 +35,12 @@ public class ResolutorV7 extends ResolutorAcotado {
     private final static int CADA_MILIS_EST = 1000;
 
     private static final boolean CON_CAMBIO_DE_ESTRATEGIA = false;
+
+    private static final int PESO_COTA_INFERIOR_NUM_DEF_INI = 1;
+    private static final int PESO_COTA_INFERIOR_DEN_DEF_INI = 8;
+
+    private static final int PESO_COTA_INFERIOR_NUM_DEF_FIN = 1;
+    private static final int PESO_COTA_INFERIOR_DEN_DEF_FIN = 2;
 
     private Set<Horario> horarios;
 
@@ -62,7 +64,7 @@ public class ResolutorV7 extends ResolutorAcotado {
         continuar = true;
 
         contexto.inicializa(horarios);
-        
+
         solucionFinal = null;
 
         if (ESTADISTICAS) {
@@ -84,17 +86,17 @@ public class ResolutorV7 extends ResolutorAcotado {
 
     @Override
     public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios) {
-        return resolver(horarios, Integer.MAX_VALUE-1);
+        return resolver(horarios, Integer.MAX_VALUE - 1);
     }
 
     /**
      *
      * @param horarios
-     * @param cotaInfCorte
+     * @param cotaInfCorteInicial
      * @return
      */
     @Override
-    public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, int cotaInfCorte) {
+    public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, int cotaInfCorteInicial) {
         this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
@@ -117,10 +119,11 @@ public class ResolutorV7 extends ResolutorAcotado {
         RAIZ = new Nodo(contexto);
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = cotaInfCorte < Integer.MAX_VALUE ?  cotaInfCorte + 1 : cotaInfCorte; //Lo tomamos como cota superior
+        cotaInferiorCorte = cotaInfCorteInicial < Integer.MAX_VALUE ? cotaInfCorteInicial + 1 : cotaInfCorteInicial; //Lo tomamos como cota superior
         Collection<Nodo> LNV;
         Supplier<Nodo> opPull;
-        contexto.pesoCotaInferior = 0.1; //Primero buscamos en profundidad
+        contexto.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_INI; //Primero buscamos en profundidad
+        contexto.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_INI; //Primero buscamos en profundidad
         if (CON_CAMBIO_DE_ESTRATEGIA) {
             ArrayDeque<Nodo> pilaNodosVivos = new ArrayDeque<>(); // Inicialmente es una cola LIFO (pila)
             LNV = pilaNodosVivos;
@@ -155,19 +158,15 @@ public class ResolutorV7 extends ResolutorAcotado {
                     Optional<Nodo> mejorHijo = actual.generaHijos(true).min(Nodo::compareTo); //true para paralelo
                     if (mejorHijo.isPresent() && mejorHijo.get().compareTo(mejor) < 0) {
                         if (mejor == RAIZ) {
-                            contexto.pesoCotaInferior = 0.55; //Después buscamos más en anchura
+                            // Cambiamos los pesos
+                            contexto.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_FIN; //Después buscamos más equilibrado
+                            contexto.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_FIN; //Después buscamos más equilibrado
+                            LNV.parallelStream().forEach(Nodo::calculaCosteEstimado);// Hay que forzar el calculo de nuevo de los costes de los nodos
                             PriorityQueue<Nodo> colaNodosVivos;
-                            if (CON_CAMBIO_DE_ESTRATEGIA) {
-                                colaNodosVivos = new PriorityQueue<>(LNV);
-                                if (DEBUG) {
-                                    System.out.println("---- CAMBIANDO A COLA DE PRIORIDAD");
-                                }
-                            } else {
-                                colaNodosVivos = new PriorityQueue<>(LNV.size());
-                                colaNodosVivos.addAll(LNV);
-                                if (DEBUG) {
-                                    System.out.println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS");
-                                }
+                            colaNodosVivos = new PriorityQueue<>(LNV.size());
+                            colaNodosVivos.addAll(LNV);
+                            if (DEBUG) {
+                                System.out.println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS");
                             }
                             opPull = colaNodosVivos::poll;
                             LNV = colaNodosVivos;
@@ -231,7 +230,7 @@ public class ResolutorV7 extends ResolutorAcotado {
 
         //Estadisticas finales
         if (ESTADISTICAS) {
-            estGlobal.setFitness(cotaInferiorCorte ).actualizaProgreso();
+            estGlobal.setFitness(cotaInferiorCorte).actualizaProgreso();
             if (DEBUG) {
                 System.out.println("====================");
                 System.out.println("Estadísticas finales");
@@ -242,9 +241,10 @@ public class ResolutorV7 extends ResolutorAcotado {
             }
         }
         // Construimos la solución final
-        if (mejor.compareTo(RAIZ) < 0) {
-            Iterator<AsignacionDiaV5> i = mejor.getEleccion().iterator();
-            solucionFinal = Stream.of(contexto.dias).collect(toMap(Function.identity(), d -> i.next()));
+        if (mejor.getCosteEstimado() < cotaInfCorteInicial) {
+            solucionFinal = mejor.getSolucion();
+        } else {
+            solucionFinal = null;
         }
 
         return solucionFinal;
@@ -259,7 +259,7 @@ public class ResolutorV7 extends ResolutorAcotado {
     public Estadisticas getEstadisticas() {
         return estGlobal;
     }
-    
+
     @Override
     public void setEstrategia(Estrategia estrategia) {
         contexto.estrategia = estrategia;

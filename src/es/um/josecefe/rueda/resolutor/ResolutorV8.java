@@ -4,23 +4,19 @@
 package es.um.josecefe.rueda.resolutor;
 
 import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
+import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * ResolutorV8
@@ -33,13 +29,14 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorV8 extends ResolutorAcotado {
 
-    private final static boolean DEBUG = false;
+    private final static boolean DEBUG = true;
 
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS_EST = 1000;
     private final static int CADA_MILIS_EST = 1000;
 
-    private static final double PESO_COTA_INFERIOR_DEF = 0.5;
+    private static final int PESO_COTA_INFERIOR_NUM_DEF = 1;
+    private static final int PESO_COTA_INFERIOR_DEN_DEF = 2;
 
     private Set<Horario> horarios;
 
@@ -62,7 +59,8 @@ public class ResolutorV8 extends ResolutorAcotado {
         continuar = true;
 
         contexto.inicializa(horarios);
-        contexto.pesoCotaInferior = PESO_COTA_INFERIOR_DEF;
+        contexto.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF;
+        contexto.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF;
 
         solucionFinal = null;
 
@@ -89,7 +87,7 @@ public class ResolutorV8 extends ResolutorAcotado {
     }
 
     @Override
-    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaInfCorte) {
+    public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaInfCorteInicial) {
         this.horarios = horarios;
         if (horarios.isEmpty()) {
             return Collections.emptyMap();
@@ -113,7 +111,7 @@ public class ResolutorV8 extends ResolutorAcotado {
         RAIZ = new Nodo(contexto);
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = new AtomicInteger(cotaInfCorte + 1); //Lo tomamos como cota superior
+        cotaInferiorCorte = new AtomicInteger(cotaInfCorteInicial + 1); //Lo tomamos como cota superior
 
         mejor = branchAndBound(actual, mejor).orElse(mejor); //Cogemos el nuevo mejor
 
@@ -131,9 +129,10 @@ public class ResolutorV8 extends ResolutorAcotado {
             }
         }
         // Construimos la solución final
-        if (mejor.compareTo(RAIZ) < 0) {
-            Iterator<AsignacionDiaV5> i = mejor.getEleccion().iterator();
-            solucionFinal = Stream.of(contexto.dias).collect(toMap(Function.identity(), d -> i.next()));
+        if (mejor.getCosteEstimado() < cotaInfCorteInicial) {
+            solucionFinal = mejor.getSolucion();
+        } else {
+            solucionFinal = null;
         }
 
         return solucionFinal;

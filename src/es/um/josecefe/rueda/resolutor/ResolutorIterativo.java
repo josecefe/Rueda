@@ -35,7 +35,7 @@ public class ResolutorIterativo extends ResolutorAcotado {
     private Map<Dia, ? extends AsignacionDia> solucion;
 
     public ResolutorIterativo() {
-        resolutor = new ResolutorV8();
+        resolutor = Runtime.getRuntime().availableProcessors() > 4 ? new ResolutorV8() : new ResolutorV7();
     }
 
     public ResolutorIterativo(ResolutorAcotado resolutor) {
@@ -43,12 +43,12 @@ public class ResolutorIterativo extends ResolutorAcotado {
     }
 
     public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaCorteTope, int cotaCorteBase) {
-        solucion = Collections.emptyMap();
+        solucion = null;
         int corte = cotaCorteBase ; // Punto de partida
         for (; (solucion==null || solucion.isEmpty()) && corte < cotaCorteTope; corte += Pesos.PESO_MAXIMO_VECES_CONDUCTOR) { // Valor inicial
             solucion = resolutor.resolver(horarios, corte);
         }
-        if ((solucion==null || solucion.isEmpty()) && corte > cotaCorteTope) {
+        if ((solucion==null || solucion.isEmpty())) {
             solucion = resolutor.resolver(horarios, cotaCorteTope);
         }
         return solucion;
@@ -84,4 +84,9 @@ public class ResolutorIterativo extends ResolutorAcotado {
         resolutor.setEstrategia(estrategia);
     }
 
+    @Override
+    public void parar() {
+        super.parar();
+        resolutor.parar();
+    }
 }
