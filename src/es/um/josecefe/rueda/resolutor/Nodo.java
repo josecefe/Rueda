@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 josec
+ * Copyright (C) 2016 José Ceferino Ortega
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-//Function<Nodo, Double> funcionCoste;
+/**
+ * Nodo
+ * Clase que se usa por diversor Resolutores como nodo del árbol de busqueda.
+ * 
+ * @author josecefe
+ */
 final class Nodo implements Comparable<Nodo> {
 
     final static boolean DEBUG = true;

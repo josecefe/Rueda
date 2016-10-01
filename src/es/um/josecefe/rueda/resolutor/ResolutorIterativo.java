@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Jose
+ * Copyright (C) 2016 José Ceferino Ortega
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 /**
  *
- * @author Jose
+ * @author josecefe
  */
 public class ResolutorIterativo extends ResolutorAcotado {
 
