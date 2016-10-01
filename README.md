@@ -1,5 +1,6 @@
-#Rueda
-Optimizador de la Rueda - (c)2016 Jose Ceferino Ortega
+#Optimizador de la Rueda
+##(c)2016 *Jose Ceferino Ortega*
+
 Aplicación para la optimización del cuadrante de una "rueda", entendiendo por rueda un sistema para compartir coche entre varias personas en el trabajo con horarios dispares.
 El proyecto se encuentra alojado en <https://github.com/josecefe/Rueda>
 
