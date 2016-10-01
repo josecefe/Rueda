@@ -20,7 +20,6 @@ import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Participante;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -35,7 +34,7 @@ public class ResolutorIterativo extends ResolutorAcotado {
     private Map<Dia, ? extends AsignacionDia> solucion;
 
     public ResolutorIterativo() {
-        resolutor = Runtime.getRuntime().availableProcessors() > 4 ? new ResolutorV8() : new ResolutorV7();
+        resolutor = Runtime.getRuntime().availableProcessors() >= 4 ? new ResolutorV8() : new ResolutorV7();
     }
 
     public ResolutorIterativo(ResolutorAcotado resolutor) {
