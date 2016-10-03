@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
  */
 public class ResolutorV8 extends ResolutorAcotado {
 
-    private final static boolean DEBUG = true;
+    private final static boolean DEBUG = false;
 
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS_EST = 1000;

@@ -58,7 +58,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResolutorGA extends Resolutor {
 
-    private final static boolean DEBUG = true;
+    private final static boolean DEBUG = false;
     private final static boolean ESTADISTICAS = true;
     private final static int IMP_CADA_CUANTAS_GEN = 100;
 
