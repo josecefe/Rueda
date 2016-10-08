@@ -1222,7 +1222,7 @@ public class PrincipalController {
                     updateMessage("Iniciando la resolución...");
                     getResolutor().getEstadisticas().progresoProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
                         updateProgress(newValue.doubleValue(), 1.0);
-                        updateMessage("Calculando asignación: " + getResolutor().getEstadisticas().toString());
+                        updateMessage(getResolutor().getEstadisticas().toString());
                     });
                     
                     return getResolutor().resolver(getHorarios());
