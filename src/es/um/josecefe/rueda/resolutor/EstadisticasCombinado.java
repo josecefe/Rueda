@@ -40,7 +40,7 @@ public class EstadisticasCombinado extends Estadisticas {
 
     @Override
     public String toString() {
-        return String.format("t=%s s, C=%,d Completado=%.3f%% (ETA=%s)",
+        return String.format("t=%s s, C=%,d Cmpl.=%.3f%% (ETR=%s)",
                 getTiempoString(), getFitness(), progresoProperty().get() * 100.0,
                 DurationFormatUtils.formatDurationHMS((long) (getTiempo() / progresoProperty().get())));
     }

@@ -59,7 +59,7 @@ public final class EstadisticasV8 extends Estadisticas {
     @Override
     public String toString() {
         double lPorcentajeArbol = getCompletado() * 100.0;
-        return String.format("t=%s, C=%,d, NE=%,d (%,.0f NE/s), NG=%,.0f (%,.0f NG/s), SG=%,.0f, NP=%g, Completado=%.3f%% (ETA=%s)",
+        return String.format("t=%s s, C=%,d NE=%,d, %,.0f NE/s, NG=%,.0f, %,.0f NG/s, SG=%,.0f, NP=%g, CMPL=%.3f%%, ETR=%s",
                 getTiempoString(), fitness, expandidos.get(), expandidos.get() * 1000.0 / tiempo, generados.sum(), generados.sum() * 1000.0 / tiempo,
                 terminales.sum(), descartados.sum(), lPorcentajeArbol,
                 DurationFormatUtils.formatDurationHMS((long) ((tiempo / lPorcentajeArbol) * 100.0)));
@@ -86,6 +86,7 @@ public final class EstadisticasV8 extends Estadisticas {
      *
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
+    @Override
     public double getCompletado() {
         return (descartados.sum() + terminales.sum()) / totalPosiblesSoluciones;
     }

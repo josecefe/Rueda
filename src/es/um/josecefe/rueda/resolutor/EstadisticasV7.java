@@ -22,12 +22,12 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
  *
  * @author josec
  */
-public final class EstadisticasV1 extends Estadisticas {
+public final class EstadisticasV7 extends Estadisticas {
     protected long expandidos = 0;
     protected double descartados = 0, terminales = 0, generados = 0;
     protected double totalPosiblesSoluciones;
 
-    public EstadisticasV1() {
+    public EstadisticasV7() {
     }
 
     @Override
@@ -41,7 +41,7 @@ public final class EstadisticasV1 extends Estadisticas {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }
     
-    protected EstadisticasV1 acumular(EstadisticasV1 otro) {
+    protected EstadisticasV7 acumular(EstadisticasV7 otro) {
         expandidos += otro.expandidos;
         generados += otro.generados;
         descartados += otro.descartados;
@@ -52,7 +52,7 @@ public final class EstadisticasV1 extends Estadisticas {
     @Override
     public String toString() {
         final double porcentajeArbol = getCompletado() * 100.0;
-        return String.format("t=%s s, C=%,d NE=%,d (%,.0f NE/s), NG=%,.0f (%,.0f NG/s), SG=%,.0f, NP=%g, Completado=%.3f%% (ETA=%s)",
+        return String.format("t=%s s, C=%,d NE=%,d, %,.0f NE/s, NG=%,.0f, %,.0f NG/s, SG=%,.0f, NP=%g, CMPL=%.3f%%, ETR=%s",
                 getTiempoString(), fitness, expandidos, expandidos * 1000.0 / tiempo, generados, generados * 1000.0 / tiempo,
                 terminales, descartados, porcentajeArbol, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeArbol) * 100)));
     }

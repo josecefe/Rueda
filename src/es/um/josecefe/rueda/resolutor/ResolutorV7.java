@@ -66,7 +66,7 @@ public class ResolutorV7 extends ResolutorAcotado {
 
     private int cotaInferiorCorte = Integer.MAX_VALUE;
     private Nodo RAIZ;
-    private final EstadisticasV1 estGlobal = new EstadisticasV1();
+    private final EstadisticasV7 estGlobal = new EstadisticasV7();
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV7() {

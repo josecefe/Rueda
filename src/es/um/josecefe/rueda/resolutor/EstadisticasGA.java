@@ -47,7 +47,7 @@ public final class EstadisticasGA extends Estadisticas {
     @Override
     public String toString() {
         final double porcentajeCompletado = getCompletado() * 100.0;
-        return String.format("t=%s, Fitness=%,d, Generación nº %,d (%,.0f gen/s), Individuos Generados=%,.0f (%,.0f g/s), Completado=%.3f%% (ETA=%s)",
+        return String.format("t=%s, C=%,d, G=%,d (%,.0f gen/s), IG=%,.0f (%,.0f g/s), Cmpl.=%.3f%% (ETR=%s)",
                 getTiempoString(), fitness, generaciones.get(), generaciones.get() * 1000.0 / tiempo, generados.sum(), generados.sum() * 1000.0 / tiempo, 
                 porcentajeCompletado, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeCompletado) * 100.0)));
     }
@@ -70,6 +70,7 @@ public final class EstadisticasGA extends Estadisticas {
      * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
+    @Override
     public double getCompletado() {
         return (double) generaciones.get() / numGeneraciones;
     }
