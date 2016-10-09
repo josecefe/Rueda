@@ -154,8 +154,9 @@ class ContextoResolucion {
                         if (plazasNecesariasIda.entrySet().stream().allMatch(e -> e.getValue().entrySet().stream().allMatch(ll -> ll.getValue() <= plazasDisponiblesIda.get(e.getKey()).getOrDefault(ll.getKey(), 0)))
                                 && plazasNecesariasVuelta.entrySet().stream().allMatch(e -> e.getValue().entrySet().stream().allMatch(ll -> ll.getValue() <= plazasDisponiblesVuelta.get(e.getKey()).getOrDefault(ll.getKey(), 0)))) {
                             // Calculamos coste
-                            int coste = Stream.of(participantesDia).filter(p -> !selCond.contains(p)).mapToInt(e -> e.getPuntosEncuentro().indexOf(lugaresIda.get(e)) + e.getPuntosEncuentro().indexOf(lugaresVuelta.get(e))).sum();//Omitimos los conductores
-                            //int coste = Stream.of(participantesDia).mapToInt(e -> e.getPuntosEncuentro().indexOf(lugaresIda.get(e)) + e.getPuntosEncuentro().indexOf(lugaresVuelta.get(e))).sum();
+                            int coste = Stream.of(participantesDia).mapToInt(
+                                    p ->  (p.getPuntosEncuentro().indexOf(lugaresIda.get(p)) + p.getPuntosEncuentro().indexOf(lugaresVuelta.get(p)))*
+                                            (selCond.contains(p) ? Pesos.PESO_LUGAR_CONDUCTOR : Pesos.PESO_LUGAR_PASAJERO)).sum();
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste;
@@ -186,7 +187,7 @@ class ContextoResolucion {
                     }
                 }
             }
-            Collections.shuffle(solucionesDia); //Barajamos las soluciones parciales
+            Collections.shuffle(solucionesDia); //Barajamos las soluciones parciales para dar cierta aleatoridad a igualdad de coste
             solucionesDia.sort(null); //Ordenamos la soluciones parciales tras el barajado
             return solucionesDia;
         }));
