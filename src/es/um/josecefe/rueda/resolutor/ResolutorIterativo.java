@@ -20,12 +20,12 @@ import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.modelo.Participante;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 /**
- *
  * @author josecefe
  */
 public class ResolutorIterativo extends ResolutorAcotado {
@@ -43,11 +43,11 @@ public class ResolutorIterativo extends ResolutorAcotado {
 
     public Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios, int cotaCorteTope, int cotaCorteBase) {
         solucion = null;
-        int corte = cotaCorteBase ; // Punto de partida
-        for (; (solucion==null || solucion.isEmpty()) && corte < cotaCorteTope; corte += Pesos.PESO_MAXIMO_VECES_CONDUCTOR) { // Valor inicial
+        int corte = cotaCorteBase; // Punto de partida
+        for (; (solucion == null || solucion.isEmpty()) && corte < cotaCorteTope; corte += Pesos.PESO_MAXIMO_VECES_CONDUCTOR) { // Valor inicial
             solucion = resolutor.resolver(horarios, corte);
         }
-        if ((solucion==null || solucion.isEmpty())) {
+        if ((solucion == null || solucion.isEmpty())) {
             solucion = resolutor.resolver(horarios, cotaCorteTope);
         }
         return solucion;
@@ -59,7 +59,7 @@ public class ResolutorIterativo extends ResolutorAcotado {
         long numParticipantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().count();
         Participante[] conductores = horarios.stream().filter(Horario::isCoche).map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
         double tamMedioCoche = Stream.of(conductores).mapToInt(Participante::getPlazasCoche).average().orElse(1);
-        int cotaCorteBase = (int) (((numParticipantes / tamMedioCoche) * numDias / conductores.length) +  1) * Pesos.PESO_MAXIMO_VECES_CONDUCTOR - 1;
+        int cotaCorteBase = (int) (((numParticipantes / tamMedioCoche) * numDias / conductores.length) + 1) * Pesos.PESO_MAXIMO_VECES_CONDUCTOR - 1;
         return resolver(horarios, cotaCorteTope, cotaCorteBase);
     }
 

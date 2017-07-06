@@ -19,25 +19,19 @@ package es.um.josecefe.rueda.resolutor;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.PriorityQueue;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * ResolutorV7
- * 
+ * <p>
  * Se trata de un resolutor que aplica la tecnica de Ramificación y poda (B&B).
- * 
+ *
  * @author josecefe
  */
 public class ResolutorV7 extends ResolutorAcotado {
@@ -54,19 +48,15 @@ public class ResolutorV7 extends ResolutorAcotado {
 
     private static final int PESO_COTA_INFERIOR_NUM_DEF_FIN = 1;
     private static final int PESO_COTA_INFERIOR_DEN_DEF_FIN = 2;
-
-    private Set<Horario> horarios;
-
     private final ContextoResolucion contexto = new ContextoResolucion();
-
+    private final EstadisticasV7 estGlobal = new EstadisticasV7();
+    private Set<Horario> horarios;
     private Map<Dia, AsignacionDiaV5> solucionFinal;
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
-
     private int cotaInferiorCorte = Integer.MAX_VALUE;
     private Nodo RAIZ;
-    private final EstadisticasV7 estGlobal = new EstadisticasV7();
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV7() {
@@ -103,7 +93,6 @@ public class ResolutorV7 extends ResolutorAcotado {
     }
 
     /**
-     *
      * @param horarios
      * @param cotaInfCorteInicial
      * @return

@@ -17,49 +17,9 @@
 package es.um.josecefe.rueda.vista;
 
 import es.um.josecefe.rueda.RuedaFX;
-import static es.um.josecefe.rueda.Version.COPYRIGHT;
-import static es.um.josecefe.rueda.Version.TITLE;
-import static es.um.josecefe.rueda.Version.VERSION;
-import es.um.josecefe.rueda.modelo.Asignacion;
-import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.DatosRueda;
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.Horario;
-import es.um.josecefe.rueda.modelo.Lugar;
-import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.*;
 import es.um.josecefe.rueda.resolutor.Resolutor;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormatSymbols;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import javafx.animation.Animation;
-import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.ParallelTransition;
-import javafx.animation.PauseTransition;
-import javafx.animation.SequentialTransition;
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -74,60 +34,40 @@ import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
+import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.scene.text.*;
+import javafx.stage.*;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.SystemUtils;
+
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormatSymbols;
+import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import static es.um.josecefe.rueda.Version.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * FXML Controller class
@@ -137,169 +77,115 @@ import org.apache.commons.lang3.SystemUtils;
 public class PrincipalController {
 
     private static final String[] RESOLUTORES = new String[]{
-        "es.um.josecefe.rueda.resolutor.ResolutorV7",
-        "es.um.josecefe.rueda.resolutor.ResolutorV8",
-        "es.um.josecefe.rueda.resolutor.ResolutorGA",
-        "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
-        "es.um.josecefe.rueda.resolutor.ResolutorIterativo"};
-
-    private RuedaFX mainApp;
-
-    private DatosRueda datosRueda;
-
-    @FXML
-    private MenuItem mCalcular;
-
-    @FXML
-    private MenuItem mCancelarCalculo;
-
-    @FXML
-    private MenuItem mExportar;
-
+            "es.um.josecefe.rueda.resolutor.ResolutorV7",
+            "es.um.josecefe.rueda.resolutor.ResolutorV8",
+            "es.um.josecefe.rueda.resolutor.ResolutorGA",
+            "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
+            "es.um.josecefe.rueda.resolutor.ResolutorIterativo"};
     @FXML
     TableView<Horario> tablaHorario;
-
     @FXML
     TableColumn<Horario, Dia> columnaDia;
-
     @FXML
     TableColumn<Horario, Participante> columnaParticipante;
-
     @FXML
     TableColumn<Horario, Integer> columnaEntrada;
-
     @FXML
     TableColumn<Horario, Integer> columnaSalida;
-
     @FXML
     TableColumn<Horario, Boolean> columnaCoche;
-
     @FXML
     Label lCoste;
-
     @FXML
     Label lEtiquetaCoste;
-
     @FXML
     TableView<Asignacion> tablaResultado;
-
     @FXML
     TableColumn<Asignacion, Dia> columnaDiaAsignacion;
-
     @FXML
     TableColumn<Asignacion, Set<Participante>> columnaConductores;
-
     @FXML
     TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeIda;
-
     @FXML
     TableColumn<Asignacion, Map<Participante, Lugar>> columnaPeVuelta;
-
     @FXML
     TableColumn<Asignacion, Integer> columnaCoste;
-
     @FXML
     TableView<AsignacionParticipante> tablaResultadoLugares;
-
     @FXML
     TableColumn<AsignacionParticipante, Participante> columnaParticipanteLugares;
-
     @FXML
     TableColumn<AsignacionParticipante, Lugar> columnaLugaresIda;
-
     @FXML
     TableColumn<AsignacionParticipante, Lugar> columnaLugaresVuelta;
-
     @FXML
     TableColumn<AsignacionParticipante, Boolean> columnaLugaresConductor;
-
     @FXML
     ProgressBar indicadorProgreso;
-
     @FXML
     Label barraEstado;
-
     @FXML
     Button bCalcular;
-
     @FXML
     Button bCancelarCalculo;
-
     @FXML
     Button bExportar;
-
     @FXML
     ComboBox<Dia> cbDia;
-
     @FXML
     ComboBox<Participante> cbParticipante;
-
     @FXML
     TextField tfEntrada;
-
     @FXML
     TextField tfSalida;
-
     @FXML
     CheckBox cCoche;
-
     @FXML
     TableView<Dia> tablaDias;
-
     @FXML
     TableColumn<Dia, Integer> columnaIdDia;
-
     @FXML
     TableColumn<Dia, String> columnaDescripcionDia;
-
     @FXML
     TextField tfDescripcionDia;
-
     @FXML
     TableView<Lugar> tablaLugares;
-
     @FXML
     TableColumn<Lugar, Integer> columnaIdLugar;
-
     @FXML
     TableColumn<Lugar, String> columnaNombreLugar;
-
     @FXML
     TextField tfNombreLugar;
-
     @FXML
     TableView<Participante> tablaParticipantes;
-
     @FXML
     TableColumn<Participante, Integer> columnaIdParticipante;
-
     @FXML
     TableColumn<Participante, String> columnaNombreParticipante;
-
     @FXML
     TableColumn<Participante, Integer> columnaPlazasCoche;
-
     @FXML
     TableColumn<Participante, List<Lugar>> columnaLugaresParticipante;
-
     @FXML
     TextField tfNombreParticipante;
-
     @FXML
     Spinner<Integer> sPlazas;
-
     @FXML
     ComboBox<Lugar> cbLugares;
-
     @FXML
     ListView<Lugar> lvLugaresEncuentro;
-
     @FXML
     ChoiceBox<Resolutor> cbAlgoritmo;
-    
     @FXML
     ChoiceBox<Resolutor.Estrategia> cbEstrategia;
-
+    private RuedaFX mainApp;
+    private DatosRueda datosRueda;
+    @FXML
+    private MenuItem mCalcular;
+    @FXML
+    private MenuItem mCancelarCalculo;
+    @FXML
+    private MenuItem mExportar;
     private Window stage;
     private boolean cerrandoAcercade;
     private ResolutorService resolutorService;
@@ -454,7 +340,7 @@ public class PrincipalController {
                 Resolutor resolutorIns = (Resolutor) resolutorCls.getDeclaredConstructor().newInstance();
                 cbAlgoritmo.getItems().add(resolutorIns);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Imposible instanciar el resolutor "+resolutor, e);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Imposible instanciar el resolutor " + resolutor, e);
             }
         }
         cbAlgoritmo.setConverter(new StringConverter<>() {
@@ -469,7 +355,7 @@ public class PrincipalController {
             }
         });
         cbAlgoritmo.getSelectionModel().select(Runtime.getRuntime().availableProcessors() >= 4 ? 1 : 0);
-        
+
         cbEstrategia.getItems().addAll(Resolutor.Estrategia.values());
         cbEstrategia.setConverter(new StringConverter<>() {
             @Override
@@ -482,7 +368,7 @@ public class PrincipalController {
                 return Resolutor.Estrategia.valueOf(string);
             }
         });
-        
+
         cbEstrategia.getSelectionModel().select(0);
     }
 
@@ -647,7 +533,7 @@ public class PrincipalController {
             BackgroundImage fondo = new BackgroundImage(
                     new Image(mainApp.getClass().getResourceAsStream("res/fondo_acercade.png")), BackgroundRepeat.NO_REPEAT,
                     BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT
-            //new BackgroundSize(100, 100, true, true, true, false)
+                    //new BackgroundSize(100, 100, true, true, true, false)
             );
             acercadeRoot.setBackground(new Background(fondo));
         } catch (Throwable th) {
@@ -688,17 +574,17 @@ public class PrincipalController {
         textoAutor.setEffect(blend);
         textoAutor.setCache(true);
 
-        String creditosString = String.format("%s %s - %s\n=====================================\n\n",TITLE,VERSION, COPYRIGHT);
+        String creditosString = String.format("%s %s - %s\n=====================================\n\n", TITLE, VERSION, COPYRIGHT);
         try (BufferedReader recursoCreditos = new BufferedReader(new InputStreamReader(mainApp.getClass().getResourceAsStream("res/creditos.txt"), StandardCharsets.UTF_8))) {
             creditosString += recursoCreditos.lines().collect(Collectors.joining("\n"));
         } catch (Exception ex) {
             Logger.getLogger(PrincipalController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        creditosString=creditosString
+        creditosString = creditosString
                 .replaceFirst("%java-version%", System.getProperty("java.version"))
-                .replaceFirst("%java-vendor%",System.getProperty("java.vendor"))
-                .replaceFirst("%os-name%",System.getProperty("os.name"))
-                .replaceFirst("%os-version%",System.getProperty("os.version"));
+                .replaceFirst("%java-vendor%", System.getProperty("java.vendor"))
+                .replaceFirst("%os-name%", System.getProperty("os.name"))
+                .replaceFirst("%os-version%", System.getProperty("os.version"));
         Text textoCreditos = new Text(creditosString);
         textoCreditos.setTextAlignment(TextAlignment.CENTER);
         textoCreditos.setFont(Font.font("", FontWeight.BOLD, 22));
@@ -838,7 +724,7 @@ public class PrincipalController {
                 alert.setTitle("Algo ha fallado");
                 alert.setHeaderText("Fallo la optimización");
                 alert.setContentText("El cálculo no ha ido bien. Revise los datos de entrada y\nsi el problema persiste, revise la instalación de la aplicación");
-                
+
                 final Throwable ex = resolutorService.getException();
 
                 Logger.getLogger(getClass().getName()).log(Level.INFO, "Problema intentando calcular una asignación: ", ex);

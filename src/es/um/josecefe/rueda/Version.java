@@ -18,6 +18,7 @@ package es.um.josecefe.rueda;
 
 /**
  * Su unica misión es guardar información de la versión
+ *
  * @author josec
  */
 public class Version {
@@ -26,7 +27,8 @@ public class Version {
     public static final String TITLE = "Optimizador de la Rueda";
     public static final String VERSION = "1.08";
     public static final String DATE = "20161003";
-    
-    private Version() {}
+
+    private Version() {
+    }
 
 }

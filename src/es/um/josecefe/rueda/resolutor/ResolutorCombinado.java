@@ -19,6 +19,7 @@ package es.um.josecefe.rueda.resolutor;
 import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -35,9 +36,9 @@ import java.util.Set;
  */
 public class ResolutorCombinado extends Resolutor {
 
+    private final EstadisticasCombinado estadisticas;
     private Resolutor primero;
     private ResolutorAcotado segundo;
-    private final EstadisticasCombinado estadisticas;
     private Map<Dia, ? extends AsignacionDia> solucion = Collections.emptyMap();
 
     /**

@@ -16,17 +16,17 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- *
  * @author josec
  */
 public class DatosRueda {
@@ -173,9 +173,9 @@ public class DatosRueda {
 
     }
 
-    /** 
+    /**
      * Obtiene el último mensaje de validación producido por la última llamada a validar
-     * 
+     *
      * @return mensaje de validación si ésta fue negativa, en blanco si fue positiva
      */
     public String getMensajeValidacion() {

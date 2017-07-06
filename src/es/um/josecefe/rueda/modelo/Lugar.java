@@ -21,13 +21,12 @@ import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Representa un lugar
- *
+ * <p>
  * SQL: CREATE TABLE "lugar" ( "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
  * "nombre" TEXT NOT NULL, "latitud" REAL, "longitud" REAL, "direccion" TEXT,
  * "poblacion" TEXT, "cp" TEXT );
  *
  * @author josec
- *
  */
 public class Lugar implements Comparable<Lugar> {
     private final SimpleIntegerProperty id;
@@ -60,7 +59,7 @@ public class Lugar implements Comparable<Lugar> {
      * @param cp
      */
     public Lugar(int id, String nombre, Double latitud, Double longitud, String direccion, String poblacion,
-            String cp) {
+                 String cp) {
         this.id = new SimpleIntegerProperty(id);
         this.nombre = new SimpleStringProperty(nombre);
         this.latitud = latitud;
@@ -71,7 +70,6 @@ public class Lugar implements Comparable<Lugar> {
     }
 
     /**
-     *
      * @return the id
      */
     public int getId() {
@@ -84,7 +82,7 @@ public class Lugar implements Comparable<Lugar> {
             this.id.set(id);
         }
     }
-    
+
     public SimpleIntegerProperty idProperty() {
         return id;
     }
@@ -95,41 +93,24 @@ public class Lugar implements Comparable<Lugar> {
     public String getNombre() {
         return nombre.get();
     }
-    
+
     public void setNombre(String nombre) {
         this.nombre.set(nombre);
     }
-    
+
     public SimpleStringProperty nombreProperty() {
         return nombre;
     }
-
-    public void setLatitud(Double latitud) {
-        this.latitud = latitud;
-    }
-
-    public void setLongitud(Double longitud) {
-        this.longitud = longitud;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-    public void setPoblacion(String poblacion) {
-        this.poblacion = poblacion;
-    }
-
-    public void setCp(String cp) {
-        this.cp = cp;
-    }
-
 
     /**
      * @return the latitud
      */
     public Double getLatitud() {
         return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
     }
 
     /**
@@ -139,11 +120,19 @@ public class Lugar implements Comparable<Lugar> {
         return longitud;
     }
 
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
+    }
+
     /**
      * @return the direccion
      */
     public String getDireccion() {
         return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
 
     /**
@@ -153,11 +142,19 @@ public class Lugar implements Comparable<Lugar> {
         return poblacion;
     }
 
+    public void setPoblacion(String poblacion) {
+        this.poblacion = poblacion;
+    }
+
     /**
      * @return the cp
      */
     public String getCp() {
         return cp;
+    }
+
+    public void setCp(String cp) {
+        this.cp = cp;
     }
 
     @Override

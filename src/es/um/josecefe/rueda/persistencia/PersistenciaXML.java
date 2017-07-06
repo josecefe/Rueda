@@ -16,49 +16,27 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
-import static es.um.josecefe.rueda.Version.COPYRIGHT;
-import static es.um.josecefe.rueda.Version.TITLE;
-import static es.um.josecefe.rueda.Version.VERSION;
-import es.um.josecefe.rueda.modelo.Asignacion;
-import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.DatosRueda;
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.Horario;
-import es.um.josecefe.rueda.modelo.Lugar;
-import es.um.josecefe.rueda.modelo.Participante;
+import es.um.josecefe.rueda.modelo.*;
 import htmlflow.HtmlView;
 import htmlflow.elements.HtmlTable;
 import htmlflow.elements.HtmlTr;
-import java.beans.DefaultPersistenceDelegate;
-import java.beans.Encoder;
-import java.beans.Expression;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import javafx.util.Pair;
+
+import java.beans.*;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static es.um.josecefe.rueda.Version.*;
 import static java.util.stream.Collectors.toList;
-import javafx.util.Pair;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 /**
- *
  * @author josec
  */
 public class PersistenciaXML {
@@ -68,7 +46,7 @@ public class PersistenciaXML {
                 new BufferedOutputStream(
                         new FileOutputStream(xmlfile)))) {
 
-            encoder.setExceptionListener(e -> e.printStackTrace());
+            encoder.setExceptionListener(Throwable::printStackTrace);
             encoder.setPersistenceDelegate(Pair.class, new PairPersistenceDelegate());
             // Poco a poco
             encoder.writeObject(new ArrayList<>(datosRueda.getDias()));
@@ -76,7 +54,7 @@ public class PersistenciaXML {
             encoder.writeObject(new ArrayList<>(datosRueda.getParticipantes()));
             encoder.writeObject(new ArrayList<>(datosRueda.getHorarios()));
             encoder.writeObject(new ArrayList<>(datosRueda.getAsignacion()));
-            encoder.writeObject((Integer) datosRueda.getCosteAsignacion());
+            encoder.writeObject(datosRueda.getCosteAsignacion());
         } catch (Exception ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -113,14 +91,6 @@ public class PersistenciaXML {
         }
     }
 
-    private static class ParticipanteIdaConduceLugar {
-
-        Participante participante;
-        boolean ida;
-        boolean conduce;
-        Lugar lugar;
-    }
-
     public static void exportaAsignacion(File htmlfile, DatosRueda datosRueda) {
 
         try (PrintStream out = new PrintStream(htmlfile)) {
@@ -140,17 +110,9 @@ public class PersistenciaXML {
                         horasDia = new HashMap<>(horasActivas.size());
                         datosTabla.put(d, horasDia);
                     }
-                    List<ParticipanteIdaConduceLugar> celdaIda = horasDia.get(h.getEntrada());
-                    if (celdaIda == null) {
-                        celdaIda = new ArrayList<>();
-                        horasDia.put(h.getEntrada(), celdaIda);
-                    }
+                    List<ParticipanteIdaConduceLugar> celdaIda = horasDia.computeIfAbsent(h.getEntrada(), k -> new ArrayList<>());
 
-                    List<ParticipanteIdaConduceLugar> celdaVuelta = horasDia.get(h.getSalida());
-                    if (celdaVuelta == null) {
-                        celdaVuelta = new ArrayList<>();
-                        horasDia.put(h.getSalida(), celdaVuelta);
-                    }
+                    List<ParticipanteIdaConduceLugar> celdaVuelta = horasDia.computeIfAbsent(h.getSalida(), k -> new ArrayList<>());
 
                     // Datos de la IDA y la VUELTA
                     ParticipanteIdaConduceLugar pIda = new ParticipanteIdaConduceLugar();
@@ -183,19 +145,20 @@ public class PersistenciaXML {
                     .table().classAttr("table table-bordered");
             HtmlTr<?> headerRow = table.tr();
             headerRow.th().text("Hora");
-            datosRueda.getDias().stream().forEachOrdered(d -> headerRow.th().text(escapeHtml4(d.toString())));
+            datosRueda.getDias().forEach(d -> headerRow.th().text(escapeHtml4(d.toString())));
             horasActivas.stream().sorted().forEachOrdered(hora -> {
                 HtmlTr<?> tr = table.tr();
                 tr.td().text(hora.toString()); //Hora
-                datosRueda.getDias().stream().forEachOrdered(dia -> {
+                datosRueda.getDias().forEach(dia -> {
                     Map<Integer, List<ParticipanteIdaConduceLugar>> dd = datosTabla.get(dia);
                     List<ParticipanteIdaConduceLugar> t = dd != null ? dd.get(hora) : null;
                     String valor = "";
                     if (t != null) {
                         valor = t.stream()
-                                .sorted((p1, p2) -> p1.conduce == p2.conduce ? 0 : p1.conduce ? -1 : 1) // Ponemos primero los conductores
-                                .sorted((p1, p2) -> p1.lugar.compareTo(p2.lugar)) // Pero dentro de un lugar
-                                .sorted((p1, p2) -> p1.ida == p2.ida ? 0 : p1.ida ? -1 : 1) // Teniendo en cuenta si es ida o vuelta
+                                .sorted((p1, p2) -> p1.ida != p2.ida ? (p1.ida ? -1 : 1) :
+                                        p1.lugar.compareTo(p2.lugar) != 0 ? p1.lugar.compareTo(p2.lugar) :
+                                                (p1.conduce != p2.conduce ? (p1.conduce ? -1 : 1) :
+                                                        p1.participante.compareTo(p2.participante)))
                                 .map(p -> {
                                     StringBuilder res = new StringBuilder();
                                     if (p.ida) {
@@ -211,7 +174,7 @@ public class PersistenciaXML {
                                         res.append("]");
                                     }
 
-                                    
+
                                     if (p.conduce) {
                                         res.append("</b>");
                                     }
@@ -231,11 +194,11 @@ public class PersistenciaXML {
             } else {
                 htmlView.body().div().text("Leyenda: <i><b>*Conductor Ida</b></i> | <i>Pasajero Ida</i> | <b>*Conductor Vuelta</b> | Pasajero Vuelta").addAttr("style", "color:green;text-align:center");
             }
-            
+
             // Coste
             htmlView.body().div().text(String.format("%s <b>%,d</b>", escapeHtml4("Coste total asignación: "), datosRueda.getCosteAsignacion())).addAttr("style", "color:royal-blue;text-align:right");
-            
-            // Cuadro de conductor/dias           
+
+            // Cuadro de conductor/dias
             htmlView.body().heading(4, escapeHtml4("Cuadro de conductor/días"));
             HtmlTable<?> tabla = htmlView.body().table().classAttr("table table-bordered");
             HtmlTr<?> cabecera = tabla.tr();
@@ -243,16 +206,16 @@ public class PersistenciaXML {
             cabecera.th().text(escapeHtml4("Días"));
             cabecera.th().text(escapeHtml4("Total"));
             datosRueda.getParticipantes().stream().sorted().forEachOrdered(participante -> {
-                List<Dia> dias=datosRueda.getAsignacion().stream().filter(a -> a.getConductores().contains(participante)).map(Asignacion::getDia).sorted().collect(toList());
-                if (dias.size()>0) {
+                List<Dia> dias = datosRueda.getAsignacion().stream().filter(a -> a.getConductores().contains(participante)).map(Asignacion::getDia).sorted().collect(toList());
+                if (dias.size() > 0) {
                     HtmlTr<?> tr = tabla.tr();
                     tr.td().text(escapeHtml4(participante.getNombre()));
                     tr.td().text(escapeHtml4(dias.toString()));
                     tr.td().text(String.valueOf(dias.size()));
                 }
             });
-            
-            // Cuadro de dia/conductores        
+
+            // Cuadro de dia/conductores
             htmlView.body().heading(4, escapeHtml4("Cuadro de día/conductores"));
             HtmlTable<?> tablaDias = htmlView.body().table().classAttr("table table-bordered");
             HtmlTr<?> cabeceraDias = tablaDias.tr();
@@ -260,19 +223,27 @@ public class PersistenciaXML {
             cabeceraDias.th().text(escapeHtml4("Conductores"));
             cabeceraDias.th().text(escapeHtml4("Total"));
             datosRueda.getAsignacion().stream().sorted().forEachOrdered(a -> {
-                    HtmlTr<?> tr = tablaDias.tr();
-                    tr.td().text(escapeHtml4(a.getDia().getDescripcion()));
-                    tr.td().text(escapeHtml4(a.getConductores().toString()));
-                    tr.td().text(String.valueOf(a.getConductores().size()));
+                HtmlTr<?> tr = tablaDias.tr();
+                tr.td().text(escapeHtml4(a.getDia().getDescripcion()));
+                tr.td().text(escapeHtml4(a.getConductores().toString()));
+                tr.td().text(String.valueOf(a.getConductores().size()));
             });
-            
+
             // Pie de pagina
-            htmlView.body().hr().div().text("Generado con <b>"+TITLE+" "+VERSION+"<b> <i>"+COPYRIGHT+"</i>").addAttr("style", "color:royalblue;text-align:right");
+            htmlView.body().hr().div().text("Generado con <b>" + TITLE + " " + VERSION + "<b> <i>" + COPYRIGHT + "</i>").addAttr("style", "color:royalblue;text-align:right");
             htmlView.setPrintStream(out);
             htmlView.write();
         } catch (Exception ex) {
             Logger.getLogger(PersistenciaXML.class.getName()).log(Level.SEVERE, "Problemas generando la exportación a HTML: ", ex);
         }
+    }
+
+    private static class ParticipanteIdaConduceLugar {
+
+        Participante participante;
+        boolean ida;
+        boolean conduce;
+        Lugar lugar;
     }
 
     private static class PairPersistenceDelegate extends DefaultPersistenceDelegate {

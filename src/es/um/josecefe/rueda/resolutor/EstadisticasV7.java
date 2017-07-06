@@ -19,7 +19,6 @@ package es.um.josecefe.rueda.resolutor;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
- *
  * @author josec
  */
 public final class EstadisticasV7 extends Estadisticas {
@@ -33,14 +32,14 @@ public final class EstadisticasV7 extends Estadisticas {
     @Override
     public Estadisticas inicia() {
         descartados = terminales = generados = expandidos = 0L;
-        return super.inicia(); 
+        return super.inicia();
     }
 
-    
+
     protected void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {
         this.totalPosiblesSoluciones = totalPosiblesSoluciones;
     }
-    
+
     protected EstadisticasV7 acumular(EstadisticasV7 otro) {
         expandidos += otro.expandidos;
         generados += otro.generados;
@@ -48,13 +47,13 @@ public final class EstadisticasV7 extends Estadisticas {
         terminales += otro.terminales;
         return this;
     }
-    
+
     @Override
     public String toString() {
         final double porcentajeArbol = getCompletado() * 100.0;
         return String.format("t=%s s, C=%,d NE=%,d, %,.0f NE/s, NG=%,.0f, %,.0f NG/s, SG=%,.0f, NP=%g, CMPL=%.3f%%, ETR=%s",
                 getTiempoString(), fitness, expandidos, expandidos * 1000.0 / tiempo, generados, generados * 1000.0 / tiempo,
-                terminales, descartados, porcentajeArbol, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeArbol) * 100)));
+                terminales, descartados, porcentajeArbol, DurationFormatUtils.formatDurationHMS((long) ((tiempo / porcentajeArbol) * 100)));
     }
 
     protected long incExpandidos() {
@@ -75,6 +74,7 @@ public final class EstadisticasV7 extends Estadisticas {
 
     /**
      * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
+     *
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
     @Override

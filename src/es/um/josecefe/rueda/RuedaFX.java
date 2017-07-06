@@ -16,17 +16,9 @@
  */
 package es.um.josecefe.rueda;
 
-import static es.um.josecefe.rueda.Version.COPYRIGHT;
-import static es.um.josecefe.rueda.Version.TITLE;
-import static es.um.josecefe.rueda.Version.VERSION;
 import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.vista.PrincipalController;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -36,17 +28,31 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
+
+import static es.um.josecefe.rueda.Version.*;
+
 /**
- *
  * @author josec
  */
 public class RuedaFX extends Application {
-    private Stage primaryStage;
     private final DatosRueda datosRueda;
+    private Stage primaryStage;
     private BorderPane Principal;
 
     public RuedaFX() {
         this.datosRueda = new DatosRueda();
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        launch(args);
     }
 
     public DatosRueda getDatosRueda() {
@@ -169,7 +175,7 @@ public class RuedaFX extends Application {
             alert.showAndWait();
         }
     }
-    
+
     /**
      * Saves the current horario data to the specified file.
      *
@@ -202,13 +208,6 @@ public class RuedaFX extends Application {
         alert.setContentText("Autor: José Ceferino Ortega Carretero");
         alert.showAndWait();
 
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
     }
 
 

@@ -18,19 +18,19 @@ package es.um.josecefe.rueda.resolutor;
 
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
 import es.um.josecefe.rueda.modelo.Dia;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_DIF_MAX_MIN_VECES_CONDUCTOR;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_MAXIMO_VECES_CONDUCTOR;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_TOTAL_CONDUCTORES;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static es.um.josecefe.rueda.resolutor.Pesos.*;
+
 /**
  * Nodo
  * Clase que se usa por diversor Resolutores como nodo del árbol de busqueda.
- * 
+ *
  * @author josecefe
  */
 final class Nodo implements Comparable<Nodo> {

@@ -16,19 +16,15 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import java.util.List;
-import static java.util.stream.Collectors.toList;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.util.Pair;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 /**
- *
  * @author josec
  */
 public class Asignacion implements Comparable<Asignacion> {

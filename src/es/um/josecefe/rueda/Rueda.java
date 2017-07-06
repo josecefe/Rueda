@@ -17,22 +17,19 @@
 package es.um.josecefe.rueda;
 
 import es.um.josecefe.rueda.modelo.DatosRueda;
-import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.resolutor.ResolutorV8;
-import es.um.josecefe.rueda.resolutor.Resolutor;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.persistencia.PersistenciaSQL;
+import es.um.josecefe.rueda.persistencia.PersistenciaXML;
+import es.um.josecefe.rueda.resolutor.Resolutor;
 import es.um.josecefe.rueda.resolutor.ResolutorGA;
 import es.um.josecefe.rueda.resolutor.ResolutorV7;
+import es.um.josecefe.rueda.resolutor.ResolutorV8;
+
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.IntSummaryStatistics;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -40,7 +37,6 @@ import static java.util.stream.Collectors.toMap;
  * Clase principal de la aplicación Rueda
  *
  * @author josecefe@um.es
- *
  */
 public class Rueda {
 //    private static final String RUEDA_BASE = "ruedamurcia";

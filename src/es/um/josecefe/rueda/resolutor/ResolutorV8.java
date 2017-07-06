@@ -20,25 +20,21 @@ import es.um.josecefe.rueda.modelo.AsignacionDia;
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * ResolutorV8
- *
+ * <p>
  * Versión paralela del resolutor -> No implementa LNV, sino que sigue una
  * estrategia no guiada, solo podada (la estimación es innecesaria)
  *
  * @author josecefe
- *
  */
 public class ResolutorV8 extends ResolutorAcotado {
 
@@ -50,18 +46,15 @@ public class ResolutorV8 extends ResolutorAcotado {
 
     private static final int PESO_COTA_INFERIOR_NUM_DEF = 1;
     private static final int PESO_COTA_INFERIOR_DEN_DEF = 2;
-
-    private Set<Horario> horarios;
-
     private final ContextoResolucion contexto = new ContextoResolucion();
-
+    private final EstadisticasV8 estGlobal = new EstadisticasV8();
+    private Set<Horario> horarios;
     private Map<Dia, AsignacionDiaV5> solucionFinal;
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
     private AtomicInteger cotaInferiorCorte;
     private Nodo RAIZ;
-    private final EstadisticasV8 estGlobal = new EstadisticasV8();
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV8() {
@@ -177,7 +170,8 @@ public class ResolutorV8 extends ResolutorAcotado {
                     int cota;
                     do {
                         cota = cotaInferiorCorte.get();
-                    } while (mejor.getCosteEstimado() < cota && !cotaInferiorCorte.compareAndSet(cota, mejor.getCosteEstimado()));
+                    }
+                    while (mejor.getCosteEstimado() < cota && !cotaInferiorCorte.compareAndSet(cota, mejor.getCosteEstimado()));
                     if (mejor.getCosteEstimado() < cota) {
                         if (ESTADISTICAS) {
                             estGlobal.setFitness(mejor.getCosteEstimado());
@@ -196,7 +190,8 @@ public class ResolutorV8 extends ResolutorAcotado {
                     int cota;
                     do {
                         cota = cotaInferiorCorte.get();
-                    } while (menorCotaSuperior.getAsInt() < cota && !cotaInferiorCorte.compareAndSet(cota, menorCotaSuperior.getAsInt()));
+                    }
+                    while (menorCotaSuperior.getAsInt() < cota && !cotaInferiorCorte.compareAndSet(cota, menorCotaSuperior.getAsInt()));
                     if (menorCotaSuperior.getAsInt() < cota) {
                         if (ESTADISTICAS) {
                             estGlobal.setFitness(menorCotaSuperior.getAsInt());

@@ -27,57 +27,26 @@ import java.util.stream.StreamSupport;
 /**
  * Esta clase contiene un generador de todas las combinaciones resultantes del producto cartesiano
  * a partir de los conjuntos dados como entrada.
- * 
- * @author josecefe@um.es
  *
+ * @author josecefe@um.es
  */
 public class Combinador<T> implements Iterable<List<T>> {
-	private final List<Iterable<T>> conjuntos;
-	
-	public Combinador(List<Iterable<T>> conjuntos) {
-		this.conjuntos = conjuntos;
-	}
+    private final List<Iterable<T>> conjuntos;
 
-	@Override
-	public Iterator<List<T>> iterator() {
-		return new CombinadorIterator();
-	}
+    public Combinador(List<Iterable<T>> conjuntos) {
+        this.conjuntos = conjuntos;
+    }
 
-	private class CombinadorIterator implements Iterator<List<T>> {
-		private List<Iterator<T>> actual = conjuntos.stream().map(c -> c.iterator()).collect(Collectors.toList()); //Para saber en que elemento estamos...
-		private List<T> ultimo=actual.stream().map(Iterator<T>::next).collect(Collectors.toList());
-		private boolean hayMas = true;
-				
-		@Override
-		public boolean hasNext() {
-			return hayMas;
-		}
-		
-		@Override
-		public List<T> next() {
-			ListIterator<Iterator<T>> a = actual.listIterator();
-			Iterator<T> act=null;
-			List<T> res = new ArrayList<>(ultimo);
+    @Override
+    public Iterator<List<T>> iterator() {
+        return new CombinadorIterator();
+    }
 
-			hayMas=false;
-			while (a.hasNext()) {
-				act = a.next();
-				if (!act.hasNext()) {
-					act=conjuntos.get(a.previousIndex()).iterator();
-					ultimo.set(a.previousIndex(), act.next());
-					a.set(act);
-				} else {
-					ultimo.set(a.previousIndex(), act.next());
-					hayMas=true;
-					break;
-				}
-			}
-			
-			return res;
-		}
-	}
+    public Stream<List<T>> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 /*
-	private class CombinadorSpliterator implements Spliterator<Set<T>> {
+    private class CombinadorSpliterator implements Spliterator<Set<T>> {
 		private int actual; // current index, advanced on split or traversal
 		private final int ultimo; // one past the greatest index
 
@@ -139,8 +108,38 @@ public class Combinador<T> implements Iterable<List<T>> {
 	}
 
 */
-	
-	public Stream<List<T>> stream() {
-		return StreamSupport.stream(spliterator(), false);
-	}
+
+    private class CombinadorIterator implements Iterator<List<T>> {
+        private List<Iterator<T>> actual = conjuntos.stream().map(c -> c.iterator()).collect(Collectors.toList()); //Para saber en que elemento estamos...
+        private List<T> ultimo = actual.stream().map(Iterator<T>::next).collect(Collectors.toList());
+        private boolean hayMas = true;
+
+        @Override
+        public boolean hasNext() {
+            return hayMas;
+        }
+
+        @Override
+        public List<T> next() {
+            ListIterator<Iterator<T>> a = actual.listIterator();
+            Iterator<T> act = null;
+            List<T> res = new ArrayList<>(ultimo);
+
+            hayMas = false;
+            while (a.hasNext()) {
+                act = a.next();
+                if (!act.hasNext()) {
+                    act = conjuntos.get(a.previousIndex()).iterator();
+                    ultimo.set(a.previousIndex(), act.next());
+                    a.set(act);
+                } else {
+                    ultimo.set(a.previousIndex(), act.next());
+                    hayMas = true;
+                    break;
+                }
+            }
+
+            return res;
+        }
+    }
 }

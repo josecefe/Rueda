@@ -16,34 +16,16 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.Horario;
-import es.um.josecefe.rueda.modelo.Lugar;
-import es.um.josecefe.rueda.modelo.Participante;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.OptionalLong;
-import java.util.Set;
+import es.um.josecefe.rueda.modelo.*;
+
+import java.util.*;
 import java.util.function.Function;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.summingInt;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
+
 /**
- *
  * @author josec
  */
 class ContextoResolucion {
@@ -112,7 +94,7 @@ class ContextoResolucion {
 
                 Map<Integer, Integer> plazasIda = selCond.stream()
                         .map(e -> participanteHorario.get(e)).collect(
-                        groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
+                                groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
                 Map<Integer, Integer> plazasVuelta = selCond.stream()
                         .map(e -> participanteHorario.get(e))
                         .collect(groupingBy(Horario::getSalida, summingInt(h -> h.getParticipante().getPlazasCoche())));
@@ -155,7 +137,7 @@ class ContextoResolucion {
                                 && plazasNecesariasVuelta.entrySet().stream().allMatch(e -> e.getValue().entrySet().stream().allMatch(ll -> ll.getValue() <= plazasDisponiblesVuelta.get(e.getKey()).getOrDefault(ll.getKey(), 0)))) {
                             // Calculamos coste
                             int coste = Stream.of(participantesDia).mapToInt(
-                                    p ->  (p.getPuntosEncuentro().indexOf(lugaresIda.get(p)) + p.getPuntosEncuentro().indexOf(lugaresVuelta.get(p)))*
+                                    p -> (p.getPuntosEncuentro().indexOf(lugaresIda.get(p)) + p.getPuntosEncuentro().indexOf(lugaresVuelta.get(p))) *
                                             (selCond.contains(p) ? Pesos.PESO_LUGAR_CONDUCTOR : Pesos.PESO_LUGAR_PASAJERO)).sum();
 
                             if (coste < mejorCoste) {

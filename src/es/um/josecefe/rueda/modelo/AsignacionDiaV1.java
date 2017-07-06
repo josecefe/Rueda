@@ -21,19 +21,18 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- *
  * @author josec
  */
 public class AsignacionDiaV1 implements Comparable<AsignacionDiaV1>, AsignacionDia {
     private final Set<Participante> conductores;
     private final Map<Participante, Lugar> peIda, peVuelta;
     private final int coste;
-    
+
     public AsignacionDiaV1(Set<Participante> conductores, Map<Participante, Lugar> puntoEncuentroIda, Map<Participante, Lugar> puntoEncuentroVuelta, int coste) {
-        this.conductores=conductores;
-        this.peIda=puntoEncuentroIda;
-        this.peVuelta=puntoEncuentroVuelta;
-        this.coste=coste;
+        this.conductores = conductores;
+        this.peIda = puntoEncuentroIda;
+        this.peVuelta = puntoEncuentroVuelta;
+        this.coste = coste;
     }
 
     @Override
@@ -93,6 +92,6 @@ public class AsignacionDiaV1 implements Comparable<AsignacionDiaV1>, AsignacionD
 
     @Override
     public String toString() {
-        return "AsignacionDia{ coste=" + coste + ", conductores=" + conductores + ", peIda=" + peIda + ", peVuelta=" + peVuelta +  '}';
+        return "AsignacionDia{ coste=" + coste + ", conductores=" + conductores + ", peIda=" + peIda + ", peVuelta=" + peVuelta + '}';
     }
 }

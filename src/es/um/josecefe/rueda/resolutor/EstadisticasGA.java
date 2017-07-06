@@ -16,12 +16,12 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.DoubleAdder;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.DoubleAdder;
+
 /**
- *
  * @author josec
  */
 public final class EstadisticasGA extends Estadisticas {
@@ -30,7 +30,7 @@ public final class EstadisticasGA extends Estadisticas {
     private int numGeneraciones;
 
     public EstadisticasGA() {
-        
+
     }
 
     void setNumGeneraciones(int numGeneraciones) {
@@ -41,15 +41,15 @@ public final class EstadisticasGA extends Estadisticas {
     public Estadisticas inicia() {
         generaciones.set(0);
         generados.reset();
-        return super.inicia(); 
+        return super.inicia();
     }
 
     @Override
     public String toString() {
         final double porcentajeCompletado = getCompletado() * 100.0;
         return String.format("t=%s, C=%,d, G=%,d (%,.0f gen/s), IG=%,.0f (%,.0f g/s), Cmpl.=%.3f%% (ETR=%s)",
-                getTiempoString(), fitness, generaciones.get(), generaciones.get() * 1000.0 / tiempo, generados.sum(), generados.sum() * 1000.0 / tiempo, 
-                porcentajeCompletado, DurationFormatUtils.formatDurationHMS((long)((tiempo / porcentajeCompletado) * 100.0)));
+                getTiempoString(), fitness, generaciones.get(), generaciones.get() * 1000.0 / tiempo, generados.sum(), generados.sum() * 1000.0 / tiempo,
+                porcentajeCompletado, DurationFormatUtils.formatDurationHMS((long) ((tiempo / porcentajeCompletado) * 100.0)));
     }
 
     long incGeneracion() {
@@ -65,9 +65,10 @@ public final class EstadisticasGA extends Estadisticas {
         generaciones.set(generation);
         return this;
     }
-    
+
     /**
      * Tanto por uno de la cantidad del arbol de posibles soluciones explorado
+     *
      * @return Valor entre 0 y 1 indicando el tanto por uno explorado
      */
     @Override

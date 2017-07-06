@@ -16,45 +16,23 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import es.um.josecefe.rueda.modelo.Participante;
-import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.Lugar;
-import es.um.josecefe.rueda.modelo.AsignacionDiaV5;
-import es.um.josecefe.rueda.modelo.Horario;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_DIF_MAX_MIN_VECES_CONDUCTOR;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_MAXIMO_VECES_CONDUCTOR;
-import static es.um.josecefe.rueda.resolutor.Pesos.PESO_TOTAL_CONDUCTORES;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IntSummaryStatistics;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import es.um.josecefe.rueda.modelo.*;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.summingInt;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toConcurrentMap;
-import static java.util.stream.Collectors.toMap;
+
+import static es.um.josecefe.rueda.resolutor.Pesos.*;
+import static java.util.stream.Collectors.*;
 
 /**
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
  * algoritmo genético.
  *
  * @author josec
- *
  */
 public class ResolutorGA extends Resolutor {
 
@@ -73,7 +51,7 @@ public class ResolutorGA extends Resolutor {
     private final static int MAX_ESTANCADO_DEF = N_GENERACIONES_DEF / 10;
 
     protected Estrategia estrategia = Estrategia.EQUILIBRADO;
-    
+
     private Set<Horario> horarios;
     private Dia[] dias;
     private Participante[] participantes;
@@ -173,7 +151,7 @@ public class ResolutorGA extends Resolutor {
 
                 Map<Integer, Integer> plazasIda = selCond.stream()
                         .map(e -> participanteHorario.get(e)).collect(
-                        groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
+                                groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
                 Map<Integer, Integer> plazasVuelta = selCond.stream()
                         .map(e -> participanteHorario.get(e))
                         .collect(groupingBy(Horario::getSalida, summingInt(h -> h.getParticipante().getPlazasCoche())));
@@ -376,6 +354,16 @@ public class ResolutorGA extends Resolutor {
         return estGlobal;
     }
 
+    /**
+     * Fija la estrategia de optimización
+     *
+     * @param estrategia Tipo de estrategia a seguir para la optimización
+     */
+    @Override
+    public void setEstrategia(Estrategia estrategia) {
+        this.estrategia = estrategia;
+    }
+
     final private class Individuo implements Comparable<Individuo> {
         private final Map<Dia, AsignacionDia> genes;
         private final int aptitud;
@@ -398,7 +386,7 @@ public class ResolutorGA extends Resolutor {
             int apt = est.getMax() * PESO_MAXIMO_VECES_CONDUCTOR + (est.getMax() - est.getMin()) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
             if (estrategia == Estrategia.MINCONDUCTORES)
                 apt += est.getSum() * PESO_TOTAL_CONDUCTORES;
-            
+
             return apt;
         }
 
@@ -407,7 +395,7 @@ public class ResolutorGA extends Resolutor {
          * y el otro padre
          *
          * @param otroPadre El otro individuo que sera padre de nuevo individuo,
-         * aportando sus genes
+         *                  aportando sus genes
          * @return nuevo individuo resultado del cruce de los genes de los
          * progenitores
          */
@@ -422,7 +410,7 @@ public class ResolutorGA extends Resolutor {
          * Crea una mutación a partir de este individuo
          *
          * @param probMutacionGen valor entre 0 y 1 indicando la probabilidad de
-         * mutar de cada gen
+         *                        mutar de cada gen
          * @return
          */
         Individuo mutacion(double probMutacionGen) {
@@ -475,15 +463,5 @@ public class ResolutorGA extends Resolutor {
             return String.format("Individuo{aptitud=%,d, genes=%s}", getAptitud(), getGenes());
         }
 
-    }
-    
-    /** 
-     * Fija la estrategia de optimización
-     * 
-     * @param estrategia Tipo de estrategia a seguir para la optimización
-     */
-    @Override
-    public void setEstrategia(Estrategia estrategia) {
-        this.estrategia = estrategia;
     }
 }

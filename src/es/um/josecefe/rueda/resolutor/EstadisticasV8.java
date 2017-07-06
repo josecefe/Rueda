@@ -16,12 +16,12 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.DoubleAdder;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.DoubleAdder;
+
 /**
- *
  * @author josec
  */
 public final class EstadisticasV8 extends Estadisticas {
@@ -41,7 +41,7 @@ public final class EstadisticasV8 extends Estadisticas {
         descartados.reset();
         terminales.reset();
         generados.reset();
-        return super.inicia(); 
+        return super.inicia();
     }
 
     void setTotalPosiblesSoluciones(double totalPosiblesSoluciones) {

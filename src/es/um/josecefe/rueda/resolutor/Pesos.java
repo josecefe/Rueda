@@ -18,6 +18,7 @@ package es.um.josecefe.rueda.resolutor;
 
 /**
  * Contiene constantes para los resolutores
+ *
  * @author josec
  */
 final class Pesos {

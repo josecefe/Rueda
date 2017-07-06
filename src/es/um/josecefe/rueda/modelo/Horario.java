@@ -16,12 +16,7 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 /**
  * SQL: CREATE TABLE "horario" ( "participante" INTEGER NOT NULL REFERENCES
@@ -30,7 +25,6 @@ import javafx.beans.property.SimpleObjectProperty;
  * "coche" INTEGER NOT NULL DEFAULT (1), PRIMARY KEY (participante,dia) );
  *
  * @author josec
- *
  */
 public class Horario implements Comparable<Horario> {
 
@@ -57,10 +51,10 @@ public class Horario implements Comparable<Horario> {
      * dados
      *
      * @param participante Participante al que pertenece esta parte del horario
-     * @param dia Día al que se refiere esta parte
-     * @param entrada Hora de entrada del participante ese dia
-     * @param salida Hora de salida del participante ese dia
-     * @param coche Indica si ese día podría compartir su coche
+     * @param dia          Día al que se refiere esta parte
+     * @param entrada      Hora de entrada del participante ese dia
+     * @param salida       Hora de salida del participante ese dia
+     * @param coche        Indica si ese día podría compartir su coche
      */
     public Horario(Participante participante, Dia dia, int entrada, int salida, boolean coche) {
         this.participanteProperty = new SimpleObjectProperty<>(participante);
@@ -78,10 +72,30 @@ public class Horario implements Comparable<Horario> {
     }
 
     /**
+     * Permite fijar el participante de esta entrada en el horario Nota: Este
+     * método se incluye para la persistencia
+     *
+     * @param participante Participante al que pertenece esta entrada
+     */
+    public void setParticipante(Participante participante) {
+        this.participanteProperty.set(participante);
+    }
+
+    /**
      * @return el dia
      */
     public Dia getDia() {
         return diaProperty.get();
+    }
+
+    /**
+     * Permite fija el dia de esta entrada de horario. Perticipante + Dia no se
+     * pueden repetir Nota: Este método se incluye para la persistencia
+     *
+     * @param dia El día al que pertenece esta entrada
+     */
+    public void setDia(Dia dia) {
+        this.diaProperty.set(dia);
     }
 
     /**
@@ -92,10 +106,34 @@ public class Horario implements Comparable<Horario> {
     }
 
     /**
+     * Permite fijar la hora de entrada (entendida como un entero, usualmente
+     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
+     * método se incluye para la persistencia
+     *
+     * @param entrada Hora de entrada (como un entero referido a 1º hora = 1, 2º
+     *                hora = 2, etc)
+     */
+    public void setEntrada(int entrada) {
+        this.entradaProperty.set(entrada);
+    }
+
+    /**
      * @return la hora de salida
      */
     public int getSalida() {
         return salidaProperty.get();
+    }
+
+    /**
+     * Permite fijar la hora de salida (entendida como un entero, usualmente
+     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
+     * método se incluye para la persistencia
+     *
+     * @param salida Hora de salida (como un entero referido a 1º hora = 1, 2º
+     *               hora = 2, etc)
+     */
+    public void setSalida(int salida) {
+        this.salidaProperty.set(salida);
     }
 
     /**
@@ -105,8 +143,17 @@ public class Horario implements Comparable<Horario> {
         return cocheProperty.get();
     }
 
+    /**
+     * Indica si el participante dispone de coche para ese día
+     *
+     * @param coche Indica si puede disponer de coche o no ese día
+     */
+    public void setCoche(boolean coche) {
+        this.cocheProperty.set(coche);
+    }
+
     /* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
@@ -169,59 +216,6 @@ public class Horario implements Comparable<Horario> {
         }
 
         return res;
-    }
-
-    /**
-     * Permite fijar el participante de esta entrada en el horario Nota: Este
-     * método se incluye para la persistencia
-     *
-     * @param participante Participante al que pertenece esta entrada
-     */
-    public void setParticipante(Participante participante) {
-        this.participanteProperty.set(participante);
-    }
-
-    /**
-     * Permite fija el dia de esta entrada de horario. Perticipante + Dia no se
-     * pueden repetir Nota: Este método se incluye para la persistencia
-     *
-     * @param dia El día al que pertenece esta entrada
-     */
-    public void setDia(Dia dia) {
-        this.diaProperty.set(dia);
-    }
-
-    /**
-     * Permite fijar la hora de entrada (entendida como un entero, usualmente
-     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
-     * método se incluye para la persistencia
-     *
-     * @param entrada Hora de entrada (como un entero referido a 1º hora = 1, 2º
-     * hora = 2, etc)
-     */
-    public void setEntrada(int entrada) {
-        this.entradaProperty.set(entrada);
-    }
-
-    /**
-     * Permite fijar la hora de salida (entendida como un entero, usualmente
-     * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
-     * método se incluye para la persistencia
-     *
-     * @param salida Hora de salida (como un entero referido a 1º hora = 1, 2º
-     * hora = 2, etc)
-     */
-    public void setSalida(int salida) {
-        this.salidaProperty.set(salida);
-    }
-
-    /**
-     * Indica si el participante dispone de coche para ese día
-     *
-     * @param coche Indica si puede disponer de coche o no ese día
-     */
-    public void setCoche(boolean coche) {
-        this.cocheProperty.set(coche);
     }
 
     /* FX Properties */

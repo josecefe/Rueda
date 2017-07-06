@@ -22,7 +22,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- *
  * @author josec
  */
 public class AsignacionParticipante {
@@ -31,11 +30,11 @@ public class AsignacionParticipante {
     private final StringProperty ida = new SimpleStringProperty();
     private final StringProperty vuelta = new SimpleStringProperty();
     private final BooleanProperty conductor = new SimpleBooleanProperty();
-    
+
     public AsignacionParticipante() {
         // Constructor por defecto
     }
-    
+
     public AsignacionParticipante(String participante, String ida, String vuelta, boolean conductor) {
         this.participante.set(participante);
         this.ida.set(ida);

@@ -22,12 +22,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- *
  * SQL: CREATE TABLE "dia" ( "id" INTEGER PRIMARY KEY NOT NULL, "descripcion"
  * TEXT );
  *
  * @author josec
- *
  */
 public class Dia implements Comparable<Dia> {
 
@@ -46,7 +44,7 @@ public class Dia implements Comparable<Dia> {
      * Constructor preferido. El Identificador debe ser un número único a partir
      * de 1
      *
-     * @param id Número único de identificación a partir del 1
+     * @param id          Número único de identificación a partir del 1
      * @param descripcion Descripción del día en texto
      */
     public Dia(int id, String descripcion) {
@@ -62,13 +60,6 @@ public class Dia implements Comparable<Dia> {
     }
 
     /**
-     * @return the descripcion
-     */
-    public String getDescripcion() {
-        return descripcion.get();
-    }
-
-    /**
      * El 0 no es un valor valido de ID
      *
      * @param id Valor de Identificación del día, empezando por el 1
@@ -77,6 +68,13 @@ public class Dia implements Comparable<Dia> {
         if (getId() == 0) {
             this.id.set(id);
         }
+    }
+
+    /**
+     * @return the descripcion
+     */
+    public String getDescripcion() {
+        return descripcion.get();
     }
 
     public void setDescripcion(String descripcion) {
@@ -92,7 +90,7 @@ public class Dia implements Comparable<Dia> {
     }
 
     /*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * 
 	 * @see java.lang.Object#hashCode()
      */

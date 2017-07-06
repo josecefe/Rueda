@@ -16,20 +16,14 @@
  */
 package es.um.josecefe.rueda.modelo;
 
-import java.util.List;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+
+import java.util.List;
 
 /**
  * @author josec
- *
+ * <p>
  * SQL: CREATE TABLE participante ( "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT
  * NULL, "nombre" TEXT NOT NULL, "plazasCoche" INTEGER NOT NULL, "residencia"
  * INTEGER REFERENCES lugar(id) )
@@ -41,7 +35,7 @@ public class Participante implements Comparable<Participante> {
     private final IntegerProperty plazasCoche;
     private final ObjectProperty<Lugar> residencia;
     /*
-	 * SQL: CREATE TABLE punto_encuentro ( "participante" INTEGER NOT
+     * SQL: CREATE TABLE punto_encuentro ( "participante" INTEGER NOT
 	 * NULL REFERENCES participante(id) ON DELETE CASCADE, "lugar" INTEGER NOT
 	 * NULL REFERENCES lugar(id) ON DELETE CASCADE, "orden" INTEGER NOT NULL,
 	 * PRIMARY KEY (participante, lugar, orden) );
@@ -64,12 +58,12 @@ public class Participante implements Comparable<Participante> {
      * Constructor de la clase que debe usarse cuando se crea un objeto de este
      * tipo, reservando el constructor por defecto para labores de persistencia
      *
-     * @param id Identificador del participante, un número único a partir de 1
-     * @param nombre Nombre a mostrar del participante
-     * @param plazasCoche Nº de ocupantes del vehículo, incluido el conductor, 0 significa que no tiene coche
-     * @param residencia (Opcional) Lugar de residencia - de momento sin uso
+     * @param id              Identificador del participante, un número único a partir de 1
+     * @param nombre          Nombre a mostrar del participante
+     * @param plazasCoche     Nº de ocupantes del vehículo, incluido el conductor, 0 significa que no tiene coche
+     * @param residencia      (Opcional) Lugar de residencia - de momento sin uso
      * @param puntosEncuentro Lista con orden que contiene los lugares de encuentro admitidos
-     * por el participante por orden de preferencia
+     *                        por el participante por orden de preferencia
      */
     public Participante(int id, String nombre, int plazasCoche, Lugar residencia, List<Lugar> puntosEncuentro) {
         this.id = new SimpleIntegerProperty(id);
@@ -88,11 +82,22 @@ public class Participante implements Comparable<Participante> {
         return id.get();
     }
 
+    public void setId(int id) {
+        // Solo se puede establecer el id en un objeto nuevo
+        if (this.id.get() == 0) {
+            this.id.set(id);
+        }
+    }
+
     /**
      * @return the nombre
      */
     public String getNombre() {
         return nombre.get();
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre.set(nombre);
     }
 
     /**
@@ -102,6 +107,10 @@ public class Participante implements Comparable<Participante> {
         return plazasCoche.get();
     }
 
+    public void setPlazasCoche(int plazasCoche) {
+        this.plazasCoche.set(plazasCoche);
+    }
+
     /**
      * @return the residencia
      */
@@ -109,30 +118,15 @@ public class Participante implements Comparable<Participante> {
         return residencia.get();
     }
 
+    public void setResidencia(Lugar residencia) {
+        this.residencia.set(residencia);
+    }
+
     /**
      * @return the puntosEncuentro
      */
     public List<Lugar> getPuntosEncuentro() {
         return puntosEncuentro;
-    }
-
-    public void setId(int id) {
-        // Solo se puede establecer el id en un objeto nuevo
-        if (this.id.get() == 0) {
-            this.id.set(id);
-        }
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre.set(nombre);
-    }
-
-    public void setPlazasCoche(int plazasCoche) {
-        this.plazasCoche.set(plazasCoche);
-    }
-
-    public void setResidencia(Lugar residencia) {
-        this.residencia.set(residencia);
     }
 
     public void setPuntosEncuentro(List<Lugar> puntosEncuentro) {

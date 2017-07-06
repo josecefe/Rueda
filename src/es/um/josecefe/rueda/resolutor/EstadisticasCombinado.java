@@ -19,7 +19,6 @@ package es.um.josecefe.rueda.resolutor;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
- *
  * @author josec
  */
 public class EstadisticasCombinado extends Estadisticas {

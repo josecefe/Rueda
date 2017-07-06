@@ -16,28 +16,14 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.Participante;
-import es.um.josecefe.rueda.modelo.Lugar;
-import es.um.josecefe.rueda.modelo.Horario;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import es.um.josecefe.rueda.modelo.*;
+
+import java.sql.*;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
  * @author josec
- *
  */
 public class PersistenciaSQL {
 
@@ -84,12 +70,12 @@ public class PersistenciaSQL {
                 insLugar.setString(4, l.getDireccion());
                 insLugar.setString(5, l.getPoblacion());
                 insLugar.setString(6, l.getCp());
-                if (insLugar.executeUpdate()==1) {
+                if (insLugar.executeUpdate() == 1) {
                     ResultSet rsl = insLugar.getGeneratedKeys();
                     l.setId(rsl.getInt(1));
                     rsl.close();
                 } else {
-                    System.err.println("Fallo la inserción del lugar "+l);
+                    System.err.println("Fallo la inserción del lugar " + l);
                 }
             }
             insLugar.close();
@@ -106,7 +92,7 @@ public class PersistenciaSQL {
                 } else {
                     insPart.setNull(3, java.sql.Types.INTEGER);
                 }
-                if (insPart.executeUpdate()==1) {
+                if (insPart.executeUpdate() == 1) {
                     ResultSet rsl = insPart.getGeneratedKeys();
                     p.setId(rsl.getInt(1));
                     rsl.close();
@@ -116,7 +102,7 @@ public class PersistenciaSQL {
                 for (int i = 0; i < p.getPuntosEncuentro().size(); ++i) {
                     insPuntos.setInt(1, p.getId());
                     insPuntos.setInt(2, p.getPuntosEncuentro().get(i).getId());
-                    insPuntos.setInt(3, i+1); //El primero será 1 no 0
+                    insPuntos.setInt(3, i + 1); //El primero será 1 no 0
                     if (insPuntos.executeUpdate() != 1) {
                         System.err.println("Falla la insercion del punto de encuentro " + p.getPuntosEncuentro().get(i));
                     }

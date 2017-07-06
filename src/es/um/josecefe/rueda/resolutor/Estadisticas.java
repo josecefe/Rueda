@@ -21,24 +21,23 @@ import javafx.beans.property.SimpleDoubleProperty;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 /**
- *
  * @author josec
  */
 public abstract class Estadisticas {
+    protected final DoubleProperty progreso = new SimpleDoubleProperty(0);
     protected int fitness;
     protected long ti; // Para el tiempo inicial
     protected long tiempo;
-    protected final DoubleProperty progreso = new SimpleDoubleProperty(0);
-    
+
+    public int getFitness() {
+        return fitness;
+    }
+
     public Estadisticas setFitness(int aptitud) {
         this.fitness = aptitud;
         return this;
     }
-    
-    public int getFitness() {
-        return fitness;
-    }
-    
+
     public Estadisticas inicia() {
         ti = System.currentTimeMillis(); // Tiempo inicial
         fitness = Integer.MAX_VALUE;
@@ -46,28 +45,29 @@ public abstract class Estadisticas {
             progreso.set(0);
         return this;
     }
-    
+
     public Estadisticas actualizaProgreso() {
         tiempo = System.currentTimeMillis() - ti;
         if (!progreso.isBound())
             progreso.set(getCompletado());
         return this;
     }
-    
+
     public String getTiempoString() {
         return DurationFormatUtils.formatDurationHMS(getTiempo());
     }
-    
+
     public long getTiempo() {
         return tiempo;
     }
-    
+
     public DoubleProperty progresoProperty() {
         return progreso;
     }
 
     /**
      * Indica el grado de completitud de la exploración de soluciones del algoritmo
+     *
      * @return valor entre 0 y 1 indicando el grado de completitud
      */
     public abstract double getCompletado();

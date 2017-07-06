@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
  * @author josec
  */
 public interface AsignacionDia {
@@ -32,5 +31,5 @@ public interface AsignacionDia {
     Map<Participante, Lugar> getPeIda();
 
     Map<Participante, Lugar> getPeVuelta();
-    
+
 }
