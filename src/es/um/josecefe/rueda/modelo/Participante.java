@@ -26,7 +26,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author josec
@@ -35,7 +34,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * NULL, "nombre" TEXT NOT NULL, "plazasCoche" INTEGER NOT NULL, "residencia"
  * INTEGER REFERENCES lugar(id) )
  */
-@XmlRootElement(name = "participante")
 public class Participante implements Comparable<Participante> {
 
     private final IntegerProperty id;

@@ -7,5 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="htmlflow" level="project" />
+    <orderEntry type="library" name="org.apache.commons.lang3" level="project" />
   </component>
 </module>

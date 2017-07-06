@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -144,7 +145,7 @@ public class PrincipalController {
 
     private RuedaFX mainApp;
 
-    DatosRueda datosRueda;
+    private DatosRueda datosRueda;
 
     @FXML
     private MenuItem mCalcular;
@@ -450,13 +451,13 @@ public class PrincipalController {
         for (String resolutor : RESOLUTORES) {
             try {
                 Class<?> resolutorCls = Class.forName(resolutor);
-                Resolutor resolutorIns = (Resolutor) resolutorCls.newInstance();
+                Resolutor resolutorIns = (Resolutor) resolutorCls.getDeclaredConstructor().newInstance();
                 cbAlgoritmo.getItems().add(resolutorIns);
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Imposible instanciar el resolutor "+resolutor, e);
             }
         }
-        cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
+        cbAlgoritmo.setConverter(new StringConverter<>() {
             @Override
             public String toString(Resolutor r) {
                 return r.getClass().getSimpleName();
@@ -470,7 +471,7 @@ public class PrincipalController {
         cbAlgoritmo.getSelectionModel().select(Runtime.getRuntime().availableProcessors() >= 4 ? 1 : 0);
         
         cbEstrategia.getItems().addAll(Resolutor.Estrategia.values());
-        cbEstrategia.setConverter(new StringConverter<Resolutor.Estrategia>() {
+        cbEstrategia.setConverter(new StringConverter<>() {
             @Override
             public String toString(Resolutor.Estrategia e) {
                 return e.toString();
@@ -753,15 +754,13 @@ public class PrincipalController {
             fadeMusica = new Timeline(
                     new KeyFrame(Duration.ZERO, new KeyValue(audioMediaPlayer.volumeProperty(), 0.0)),
                     new KeyFrame(Duration.seconds(3), new KeyValue(audioMediaPlayer.volumeProperty(), 1.0)));
-            fadeMusica.setOnFinished(of -> {
-                audioMediaPlayer.setAudioSpectrumListener(
-                        (double timestamp, double duration, float[] magnitudes, float[] phases) -> {
-                            if (!cerrandoAcercade) {
-                                textoSolidos.setTranslateY(textoSolidosBounds.getHeight() + (60 + magnitudes[0]));
-                                textoAutor.setTranslateY((acercadeRoot.getHeight() - (60 + magnitudes[1])));
-                            }
-                        });
-            });
+            fadeMusica.setOnFinished(of -> audioMediaPlayer.setAudioSpectrumListener(
+                    (double timestamp, double duration, float[] magnitudes, float[] phases) -> {
+                        if (!cerrandoAcercade) {
+                            textoSolidos.setTranslateY(textoSolidosBounds.getHeight() + (60 + magnitudes[0]));
+                            textoAutor.setTranslateY((acercadeRoot.getHeight() - (60 + magnitudes[1])));
+                        }
+                    }));
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             fadeMusica = new PauseTransition(Duration.seconds(3));
@@ -1076,9 +1075,7 @@ public class PrincipalController {
                 alert.setContentText("El Lugar seleccionado está en uso como punto de encuentro de algún participante. Si continua se eliminarán todos los puntos de encuentro que lo usen. ¿Desea continuar?");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                    datosRueda.getParticipantes().stream().forEach((Participante p) -> {
-                        p.getPuntosEncuentro().remove(ds);
-                    });
+                    datosRueda.getParticipantes().forEach((Participante p) -> p.getPuntosEncuentro().remove(ds));
                 } else {
                     return;
                 }
@@ -1180,7 +1177,7 @@ public class PrincipalController {
         private final ObjectProperty<Resolutor> resolutor = new SimpleObjectProperty<>();
         private final SetProperty<Horario> horarios = new SimpleSetProperty<>();
 
-        public ResolutorService() {
+        ResolutorService() {
         }
 
         public ResolutorService(Resolutor r, Set<Horario> h) {
@@ -1215,7 +1212,7 @@ public class PrincipalController {
 
         @Override
         protected Task<Map<Dia, ? extends AsignacionDia>> createTask() {
-            return new Task<Map<Dia, ? extends AsignacionDia>>() {
+            return new Task<>() {
                 @Override
                 protected Map<Dia, ? extends AsignacionDia> call() throws Exception {
                     updateProgress(0, 1);
@@ -1224,7 +1221,7 @@ public class PrincipalController {
                         updateProgress(newValue.doubleValue(), 1.0);
                         updateMessage(getResolutor().getEstadisticas().toString());
                     });
-                    
+
                     return getResolutor().resolver(getHorarios());
                 }
             };

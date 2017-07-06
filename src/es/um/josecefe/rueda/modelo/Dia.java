@@ -20,7 +20,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -30,7 +29,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author josec
  *
  */
-@XmlRootElement(name = "dia")
 public class Dia implements Comparable<Dia> {
 
     private final IntegerProperty id;
