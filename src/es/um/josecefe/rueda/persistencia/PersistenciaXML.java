@@ -100,7 +100,7 @@ public class PersistenciaXML {
             Set<Integer> horasActivas = datosRueda.getHorarios().stream().map(Horario::getEntrada).collect(Collectors.toSet());
             horasActivas.addAll(datosRueda.getHorarios().stream().map(Horario::getSalida).collect(Collectors.toSet()));
 
-            // Vamos a guardar todo en una tabla "virtual"
+            // Vamos a guardar en una tabla "virtual"
             Map<Dia, Map<Integer, List<ParticipanteIdaConduceLugar>>> datosTabla = new HashMap<>(datosRueda.getDias().size());
             for (Asignacion a : datosRueda.getAsignacion()) {
                 Dia d = a.getDia();

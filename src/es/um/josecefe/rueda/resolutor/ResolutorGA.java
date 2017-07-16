@@ -32,7 +32,7 @@ import static java.util.stream.Collectors.*;
  * Implementa la resolución del problema de la Rueda mediante el empleo de un
  * algoritmo genético.
  *
- * @author josec
+ * @author josecefe
  */
 public class ResolutorGA extends Resolutor {
 
@@ -58,8 +58,6 @@ public class ResolutorGA extends Resolutor {
     private float[] coefConduccion;
     private Map<Dia, List<AsignacionDiaV5>> solCandidatasDiarias;
     private Map<Dia, AsignacionDia> solucionFinal;
-    private int[] tamanosNivel;
-    private double totalPosiblesSoluciones;
     private boolean[] participantesConCoche;
     private int tamPoblacion;
     private double probMutacion;
@@ -146,14 +144,14 @@ public class ResolutorGA extends Resolutor {
             Combinador<Set<Participante>> combinarConductoresDia = new Combinador<>(conductoresDia);
 
             for (List<Set<Participante>> condDia : combinarConductoresDia) {
-                final Set<Participante> selCond = condDia.stream().flatMap(e -> e.stream()).collect(toSet());
+                final Set<Participante> selCond = condDia.stream().flatMap(Collection::stream).collect(toSet());
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
                 Map<Integer, Integer> plazasIda = selCond.stream()
-                        .map(e -> participanteHorario.get(e)).collect(
+                        .map(participanteHorario::get).collect(
                                 groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
                 Map<Integer, Integer> plazasVuelta = selCond.stream()
-                        .map(e -> participanteHorario.get(e))
+                        .map(participanteHorario::get)
                         .collect(groupingBy(Horario::getSalida, summingInt(h -> h.getParticipante().getPlazasCoche())));
 
                 if (nParticipantesIda.entrySet().stream().allMatch(e -> plazasIda.getOrDefault(e.getKey(), 0) >= e.getValue())
@@ -179,10 +177,10 @@ public class ResolutorGA extends Resolutor {
                                     ? il.next() : selLugares.get(i));
                         }
                         Map<Integer, Map<Lugar, Integer>> plazasDisponiblesIda = selCond.stream()
-                                .collect(groupingBy(p -> participanteHorario.get(p).getEntrada(), groupingBy(p -> lugaresIda.get(p), summingInt(Participante::getPlazasCoche))));
+                                .collect(groupingBy(p -> participanteHorario.get(p).getEntrada(), groupingBy(lugaresIda::get, summingInt(Participante::getPlazasCoche))));
 
                         Map<Integer, Map<Lugar, Integer>> plazasDisponiblesVuelta = selCond.stream()
-                                .collect(groupingBy(p -> participanteHorario.get(p).getSalida(), groupingBy(p -> lugaresVuelta.get(p), summingInt(Participante::getPlazasCoche))));
+                                .collect(groupingBy(p -> participanteHorario.get(p).getSalida(), groupingBy(lugaresVuelta::get, summingInt(Participante::getPlazasCoche))));
                         // Para comprobar, vemos los participantes, sus entradas y salidas
                         Map<Integer, Map<Lugar, Long>> plazasNecesariasIda = horariosDia.stream()
                                 .collect(groupingBy(Horario::getEntrada, groupingBy(h -> lugaresIda.get(h.getParticipante()), counting())));
@@ -212,8 +210,8 @@ public class ResolutorGA extends Resolutor {
         }));
 
         if (ESTADISTICAS) {
-            tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
-            totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
+            int[] tamanosNivel = solCandidatasDiarias.keySet().stream().mapToInt(k -> solCandidatasDiarias.get(k).size()).toArray();
+            double totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
             if (DEBUG) {
                 System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
                         + totalPosiblesSoluciones);
@@ -263,10 +261,10 @@ public class ResolutorGA extends Resolutor {
 
         if (DEBUG) {
             System.out.println("Mejor Población Inicial: " + mejor);
-            System.out.println("Est. Población Inicial: " + poblacion.stream().mapToInt(ind -> ind.getAptitud()).summaryStatistics());
+            System.out.println("Est. Población Inicial: " + poblacion.stream().mapToInt(Individuo::getAptitud).summaryStatistics());
         }
         int nGen = 0, estancado = 0;
-        //TODO: AHORA VA EL ESQUEMA DEL GA
+        //AHORA VA EL ESQUEMA DEL GA
         long ti = System.currentTimeMillis();
         while (System.currentTimeMillis() - ti < tiempoMaximo && nGen++ < numGeneraciones && mejor.getAptitud() > objAptitud && continuar) {
             // Paso 1 y 2: Seleccionar padres, combinar y después mutar...
@@ -292,7 +290,9 @@ public class ResolutorGA extends Resolutor {
                 if (tamElite == 1) {
                     poblacion.add(mejor);
                 } else {
-                    poblacion.addAll(elite);
+                    if (elite != null) {
+                        poblacion.addAll(elite);
+                    }
                 }
             }
 
@@ -322,7 +322,7 @@ public class ResolutorGA extends Resolutor {
                 estGlobal.actualizaProgreso();
                 if (DEBUG) {
                     System.out.format("Generación %d -> mejor=%s\n", nGen, mejor);
-                    System.out.println(" - Est. población: " + poblacion.stream().mapToInt(ind -> ind.getAptitud()).summaryStatistics());
+                    System.out.println(" - Est. población: " + poblacion.stream().mapToInt(Individuo::getAptitud).summaryStatistics());
                     System.out.println(" - Est. algoritmo:" + estGlobal);
                 }
             }

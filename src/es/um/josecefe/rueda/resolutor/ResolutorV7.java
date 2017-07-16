@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class ResolutorV7 extends ResolutorAcotado {
 
-    final static boolean DEBUG = false;
+    private final static boolean DEBUG = true;
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS = 1000;
     private final static int CADA_MILIS_EST = 1000;
@@ -55,8 +55,6 @@ public class ResolutorV7 extends ResolutorAcotado {
     private int[] tamanosNivel;
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
-    private int cotaInferiorCorte = Integer.MAX_VALUE;
-    private Nodo RAIZ;
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV7() {
@@ -92,11 +90,6 @@ public class ResolutorV7 extends ResolutorAcotado {
         return resolver(horarios, Integer.MAX_VALUE - 1);
     }
 
-    /**
-     * @param horarios
-     * @param cotaInfCorteInicial
-     * @return
-     */
     @Override
     public Map<Dia, AsignacionDiaV5> resolver(Set<Horario> horarios, int cotaInfCorteInicial) {
         this.horarios = horarios;
@@ -118,10 +111,10 @@ public class ResolutorV7 extends ResolutorAcotado {
             }
         }
         // Preparamos el algoritmo
-        RAIZ = new Nodo(contexto);
+        Nodo RAIZ = new Nodo(contexto);
         Nodo actual = RAIZ;
         Nodo mejor = actual;
-        cotaInferiorCorte = cotaInfCorteInicial < Integer.MAX_VALUE ? cotaInfCorteInicial + 1 : cotaInfCorteInicial; //Lo tomamos como cota superior
+        int cotaInferiorCorte = cotaInfCorteInicial < Integer.MAX_VALUE ? cotaInfCorteInicial + 1 : cotaInfCorteInicial;
         Collection<Nodo> LNV;
         Supplier<Nodo> opPull;
         contexto.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_INI; //Primero buscamos en profundidad

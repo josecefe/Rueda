@@ -77,11 +77,12 @@ import static java.util.stream.Collectors.toMap;
 public class PrincipalController {
 
     private static final String[] RESOLUTORES = new String[]{
-            "es.um.josecefe.rueda.resolutor.ResolutorV7",
-            "es.um.josecefe.rueda.resolutor.ResolutorV8",
-            "es.um.josecefe.rueda.resolutor.ResolutorGA",
-            "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
-            "es.um.josecefe.rueda.resolutor.ResolutorIterativo"};
+            es.um.josecefe.rueda.resolutor.ResolutorV7.class.getCanonicalName(),
+            es.um.josecefe.rueda.resolutor.ResolutorV8.class.getCanonicalName(),
+            es.um.josecefe.rueda.resolutor.ResolutorGA.class.getCanonicalName(),
+            es.um.josecefe.rueda.resolutor.ResolutorCombinado.class.getCanonicalName(),
+            es.um.josecefe.rueda.resolutor.ResolutorIterativo.class.getCanonicalName(),
+            es.um.josecefe.rueda.resolutor.ResolutorExhaustivo.class.getCanonicalName()};
     @FXML
     TableView<Horario> tablaHorario;
     @FXML
@@ -375,7 +376,6 @@ public class PrincipalController {
     public void setMainApp(RuedaFX mainApp) {
         this.mainApp = mainApp;
         this.stage = mainApp.getPrimaryStage();
-        datosRueda = mainApp.getDatosRueda();
         tablaHorario.setItems(datosRueda.horariosProperty());
         columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.diasProperty()));
         columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.participantesProperty()));
@@ -771,7 +771,7 @@ public class PrincipalController {
         barraEstado.textProperty().bind(resolutorService.messageProperty());
         indicadorProgreso.setProgress(-1);
         indicadorProgreso.progressProperty().bind(resolutorService.progressProperty().subtract(0.01));
-        datosRueda.asignacionProperty().clear(); // Borramos todo antes de empezar
+        datosRueda.asignacionProperty().clear(); // Borramos antes de empezar
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
         bCancelarCalculo.setDisable(false);
@@ -1056,6 +1056,10 @@ public class PrincipalController {
             lvLugaresEncuentro.getItems().add(pos + 1, l);
             lvLugaresEncuentro.getSelectionModel().select(l);
         }
+    }
+
+    public void setDatosRueda(DatosRueda datosRueda) {
+        this.datosRueda = datosRueda;
     }
 
     private static class ResolutorService extends Service<Map<Dia, ? extends AsignacionDia>> {

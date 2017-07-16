@@ -240,7 +240,6 @@ public class PersistenciaSQL {
             // it probably means no database file is found
             System.err.println(e.getMessage());
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             System.err.println("Problema con los drivers, compruebe que el archivo .jar del sqlite-jdbc esta en su sitio");
         } finally {
             try {
@@ -318,7 +317,6 @@ public class PersistenciaSQL {
             // it probably means no database file is found
             System.err.println(e.getMessage());
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             System.err.println("Problema con los drivers, compruebe que el archivo .jar del sqlite-jdbc esta en su sitio");
         } finally {
             try {
@@ -372,7 +370,6 @@ public class PersistenciaSQL {
             // it probably means no database file is found
             System.err.println(e.getMessage());
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             System.err.println("Problema con los drivers, compruebe que el archivo .jar del sqlite-jdbc esta en su sitio");
         } finally {
             try {

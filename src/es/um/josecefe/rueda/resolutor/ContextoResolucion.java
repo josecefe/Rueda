@@ -33,7 +33,7 @@ class ContextoResolucion {
     Participante[] participantes;
     Map<Dia, List<AsignacionDiaV5>> solucionesCandidatas;
     boolean[] participantesConCoche;
-    double[] coefConduccion;
+    double[] coefConduccion; //Que tanto por 1 supone que use el coche cada conductor
     int[][] maxVecesCondDia;
     int[][] minVecesCondDia;
     int[] peorCosteDia;
@@ -89,14 +89,14 @@ class ContextoResolucion {
             Combinador<Set<Participante>> combinarConductoresDia = new Combinador<>(conductoresDia);
 
             for (List<Set<Participante>> condDia : combinarConductoresDia) {
-                final Set<Participante> selCond = condDia.stream().flatMap(e -> e.stream()).collect(toSet());
+                final Set<Participante> selCond = condDia.stream().flatMap(Collection::stream).collect(toSet());
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
                 Map<Integer, Integer> plazasIda = selCond.stream()
-                        .map(e -> participanteHorario.get(e)).collect(
+                        .map(participanteHorario::get).collect(
                                 groupingBy(Horario::getEntrada, summingInt(h -> h.getParticipante().getPlazasCoche())));
                 Map<Integer, Integer> plazasVuelta = selCond.stream()
-                        .map(e -> participanteHorario.get(e))
+                        .map(participanteHorario::get)
                         .collect(groupingBy(Horario::getSalida, summingInt(h -> h.getParticipante().getPlazasCoche())));
 
                 if (nParticipantesIda.entrySet().stream().allMatch(e -> plazasIda.getOrDefault(e.getKey(), 0) >= e.getValue())
@@ -122,10 +122,10 @@ class ContextoResolucion {
                                     ? il.next() : selLugares.get(i));
                         }
                         Map<Integer, Map<Lugar, Integer>> plazasDisponiblesIda = selCond.stream()
-                                .collect(groupingBy(p -> participanteHorario.get(p).getEntrada(), groupingBy(p -> lugaresIda.get(p), summingInt(Participante::getPlazasCoche))));
+                                .collect(groupingBy(p -> participanteHorario.get(p).getEntrada(), groupingBy(lugaresIda::get, summingInt(Participante::getPlazasCoche))));
 
                         Map<Integer, Map<Lugar, Integer>> plazasDisponiblesVuelta = selCond.stream()
-                                .collect(groupingBy(p -> participanteHorario.get(p).getSalida(), groupingBy(p -> lugaresVuelta.get(p), summingInt(Participante::getPlazasCoche))));
+                                .collect(groupingBy(p -> participanteHorario.get(p).getSalida(), groupingBy(lugaresVuelta::get, summingInt(Participante::getPlazasCoche))));
                         // Para comprobar, vemos los participantes, sus entradas y salidas
                         Map<Integer, Map<Lugar, Long>> plazasNecesariasIda = horariosDia.stream()
                                 .collect(groupingBy(Horario::getEntrada, groupingBy(h -> lugaresIda.get(h.getParticipante()), counting())));

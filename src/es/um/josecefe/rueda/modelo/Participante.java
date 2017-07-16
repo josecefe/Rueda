@@ -19,6 +19,7 @@ package es.um.josecefe.rueda.modelo;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -126,7 +127,7 @@ public class Participante implements Comparable<Participante> {
      * @return the puntosEncuentro
      */
     public List<Lugar> getPuntosEncuentro() {
-        return puntosEncuentro;
+        return new ArrayList<>(puntosEncuentro);
     }
 
     public void setPuntosEncuentro(List<Lugar> puntosEncuentro) {

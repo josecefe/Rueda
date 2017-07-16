@@ -21,10 +21,7 @@ import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
 import es.um.josecefe.rueda.persistencia.PersistenciaSQL;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
-import es.um.josecefe.rueda.resolutor.Resolutor;
-import es.um.josecefe.rueda.resolutor.ResolutorGA;
-import es.um.josecefe.rueda.resolutor.ResolutorV7;
-import es.um.josecefe.rueda.resolutor.ResolutorV8;
+import es.um.josecefe.rueda.resolutor.*;
 
 import java.io.File;
 import java.util.*;
@@ -45,7 +42,7 @@ public class Rueda {
     private static final String RUEDABD = RUEDA_BASE + ".db";
     private static final String RUEDAXML_HORARIOS = RUEDA_BASE + "_horarios.xml";
     private static final String RUEDAXML_ASIGNACION = RUEDA_BASE + "_asignacion.xml";
-    private static final boolean COMPARANDO = true;
+    private static final boolean COMPARANDO = false;
     private static final boolean AMPLIADO = false;
 
     /**
@@ -68,26 +65,21 @@ public class Rueda {
     }
 
     private void pruebaResolutor() {
-        Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
-        //DatosRueda datos = PersistenciaXML.cargaDatosRueda(new File(RUEDAXML_HORARIOS));
-        //Set<Horario> horarios = datos.getHorarios();
-        // Creando bd nueva y guardando
+        //Set<Horario> horarios = PersistenciaSQL.cargaHorarios(RUEDABD);
         DatosRueda datos = new DatosRueda();
-        datos.poblarDesdeHorarios(horarios);
+        PersistenciaXML.cargaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
+        Set<Horario> horarios = new HashSet<>(datos.getHorarios());
+        // Creando bd nueva y guardando
+        //DatosRueda datos = new DatosRueda();
+        //datos.poblarDesdeHorarios(horarios);
         //PersistenciaSQL.guardaDatosRueda(RUEDABD, datos);
         // Vamos a guardarlo en XML
-        PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
+        //PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
 
         List<? extends Resolutor> resolutores = Arrays.asList(
-                //                new ResolutorV1(),
-                //                new ResolutorV2(),
-                //                new ResolutorV3(),
-                //                new ResolutorV4(),
-                //                new ResolutorV5(),
-                //                new ResolutorV6(),
                 new ResolutorV7(),
                 new ResolutorV8(),
-                new ResolutorGA()
+                new ResolutorExhaustivo()
         );
         if (COMPARANDO) {
             resolutores.forEach(r -> {

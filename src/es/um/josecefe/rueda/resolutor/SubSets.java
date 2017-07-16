@@ -16,10 +16,7 @@
  */
 package es.um.josecefe.rueda.resolutor;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -37,18 +34,15 @@ public class SubSets<T> implements Iterable<Set<T>> {
     private final int maxSize;
 
     @SuppressWarnings("unchecked")
-    public SubSets(Set<T> conjunto) {
-        this.base = (T[]) conjunto.toArray();
-        this.minSize = 0;
-        this.maxSize = this.size = conjunto.size();
+    private static <T> T[] asignaBase(Collection<T> conjunto) {
+        return (T[]) conjunto.toArray();
     }
 
-    @SuppressWarnings("unchecked")
-    public SubSets(Set<T> conjunto, int minSize, int maxSize) {
-        this.base = (T[]) conjunto.toArray();
+    public SubSets(Collection<T> conjunto, int minSize, int maxSize) {
+        this.base = asignaBase(conjunto);
         this.size = conjunto.size();
         this.minSize = Math.min(this.size, minSize);
-        this.maxSize = Math.min(this.size, maxSize);
+        this.maxSize = (maxSize > this.size) ? this.size : maxSize;
     }
 
     private Set<T> generarElemento(int bit) {

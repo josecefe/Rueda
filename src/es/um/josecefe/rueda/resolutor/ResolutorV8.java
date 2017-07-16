@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class ResolutorV8 extends ResolutorAcotado {
 
-    private final static boolean DEBUG = false;
+    private final static boolean DEBUG = true;
 
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS_EST = 1000;
@@ -54,7 +54,6 @@ public class ResolutorV8 extends ResolutorAcotado {
     private double[] nPosiblesSoluciones;
     private double totalPosiblesSoluciones;
     private AtomicInteger cotaInferiorCorte;
-    private Nodo RAIZ;
     private long ultMilisEst; // La ultima vez que se hizo estadística
 
     public ResolutorV8() {
@@ -114,8 +113,7 @@ public class ResolutorV8 extends ResolutorAcotado {
         }
 
         // Preparamos el algoritmo
-        RAIZ = new Nodo(contexto);
-        Nodo actual = RAIZ;
+        Nodo actual = new Nodo(contexto);
         Nodo mejor = actual;
         cotaInferiorCorte = new AtomicInteger(cotaInfCorteInicial + 1); //Lo tomamos como cota superior
 
@@ -208,7 +206,7 @@ public class ResolutorV8 extends ResolutorAcotado {
                     estGlobal.addDescartados((tamanosNivel[actual.getIndiceDia() + 1] - lNF.size()) * nPosiblesSoluciones[actual.getIndiceDia() + 1]);
                 }
                 final Nodo mejorAhora = mejor;
-                Optional<Nodo> mejorHijo = lNF.parallelStream().sorted().map(n -> branchAndBound(n, mejorAhora)).filter(Optional<Nodo>::isPresent).map(Optional<Nodo>::get).min(Nodo::compareTo);
+                Optional<Nodo> mejorHijo = lNF.parallelStream().sorted().map(n -> branchAndBound(n, mejorAhora)).filter(Optional::isPresent).map(Optional<Nodo>::get).min(Nodo::compareTo);
                 if (mejorHijo.isPresent() && mejorHijo.get().compareTo(mejor) < 0) { // Tenemos un hijo que mejora
                     mejor = mejorHijo.get();
                 }

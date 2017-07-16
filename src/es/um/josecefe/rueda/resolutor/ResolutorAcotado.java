@@ -30,7 +30,7 @@ public abstract class ResolutorAcotado extends Resolutor {
     /**
      * Resuelve el problema de optimización de la rueda dado un horario de entrada sabiendo
      * que la solución dada tiene que tener un fitness menor o igual que el dado, descartando
-     * las qeu lo tengan mayor.
+     * las que lo tengan mayor.
      *
      * @param horarios     Entradas del horario
      * @param cotaInfCorte Valor de acotación del fitness de la solución (descartar soluciones con fitness mayor)

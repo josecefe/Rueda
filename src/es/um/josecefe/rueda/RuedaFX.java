@@ -42,7 +42,6 @@ import static es.um.josecefe.rueda.Version.*;
 public class RuedaFX extends Application {
     private final DatosRueda datosRueda;
     private Stage primaryStage;
-    private BorderPane Principal;
 
     public RuedaFX() {
         this.datosRueda = new DatosRueda();
@@ -53,10 +52,6 @@ public class RuedaFX extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public DatosRueda getDatosRueda() {
-        return datosRueda;
     }
 
     public Window getPrimaryStage() {
@@ -72,14 +67,15 @@ public class RuedaFX extends Application {
 
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("vista/Principal.fxml"));
-            Principal = (BorderPane) loader.load();
+            BorderPane principal = loader.load();
 
             // Give the controller access to the main app.
             PrincipalController controller = loader.getController();
+            controller.setDatosRueda(datosRueda);
             controller.setMainApp(this);
 
             // Show the scene containing the root layout.
-            Scene scene = new Scene(Principal);
+            Scene scene = new Scene(principal);
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
 
@@ -91,7 +87,7 @@ public class RuedaFX extends Application {
                 cargaHorarios(file);
             }
         } catch (IOException ex) {
-            Logger.getLogger(RuedaFX.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RuedaFX.class.getName()).log(Level.SEVERE, "Fallo inicializando la ventana principal", ex);
         }
     }
 
@@ -134,10 +130,10 @@ public class RuedaFX extends Application {
     }
 
     /**
-     * Loads horario data from the specified file. The current horario data will
+     * Loads horario data from the specified file. The current datosRueda data will
      * be replaced.
      *
-     * @param file
+     * @param file Fichero del que cargar los datos
      */
     public void cargaHorarios(File file) {
         try {
@@ -159,7 +155,7 @@ public class RuedaFX extends Application {
     /**
      * Saves the current horario data to the specified file.
      *
-     * @param file
+     * @param file Fichero en el que guardar los datosRueda
      */
     public void guardaHorarios(File file) {
         try {
@@ -179,7 +175,7 @@ public class RuedaFX extends Application {
     /**
      * Saves the current horario data to the specified file.
      *
-     * @param file
+     * @param file Fichero en el que guardar el HTML generado
      * @return indica si se completo con exito la operación
      */
     public boolean exportaAsignacion(File file) {
@@ -196,18 +192,6 @@ public class RuedaFX extends Application {
             alert.showAndWait();
         }
         return false;
-    }
-
-    /**
-     * Muestra un dialogo con el acerca de...
-     */
-    public void acercaDe() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(TITLE);
-        alert.setHeaderText("Acerca de");
-        alert.setContentText("Autor: José Ceferino Ortega Carretero");
-        alert.showAndWait();
-
     }
 
 
