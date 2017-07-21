@@ -1,18 +1,9 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda.resolutor;
 
@@ -70,7 +61,7 @@ public class ResolutorV8 extends ResolutorAcotado {
         solucionFinal = null;
 
         if (ESTADISTICAS) {
-            tamanosNivel = contexto.solucionesCandidatas.keySet().stream().mapToInt(k -> contexto.solucionesCandidatas.get(k).size()).toArray();
+            tamanosNivel = IntStream.of(contexto.ordenExploracionDias).map(i -> contexto.solucionesCandidatas.get(contexto.dias[i]).size()).toArray();
             totalPosiblesSoluciones = IntStream.of(tamanosNivel).mapToDouble(i -> (double) i).reduce(1.0, (a, b) -> a * b);
             if (DEBUG) {
                 System.out.println("Nº de posibles soluciones: " + IntStream.of(tamanosNivel).mapToObj(Double::toString).collect(Collectors.joining(" * ")) + " = "
@@ -155,11 +146,11 @@ public class ResolutorV8 extends ResolutorAcotado {
         }
         if (actual.getCotaInferior() < cotaInferiorCorte.get() && continuar) { //Estrategia de poda: si la cotaInferior >= C no seguimos
             if (ESTADISTICAS) {
-                estGlobal.addGenerados(tamanosNivel[actual.getIndiceDia() + 1]);
+                estGlobal.addGenerados(tamanosNivel[actual.getNivel() + 1]);
             }
-            if (actual.getIndiceDia() + 2 == contexto.dias.length) { // Los hijos son terminales
+            if (actual.getNivel() + 2 == contexto.dias.length) { // Los hijos son terminales
                 if (ESTADISTICAS) {
-                    estGlobal.addTerminales(tamanosNivel[actual.getIndiceDia() + 1]);
+                    estGlobal.addTerminales(tamanosNivel[actual.getNivel() + 1]);
                 }
                 Optional<Nodo> mejorHijo = actual.generaHijos(true).min(Nodo::compareTo); //true para paralelo
 
@@ -203,7 +194,7 @@ public class ResolutorV8 extends ResolutorAcotado {
                     // Limpiamos la LNV
                 }
                 if (ESTADISTICAS) {
-                    estGlobal.addDescartados((tamanosNivel[actual.getIndiceDia() + 1] - lNF.size()) * nPosiblesSoluciones[actual.getIndiceDia() + 1]);
+                    estGlobal.addDescartados((tamanosNivel[actual.getNivel() + 1] - lNF.size()) * nPosiblesSoluciones[actual.getNivel() + 1]);
                 }
                 final Nodo mejorAhora = mejor;
                 Optional<Nodo> mejorHijo = lNF.parallelStream().sorted().map(n -> branchAndBound(n, mejorAhora)).filter(Optional::isPresent).map(Optional<Nodo>::get).min(Nodo::compareTo);
@@ -213,7 +204,7 @@ public class ResolutorV8 extends ResolutorAcotado {
             }
         } else if (ESTADISTICAS) {
             if (continuar) {
-                estGlobal.addDescartados(nPosiblesSoluciones[actual.getIndiceDia()]);
+                estGlobal.addDescartados(nPosiblesSoluciones[actual.getNivel()]);
             }
         }
 

@@ -1,18 +1,9 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda.resolutor;
 
@@ -40,7 +31,7 @@ final class Nodo implements Comparable<Nodo> {
     private final Nodo padre;
     private final AsignacionDiaV5 eleccion;
     private final byte[] vecesConductor;
-    private final int indiceDia;
+    private final int nivel;
     private final int costeAcumulado;
     private final int cotaInferior;
     private final int cotaSuperior;
@@ -54,13 +45,13 @@ final class Nodo implements Comparable<Nodo> {
         vecesConductor = new byte[contexto.participantes.length];
         costeAcumulado = cotaInferior = 0;
         costeEstimado = cotaSuperior = Integer.MAX_VALUE;
-        indiceDia = -1;
+        nivel = -1;
     }
 
     Nodo(Nodo padre, AsignacionDiaV5 nuevaAsignacion, final ContextoResolucion contexto) {
         this.contexto = contexto;
         this.padre = padre;
-        indiceDia = padre.indiceDia + 1;
+        nivel = padre.nivel + 1;
         eleccion = nuevaAsignacion;
         costeAcumulado = padre.costeAcumulado + nuevaAsignacion.getCoste();
         vecesConductor = Arrays.copyOf(padre.vecesConductor, padre.vecesConductor.length);
@@ -74,11 +65,11 @@ final class Nodo implements Comparable<Nodo> {
         int minimo = Integer.MAX_VALUE;
         int minCI = Integer.MAX_VALUE;
         int minCS = Integer.MAX_VALUE;
-        final boolean terminal = contexto.dias.length == indiceDia + 1;
+        final boolean terminal = contexto.dias.length == nivel + 1;
         //int sum = 0;
         //nuevaAsignacion.getConductores().stream().forEachOrdered(ic -> ++vecesConductor[ic]);
         for (int i = 0; i < vecesConductor.length; i++) {
-            if (contexto.participantesConCoche[i]) {
+            if (contexto.participantes[i].getPlazasCoche() > 0) {
                 //sum = vecesConductor[i];
                 if (conductores[i]) {
                     ++vecesConductor[i];
@@ -92,14 +83,14 @@ final class Nodo implements Comparable<Nodo> {
                     minimo = vecesConductorVirt;
                 }
                 if (!terminal) {
-                    int vecesConductorVirtCS = Math.round((float) ((vecesConductor[i] + contexto.maxVecesCondDia[indiceDia + 1][i]) * contexto.coefConduccion[i]));
+                    int vecesConductorVirtCS = Math.round((float) ((vecesConductor[i] + contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]));
                     if (vecesConductorVirtCS > maxCS) {
                         maxCS = vecesConductorVirtCS;
                     }
                     if (vecesConductorVirtCS < minCS) {
                         minCS = vecesConductorVirtCS;
                     }
-                    int vecesConductorVirtCI = Math.round((float) ((vecesConductor[i] + contexto.minVecesCondDia[indiceDia + 1][i]) * contexto.coefConduccion[i]));
+                    int vecesConductorVirtCI = Math.round((float) ((vecesConductor[i] + contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]));
                     if (vecesConductorVirtCI > maxCI) {
                         maxCI = vecesConductorVirtCI;
                     }
@@ -107,8 +98,8 @@ final class Nodo implements Comparable<Nodo> {
                         minCI = vecesConductorVirtCI;
                     }
                     if (contexto.estrategia == Resolutor.Estrategia.MINCONDUCTORES) {
-                        totalMaxRes += contexto.maxVecesCondDia[indiceDia + 1][i];
-                        totalMinRes += contexto.minVecesCondDia[indiceDia + 1][i];
+                        totalMaxRes += contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i];
+                        totalMinRes += contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i];
                     }
                 }
             }
@@ -122,12 +113,12 @@ final class Nodo implements Comparable<Nodo> {
                 cotaSuperior = cotaInferior = maximo * PESO_MAXIMO_VECES_CONDUCTOR + total * PESO_TOTAL_CONDUCTORES + (maximo - minimo) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado;
             }
         } else if (contexto.estrategia == Resolutor.Estrategia.EQUILIBRADO) {
-            cotaInferior = maxCI * PESO_MAXIMO_VECES_CONDUCTOR + (maxCI - minCS) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.mejorCosteDia[indiceDia + 1];
-            cotaSuperior = maxCS * PESO_MAXIMO_VECES_CONDUCTOR + (maxCS - minCI) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.peorCosteDia[indiceDia + 1] + 1; // Añadimos el 1 para evitar un bug que nos haría perder una solución
+            cotaInferior = maxCI * PESO_MAXIMO_VECES_CONDUCTOR + (maxCI - minCS) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.mejorCosteDia[contexto.ordenExploracionDias[nivel + 1]];
+            cotaSuperior = maxCS * PESO_MAXIMO_VECES_CONDUCTOR + (maxCS - minCI) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.peorCosteDia[contexto.ordenExploracionDias[nivel + 1]] + 1; // Añadimos el 1 para evitar un bug que nos haría perder una solución
         } else {
             // estrategia == Estrategia.MINCONDUCTORES
-            cotaInferior = maxCI * PESO_MAXIMO_VECES_CONDUCTOR + (total + totalMinRes) * PESO_TOTAL_CONDUCTORES + (maxCI - minCS) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.mejorCosteDia[indiceDia + 1];
-            cotaSuperior = maxCS * PESO_MAXIMO_VECES_CONDUCTOR + (total + totalMaxRes) * PESO_TOTAL_CONDUCTORES + (maxCS - minCI) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.peorCosteDia[indiceDia + 1] + 1; // Añadimos el 1 para evitar un bug que nos haría perder una solución
+            cotaInferior = maxCI * PESO_MAXIMO_VECES_CONDUCTOR + (total + totalMinRes) * PESO_TOTAL_CONDUCTORES + (maxCI - minCS) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.mejorCosteDia[contexto.ordenExploracionDias[nivel + 1]];
+            cotaSuperior = maxCS * PESO_MAXIMO_VECES_CONDUCTOR + (total + totalMaxRes) * PESO_TOTAL_CONDUCTORES + (maxCS - minCI) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + costeAcumulado + contexto.peorCosteDia[contexto.ordenExploracionDias[nivel + 1]] + 1; // Añadimos el 1 para evitar un bug que nos haría perder una solución
         }
         if (DEBUG && (cotaInferior < padre.cotaInferior || cotaSuperior > padre.cotaSuperior || cotaSuperior < cotaInferior)) {
             System.err.println("*****************\n**** ¡LIADA!:\n --> Padre=" + padre + "\n --> Hijo=" + this);
@@ -156,24 +147,27 @@ final class Nodo implements Comparable<Nodo> {
         return eleccion;
     }
 
-    int getIndiceDia() {
-        return indiceDia;
+    int getNivel() {
+        return nivel;
     }
 
     Dia getDia() {
-        return indiceDia >= 0 ? contexto.dias[indiceDia] : null;
+        return nivel >= 0 ? contexto.dias[contexto.ordenExploracionDias[nivel]] : null;
     }
 
     Map<Dia, AsignacionDiaV5> getSolucion() {
         Map<Dia, AsignacionDiaV5> solucion = padre != null ? padre.getSolucion() : new HashMap<>();
-        if (indiceDia >= 0) {
+        if (nivel >= 0) {
             solucion.put(getDia(), eleccion);
         }
         return solucion;
     }
 
     Stream<Nodo> generaHijos(boolean paralelo) {
-        return (paralelo ? contexto.solucionesCandidatas.get(contexto.dias[indiceDia + 1]).parallelStream() : contexto.solucionesCandidatas.get(contexto.dias[indiceDia + 1]).stream()).map(this::generaHijo);
+        return (paralelo ?
+                    contexto.solucionesCandidatas.get(contexto.dias[contexto.ordenExploracionDias[nivel + 1]]).parallelStream() :
+                    contexto.solucionesCandidatas.get(contexto.dias[contexto.ordenExploracionDias[nivel + 1]]).stream())
+                        .map(this::generaHijo);
     }
 
     Nodo generaHijo(AsignacionDiaV5 solDia) {
@@ -187,7 +181,7 @@ final class Nodo implements Comparable<Nodo> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.eleccion, padre, indiceDia);
+        return Objects.hash(this.eleccion, padre, nivel);
     }
 
     @Override
@@ -202,7 +196,7 @@ final class Nodo implements Comparable<Nodo> {
             return false;
         }
         final Nodo other = (Nodo) obj;
-        if (this.indiceDia != other.indiceDia) {
+        if (this.nivel != other.nivel) {
             return false;
         }
         return Objects.equals(this.eleccion, other.eleccion) && Objects.equals(this.padre, other.padre);
@@ -211,7 +205,6 @@ final class Nodo implements Comparable<Nodo> {
 
     @Override
     public String toString() {
-        return String.format("Nodo{nivel=%d, estimado=%,d, inferior=%,d, superior=%,d}", indiceDia, getCosteEstimado(), getCotaInferior(), getCotaSuperior());
+        return String.format("Nodo{nivel=%d, estimado=%,d, inferior=%,d, superior=%,d}", nivel, getCosteEstimado(), getCotaInferior(), getCotaSuperior());
     }
-
 }

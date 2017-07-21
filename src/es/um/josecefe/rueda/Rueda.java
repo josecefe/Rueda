@@ -1,25 +1,15 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda;
 
 import es.um.josecefe.rueda.modelo.DatosRueda;
 import es.um.josecefe.rueda.modelo.Dia;
 import es.um.josecefe.rueda.modelo.Horario;
-import es.um.josecefe.rueda.persistencia.PersistenciaSQL;
 import es.um.josecefe.rueda.persistencia.PersistenciaXML;
 import es.um.josecefe.rueda.resolutor.*;
 
@@ -38,11 +28,11 @@ import static java.util.stream.Collectors.toMap;
 public class Rueda {
 //    private static final String RUEDA_BASE = "ruedamurcia";
 
-    private static final String RUEDA_BASE = "ruedaalberca";
+    private static final String RUEDA_BASE = "rueda";
     private static final String RUEDABD = RUEDA_BASE + ".db";
-    private static final String RUEDAXML_HORARIOS = RUEDA_BASE + "_horarios.xml";
+    private static final String RUEDAXML_HORARIOS = RUEDA_BASE + "_alberca201617.xml";
     private static final String RUEDAXML_ASIGNACION = RUEDA_BASE + "_asignacion.xml";
-    private static final boolean COMPARANDO = false;
+    private static final boolean COMPARANDO = true;
     private static final boolean AMPLIADO = false;
 
     /**
@@ -77,8 +67,8 @@ public class Rueda {
         //PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
 
         List<? extends Resolutor> resolutores = Arrays.asList(
-                new ResolutorV7(),
                 new ResolutorV8(),
+                new ResolutorV7(),
                 new ResolutorExhaustivo()
         );
         if (COMPARANDO) {
@@ -88,9 +78,7 @@ public class Rueda {
                 r.resolver(horarios);
                 System.out.println("\n**********************************\n");
             });
-            resolutores.forEach(r -> {
-                System.out.format("Resolutor %s:\n->sol=%s\n->%s\n", r.getClass().getSimpleName(), r.getSolucionFinal(), r.getEstadisticas());
-            });
+            resolutores.forEach(r -> System.out.format("Resolutor %s:\n->sol=%s\n->%s\n", r.getClass().getSimpleName(), r.getSolucionFinal(), r.getEstadisticas()));
         } else {
             Resolutor r = resolutores.get(resolutores.size() - 1);
             System.out.println("\n**********************************\n");
@@ -103,23 +91,13 @@ public class Rueda {
         }
         if (AMPLIADO) {
             Set<Horario> horariosAmpliado = duplicarHorario(horarios);
-            Resolutor r = new ResolutorGA();
-            ResolutorV8 r2 = new ResolutorV8();
+            ResolutorV8 r = new ResolutorV8();
 
             System.out.println("\n**********************************\n");
-            System.out.format("Resolvemos el problema Ampliado con %s y %s:\n", r.getClass().getSimpleName(), r2.getClass().getSimpleName());
+            System.out.format("Resolvemos el problema Ampliado con %s:\n", r.getClass().getSimpleName());
             System.out.format("Fase 1: Ampliado %s:\n", r.getClass().getSimpleName());
             System.out.println(r.resolver(horariosAmpliado));
             System.out.format("->Est: %s\n", r.getEstadisticas());
-            if (r.getSolucionFinal() != null) {
-                int C = r.getEstadisticas().getFitness() + 1; //Uno más para que encuentre la misma solución por lo menos...
-                System.out.format("Fase 2: Ampliado %s tomando como entrada %,d como mejor coste máximo:\n", r2.getClass().getSimpleName(), C);
-                System.out.println(r2.resolver(horariosAmpliado, C));
-            } else {
-                System.out.format("Fase 2: Ampliado %s sin tener información adicional:\n", r2.getClass().getSimpleName());
-                System.out.println(r2.resolver(horariosAmpliado));
-            }
-            System.out.format("->Est: %s\n", r2.getEstadisticas());
         }
     }
 }

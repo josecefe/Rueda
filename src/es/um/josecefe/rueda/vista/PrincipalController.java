@@ -1,18 +1,9 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda.vista;
 
@@ -77,12 +68,12 @@ import static java.util.stream.Collectors.toMap;
 public class PrincipalController {
 
     private static final String[] RESOLUTORES = new String[]{
-            es.um.josecefe.rueda.resolutor.ResolutorV7.class.getCanonicalName(),
-            es.um.josecefe.rueda.resolutor.ResolutorV8.class.getCanonicalName(),
-            es.um.josecefe.rueda.resolutor.ResolutorGA.class.getCanonicalName(),
-            es.um.josecefe.rueda.resolutor.ResolutorCombinado.class.getCanonicalName(),
-            es.um.josecefe.rueda.resolutor.ResolutorIterativo.class.getCanonicalName(),
-            es.um.josecefe.rueda.resolutor.ResolutorExhaustivo.class.getCanonicalName()};
+            "es.um.josecefe.rueda.resolutor.ResolutorV7",
+            "es.um.josecefe.rueda.resolutor.ResolutorV8",
+            "es.um.josecefe.rueda.resolutor.ResolutorGA",
+            "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
+            "es.um.josecefe.rueda.resolutor.ResolutorIterativo",
+            "es.um.josecefe.rueda.resolutor.ResolutorExhaustivo"};
     @FXML
     TableView<Horario> tablaHorario;
     @FXML
@@ -344,7 +335,7 @@ public class PrincipalController {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, "Imposible instanciar el resolutor " + resolutor, e);
             }
         }
-        cbAlgoritmo.setConverter(new StringConverter<>() {
+        cbAlgoritmo.setConverter(new StringConverter<Resolutor>() {
             @Override
             public String toString(Resolutor r) {
                 return r.getClass().getSimpleName();
@@ -358,7 +349,7 @@ public class PrincipalController {
         cbAlgoritmo.getSelectionModel().select(Runtime.getRuntime().availableProcessors() >= 4 ? 1 : 0);
 
         cbEstrategia.getItems().addAll(Resolutor.Estrategia.values());
-        cbEstrategia.setConverter(new StringConverter<>() {
+        cbEstrategia.setConverter(new StringConverter<Resolutor.Estrategia>() {
             @Override
             public String toString(Resolutor.Estrategia e) {
                 return e.toString();
@@ -1102,7 +1093,7 @@ public class PrincipalController {
 
         @Override
         protected Task<Map<Dia, ? extends AsignacionDia>> createTask() {
-            return new Task<>() {
+            return new Task<Map<Dia, ? extends AsignacionDia>>() {
                 @Override
                 protected Map<Dia, ? extends AsignacionDia> call() throws Exception {
                     updateProgress(0, 1);

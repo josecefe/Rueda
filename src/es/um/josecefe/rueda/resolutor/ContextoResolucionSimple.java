@@ -1,18 +1,9 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda.resolutor;
 
@@ -21,8 +12,6 @@ import es.um.josecefe.rueda.modelo.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
@@ -31,13 +20,11 @@ import static java.util.stream.Collectors.*;
  */
 class ContextoResolucionSimple {
     final List<Dia> dias;
-    final int nDias;
     //Map<Dia, Integer> diasIndex;
     final List<Participante> participantes;
-    final int nParticipantes;
     //Map<Participante, Integer> participantesIndex;
     final Map<Dia, List<AsignacionDiaSimple>> solucionesCandidatas;
-    final BitSet participantesConCoche;
+    final HashMap<Dia,HashMap<Set<Participante>,AsignacionDiaSimple>> mapaParticipantesSoluciones;
     final Map<Participante, Double> coefConduccion; //Que tanto por 1 supone que use el coche cada conductor
 
     ContextoResolucionSimple(final Set<Horario> horarios) {
@@ -47,7 +34,6 @@ class ContextoResolucionSimple {
             diasSet.add(horario.getDia());
         }
         dias = new ArrayList<>(diasSet); // Podría ser un array si lo vemos necesario
-        nDias = dias.size();
 
         //Construimos ahora la lista de conductores (también usamos una lista por lo mismo que en dias
         Set<Participante> participanteSet = new TreeSet<>(); //Lo queremos ordenado
@@ -56,19 +42,10 @@ class ContextoResolucionSimple {
             participanteSet.add(participante);
         }
         participantes = new ArrayList<>(participanteSet);
-        nParticipantes = participantes.size();
-
-        // Sacamos ahora la lista de conductores posibles
-        participantesConCoche = new BitSet(participantes.size());
-        for (int i1 = 0; i1 < nParticipantes; i1++) {
-            if (participantes.get(i1).getPlazasCoche() > 0) {
-                participantesConCoche.set(i1);
-            }
-        }
 
         // Y aquí ajustamos el coeficiente que nos mide su grado de participación (gente que solo va parte de los días)
         Map<Participante, Long> vecesParticipa = horarios.stream().collect(groupingBy(Horario::getParticipante, counting()));
-        long maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElseGet(() -> 0L);
+        long maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElse(0L);
         coefConduccion = new LinkedHashMap<>(participantes.size());
         for (Participante p : participantes) {
             coefConduccion.put(p, (double) maxVecesParticipa / vecesParticipa.get(p) - 0.001); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
@@ -77,9 +54,10 @@ class ContextoResolucionSimple {
         // Vamos a trabajar día a día
         //Para parelizar: solucionesCandidatas = dias.stream().collect(toMap(ind -> ind, d -> {
         solucionesCandidatas = new LinkedHashMap<>();
-        for (int indDia = 0; indDia < dias.size(); indDia++) {
-            Dia d = dias.get(indDia);
+        mapaParticipantesSoluciones = new HashMap<>();
+        for (Dia d : dias) {
             ArrayList<AsignacionDiaSimple> solucionesDia = new ArrayList<>();
+            HashMap<Set<Participante>,AsignacionDiaSimple> mapaParticipantesAsignacionDia = new HashMap<>();
             Set<Horario> horariosDia = horarios.stream().filter(h -> h.getDia() == d).collect(toSet());
             Map<Participante, Horario> participanteHorario = horariosDia.stream().collect(toMap(Horario::getParticipante, Function.identity()));
             List<Participante> participantesDia = horariosDia.stream().map(Horario::getParticipante).sorted().collect(toList());
@@ -159,12 +137,15 @@ class ContextoResolucionSimple {
                     }
                     if (mejorCoste < Integer.MAX_VALUE) {
                         // Tenemos una solución válida
-                        solucionesDia.add(new AsignacionDiaSimple(selCond, mejorLugaresIda, mejorLugaresVuelta, mejorCoste));
+                        AsignacionDiaSimple asignacionDiaSimple = new AsignacionDiaSimple(selCond, mejorLugaresIda, mejorLugaresVuelta, mejorCoste);
+                        solucionesDia.add(asignacionDiaSimple);
+                        mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple); //Para acelerar la busqueda después
                     }
                 }
             }
             solucionesDia.sort(null); //Ordenamos la soluciones parciales tras el barajado
             solucionesCandidatas.put(d, solucionesDia);
+            mapaParticipantesSoluciones.put(d, mapaParticipantesAsignacionDia);
         }
     }
 }

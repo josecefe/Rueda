@@ -1,22 +1,14 @@
 /*
- * Copyright (C) 2016 José Ceferino Ortega
+ * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package es.um.josecefe.rueda.resolutor;
 
 import es.um.josecefe.rueda.modelo.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -29,10 +21,11 @@ import static java.util.stream.Collectors.*;
  * @author josec
  */
 class ContextoResolucion {
+    private static final boolean ORDEN_IMPORTA = true;
     Dia[] dias;
+    int[] ordenExploracionDias;
     Participante[] participantes;
     Map<Dia, List<AsignacionDiaV5>> solucionesCandidatas;
-    boolean[] participantesConCoche;
     double[] coefConduccion; //Que tanto por 1 supone que use el coche cada conductor
     int[][] maxVecesCondDia;
     int[][] minVecesCondDia;
@@ -40,20 +33,16 @@ class ContextoResolucion {
     int[] mejorCosteDia;
     int pesoCotaInferiorNum; //Numerador de la fracción al ponderar la cota inferior respecto de la cota superior (el resto) para calcular el coste estimado
     int pesoCotaInferiorDen; //Denominador de la fracción al ponderar las cotas inferior y superior para calcular el coste estimado
-    Resolutor.Estrategia estrategia;
+    Resolutor.Estrategia estrategia = Resolutor.Estrategia.EQUILIBRADO;
 
     void inicializa(final Set<Horario> horarios) {
         dias = horarios.stream().map(Horario::getDia).distinct().sorted().toArray(Dia[]::new);
         participantes = horarios.stream().map(Horario::getParticipante).distinct().sorted().toArray(Participante[]::new);
-        participantesConCoche = new boolean[participantes.length];
-        for (int i = 0; i < participantes.length; i++) {
-            participantesConCoche[i] = participantes[i].getPlazasCoche() > 0;
-        }
 
         Map<Participante, Long> vecesParticipa = horarios.stream().collect(groupingBy(Horario::getParticipante, counting()));
-        OptionalLong maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max();
+        long maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElseThrow(()-> new IllegalArgumentException("Horarios incorrectos"));
 
-        coefConduccion = Stream.of(participantes).mapToDouble(p -> (double) maxVecesParticipa.getAsLong() / vecesParticipa.get(p) - 0.001).toArray(); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+        coefConduccion = Stream.of(participantes).mapToDouble(p -> (double) maxVecesParticipa / vecesParticipa.get(p) - 0.001).toArray(); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
 
         maxVecesCondDia = new int[dias.length][participantes.length];
         minVecesCondDia = new int[dias.length][participantes.length];
@@ -69,6 +58,7 @@ class ContextoResolucion {
             //for (int indDia = 0; indDia < dias.length; indDia++) {
             Dia d = dias[indDia];
             Arrays.fill(minVecesCondDia[indDia], 1); //El minimo lo ponemos en 1 en ausencia de informacion
+            // El array de maximos ya esta incializado a 0 que es lo que necesitamos
             ArrayList<AsignacionDiaV5> solucionesDia = new ArrayList<>();
             Set<Horario> horariosDia = horarios.stream().filter(h -> h.getDia() == d).collect(toSet());
             Map<Participante, Horario> participanteHorario = horariosDia.stream()
@@ -174,14 +164,23 @@ class ContextoResolucion {
             return solucionesDia;
         }));
 
-        for (int i = peorCosteDia.length - 2; i >= 0; i--) {
-            peorCosteDia[i] += peorCosteDia[i + 1];
-            mejorCosteDia[i] += mejorCosteDia[i + 1];
-            for (int j = 0; j < minVecesCondDia[i].length; j++) {
-                minVecesCondDia[i][j] += minVecesCondDia[i + 1][j];
-                maxVecesCondDia[i][j] += maxVecesCondDia[i + 1][j];
-            }
+        //Vamos a ver cual sería el mejor orden para ir explorando los días, empezando por el que menos soluciones posibles ofrece
+        if (ORDEN_IMPORTA) {
+            Comparator<Map.Entry<Dia, List<AsignacionDiaV5>>> comparator = Comparator.comparingInt(e -> e.getValue().size());
+            ordenExploracionDias = solucionesCandidatas.entrySet().stream().sorted(comparator.reversed()).mapToInt(e -> ArrayUtils.indexOf(dias, e.getKey())).toArray();
+        } else {
+            ordenExploracionDias = IntStream.range(0,solucionesCandidatas.size()).toArray();
         }
 
+
+        // Cambio de indirección: para calcular acumulados vamos a tener en cuenta el orden de exploración
+        for (int i = peorCosteDia.length - 2; i >= 0; i--) {
+            peorCosteDia[ordenExploracionDias[i]] += peorCosteDia[ordenExploracionDias[i + 1]];
+            mejorCosteDia[ordenExploracionDias[i]] += mejorCosteDia[ordenExploracionDias[i + 1]];
+            for (int j = 0; j < minVecesCondDia[ordenExploracionDias[i]].length; j++) {
+                minVecesCondDia[ordenExploracionDias[i]][j] += minVecesCondDia[ordenExploracionDias[i + 1]][j];
+                maxVecesCondDia[ordenExploracionDias[i]][j] += maxVecesCondDia[ordenExploracionDias[i + 1]][j];
+            }
+        }
     }
 }
