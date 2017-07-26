@@ -210,8 +210,6 @@
                                                            AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
                                                            AnchorPane.topAnchor="14.0">
                                                     <columns>
-                                                        <TableColumn fx:id="columnaIdDia" editable="false"
-                                                                     prefWidth="33.0" text="Id"/>
                                                         <TableColumn fx:id="columnaDescripcionDia" prefWidth="158.0"
                                                                      text="Nombre o Descripción"/>
                                                     </columns>
@@ -249,8 +247,6 @@
                                                            AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
                                                            AnchorPane.topAnchor="14.0">
                                                     <columns>
-                                                        <TableColumn fx:id="columnaIdLugar" editable="false"
-                                                                     prefWidth="33.0" text="Id"/>
                                                         <TableColumn fx:id="columnaNombreLugar" prefWidth="157.0"
                                                                      text="Nombre"/>
                                                     </columns>
@@ -291,8 +287,6 @@
                                                            AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="380.0"
                                                            AnchorPane.topAnchor="14.0">
                                                     <columns>
-                                                        <TableColumn fx:id="columnaIdParticipante" editable="false"
-                                                                     prefWidth="33.0" text="Id"/>
                                                         <TableColumn fx:id="columnaNombreParticipante" prefWidth="144.0"
                                                                      text="Nombre"/>
                                                         <TableColumn fx:id="columnaPlazasCoche" prefWidth="60.0"

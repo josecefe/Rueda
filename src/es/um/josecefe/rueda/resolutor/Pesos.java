@@ -13,9 +13,9 @@ package es.um.josecefe.rueda.resolutor;
  * @author josec
  */
 final class Pesos {
-    public static final int PESO_MAXIMO_VECES_CONDUCTOR = 1000000;
-    public static final int PESO_TOTAL_CONDUCTORES = 1000;
-    public static final int PESO_DIF_MAX_MIN_VECES_CONDUCTOR = 1100;
-    public static final int PESO_LUGAR_CONDUCTOR = 1;
-    public static final int PESO_LUGAR_PASAJERO = 2;
+    static final int PESO_MAXIMO_VECES_CONDUCTOR = 1000000;
+    static final int PESO_TOTAL_CONDUCTORES = 1000;
+    static final int PESO_DIF_MAX_MIN_VECES_CONDUCTOR = 1100;
+    static final int PESO_LUGAR_CONDUCTOR = 1;
+    static final int PESO_LUGAR_PASAJERO = 5;
 }

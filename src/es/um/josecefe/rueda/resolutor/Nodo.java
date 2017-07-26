@@ -26,7 +26,8 @@ import static es.um.josecefe.rueda.resolutor.Pesos.*;
  */
 final class Nodo implements Comparable<Nodo> {
 
-    final static boolean DEBUG = true;
+    private final static boolean DEBUG = true;
+    private final static boolean PARALELO = false;
 
     private final Nodo padre;
     private final AsignacionDiaV5 eleccion;
@@ -48,7 +49,7 @@ final class Nodo implements Comparable<Nodo> {
         nivel = -1;
     }
 
-    Nodo(Nodo padre, AsignacionDiaV5 nuevaAsignacion, final ContextoResolucion contexto) {
+    private Nodo(Nodo padre, AsignacionDiaV5 nuevaAsignacion, final ContextoResolucion contexto) {
         this.contexto = contexto;
         this.padre = padre;
         nivel = padre.nivel + 1;
@@ -69,13 +70,13 @@ final class Nodo implements Comparable<Nodo> {
         //int sum = 0;
         //nuevaAsignacion.getConductores().stream().forEachOrdered(ic -> ++vecesConductor[ic]);
         for (int i = 0; i < vecesConductor.length; i++) {
-            if (contexto.participantes[i].getPlazasCoche() > 0) {
+            if (contexto.participantesConCoche[i]) {
                 //sum = vecesConductor[i];
                 if (conductores[i]) {
                     ++vecesConductor[i];
                 }
                 total += vecesConductor[i];
-                int vecesConductorVirt = Math.round((float) (vecesConductor[i] * contexto.coefConduccion[i]));
+                int vecesConductorVirt = (int)((float) (vecesConductor[i] * contexto.coefConduccion[i])+0.5f);
                 if (vecesConductorVirt > maximo) {
                     maximo = vecesConductorVirt;
                 }
@@ -83,14 +84,14 @@ final class Nodo implements Comparable<Nodo> {
                     minimo = vecesConductorVirt;
                 }
                 if (!terminal) {
-                    int vecesConductorVirtCS = Math.round((float) ((vecesConductor[i] + contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]));
+                    int vecesConductorVirtCS = (int)((float) ((vecesConductor[i] + contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i])+0.5f);
                     if (vecesConductorVirtCS > maxCS) {
                         maxCS = vecesConductorVirtCS;
                     }
                     if (vecesConductorVirtCS < minCS) {
                         minCS = vecesConductorVirtCS;
                     }
-                    int vecesConductorVirtCI = Math.round((float) ((vecesConductor[i] + contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]));
+                    int vecesConductorVirtCI = (int)((float) ((vecesConductor[i] + contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i])+0.5f);
                     if (vecesConductorVirtCI > maxCI) {
                         maxCI = vecesConductorVirtCI;
                     }
@@ -170,13 +171,13 @@ final class Nodo implements Comparable<Nodo> {
                         .map(this::generaHijo);
     }
 
-    Nodo generaHijo(AsignacionDiaV5 solDia) {
+    private Nodo generaHijo(AsignacionDiaV5 solDia) {
         return new Nodo(this, solDia, contexto);
     }
 
     @Override
-    public int compareTo(Nodo o) {
-        return getCosteEstimado() - o.getCosteEstimado();
+    public int compareTo(Nodo other) {
+        return costeEstimado - other.costeEstimado;
     }
 
     @Override

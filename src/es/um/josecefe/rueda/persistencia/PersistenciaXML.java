@@ -7,6 +7,7 @@
  */
 package es.um.josecefe.rueda.persistencia;
 
+import es.um.josecefe.rueda.VersionKt;
 import es.um.josecefe.rueda.modelo.*;
 import htmlflow.HtmlView;
 import htmlflow.elements.HtmlTable;
@@ -23,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static es.um.josecefe.rueda.Version.*;
+import static es.um.josecefe.rueda.VersionKt.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 

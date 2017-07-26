@@ -11,10 +11,10 @@ package es.um.josecefe.rueda.modelo
  * @author josecefe
  */
 class AsignacionDiaSimple : Comparable<AsignacionDiaSimple>, AsignacionDia {
-    private var conductores: Set<Participante> = emptySet()
-    private var peIda: Map<Participante, Lugar> = emptyMap()
-    private var peVuelta: Map<Participante, Lugar> = emptyMap()
-    private var coste: Int = 0
+    override var conductores: Set<Participante> = emptySet()
+    override var peIda: Map<Participante, Lugar> = emptyMap()
+    override var peVuelta: Map<Participante, Lugar> = emptyMap()
+    override var coste: Int = 0
 
     /**
      * Constructor pensado para la persistencia
@@ -33,38 +33,6 @@ class AsignacionDiaSimple : Comparable<AsignacionDiaSimple>, AsignacionDia {
         this.conductores = conductores.toSet()
         this.peIda = puntoEncuentroIda.toMap()
         this.peVuelta = puntoEncuentroVuelta.toMap()
-        this.coste = coste
-    }
-
-    override fun getConductores(): Set<Participante> {
-        return conductores
-    }
-
-    internal fun setConductores(conductores: Set<Participante>) {
-        this.conductores = conductores.toSet()
-    }
-
-    override fun getPeIda(): Map<Participante, Lugar> {
-        return peIda
-    }
-
-    internal fun setPeIda(peIda: Map<Participante, Lugar>) {
-        this.peIda = peIda
-    }
-
-    override fun getPeVuelta(): Map<Participante, Lugar> {
-        return peVuelta
-    }
-
-    internal fun setPeVuelta(peVuelta: Map<Participante, Lugar>) {
-        this.peVuelta = peVuelta
-    }
-
-    override fun getCoste(): Int {
-        return coste
-    }
-
-    internal fun setCoste(coste: Int) {
         this.coste = coste
     }
 

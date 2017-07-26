@@ -17,12 +17,11 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
+private const val DEBUG = true
+private const val ESTADISTICAS = true
+private const val CADA_EXPANDIDOS_EST = 1000
+
 class ResolutorExhaustivo : Resolutor() {
-    private val DEBUG = true
-
-    private val ESTADISTICAS = true
-    private val CADA_EXPANDIDOS_EST = 1000
-
     private val estGlobal = EstadisticasV8()
     private var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
 
@@ -54,7 +53,7 @@ class ResolutorExhaustivo : Resolutor() {
         for (i in contexto.participantes.indices) {
             if (contexto.participantes[i].plazasCoche > 0) {
                 val p: Participante = contexto.participantes[i]
-                val setDias = horarios.filter { h -> h.isCoche && h.participante == p }.map { h -> h.dia }.toSet()
+                val setDias = horarios.filter { h -> h.isCoche && h.participante == p }.map { h -> h.dia }.filterNotNull().toSet()
                 mapParticipanteDias[p] = setDias
             }
         }
@@ -67,10 +66,10 @@ class ResolutorExhaustivo : Resolutor() {
                 var comb = 1.0
                 if (DEBUG) print("Para $i veces conducir por participante tenemos ")
                 for ((key, value) in mapParticipanteDias) {
-                    val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!)) //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
+                    val numVecesCond = Math.max(1, (i.toFloat() / contexto.coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                     val porDiasFijos = diasFijos.getOrDefault(key, vacio).size.toLong()
-                    if (porDiasFijos >= numVecesCond) continue
-                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), numVecesCond - porDiasFijos)
+                    //if (porDiasFijos >= numVecesCond) continue
+                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), Math.max(1,numVecesCond - porDiasFijos))
                     if (DEBUG) print(" * $combinations")
                     comb *= combinations
                 }

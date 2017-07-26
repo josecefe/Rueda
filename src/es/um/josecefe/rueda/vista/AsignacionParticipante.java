@@ -26,13 +26,6 @@ public class AsignacionParticipante {
         // Constructor por defecto
     }
 
-    public AsignacionParticipante(String participante, String ida, String vuelta, boolean conductor) {
-        this.participante.set(participante);
-        this.ida.set(ida);
-        this.vuelta.set(vuelta);
-        this.conductor.set(conductor);
-    }
-
     public String getParticipante() {
         return participante.get();
     }

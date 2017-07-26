@@ -56,7 +56,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static es.um.josecefe.rueda.Version.*;
+import static es.um.josecefe.rueda.VersionKt.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -135,23 +135,17 @@ public class PrincipalController {
     @FXML
     TableView<Dia> tablaDias;
     @FXML
-    TableColumn<Dia, Integer> columnaIdDia;
-    @FXML
     TableColumn<Dia, String> columnaDescripcionDia;
     @FXML
     TextField tfDescripcionDia;
     @FXML
     TableView<Lugar> tablaLugares;
     @FXML
-    TableColumn<Lugar, Integer> columnaIdLugar;
-    @FXML
     TableColumn<Lugar, String> columnaNombreLugar;
     @FXML
     TextField tfNombreLugar;
     @FXML
     TableView<Participante> tablaParticipantes;
-    @FXML
-    TableColumn<Participante, Integer> columnaIdParticipante;
     @FXML
     TableColumn<Participante, String> columnaNombreParticipante;
     @FXML
@@ -239,7 +233,6 @@ public class PrincipalController {
         columnaLugaresConductor.setCellFactory(CheckBoxTableCell.forTableColumn(columnaLugaresConductor));
 
         // Tabla de dias
-        columnaIdDia.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaDescripcionDia.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         columnaDescripcionDia.setCellFactory(TextFieldTableCell.forTableColumn());
         columnaDescripcionDia.setOnEditCommit((TableColumn.CellEditEvent<Dia, String> v) -> {
@@ -258,7 +251,6 @@ public class PrincipalController {
         });
 
         // Tabla de lugares
-        columnaIdLugar.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaNombreLugar.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaNombreLugar.setCellFactory(TextFieldTableCell.forTableColumn());
         columnaNombreLugar.setOnEditCommit((TableColumn.CellEditEvent<Lugar, String> v) -> {
@@ -277,7 +269,6 @@ public class PrincipalController {
         });
 
         //Tabla Participantes
-        columnaIdParticipante.setCellValueFactory(new PropertyValueFactory<>("id"));
         columnaNombreParticipante.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaNombreParticipante.setCellFactory(TextFieldTableCell.forTableColumn());
         columnaNombreParticipante.setOnEditCommit((TableColumn.CellEditEvent<Participante, String> v) -> {
@@ -367,25 +358,25 @@ public class PrincipalController {
     public void setMainApp(RuedaFX mainApp) {
         this.mainApp = mainApp;
         this.stage = mainApp.getPrimaryStage();
-        tablaHorario.setItems(datosRueda.horariosProperty());
-        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.diasProperty()));
-        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.participantesProperty()));
-        tablaResultado.setItems(datosRueda.asignacionProperty());
+        tablaHorario.setItems(datosRueda.getHorariosProperty());
+        columnaDia.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getDiasProperty()));
+        columnaParticipante.setCellFactory(ComboBoxTableCell.forTableColumn(datosRueda.getParticipantesProperty()));
+        tablaResultado.setItems(datosRueda.getAsignacionProperty());
         // Combos
-        cbDia.setItems(datosRueda.diasProperty());
-        cbParticipante.setItems(datosRueda.participantesProperty());
-        cbLugares.setItems(datosRueda.lugaresProperty());
+        cbDia.setItems(datosRueda.getDiasProperty());
+        cbParticipante.setItems(datosRueda.getParticipantesProperty());
+        cbLugares.setItems(datosRueda.getLugaresProperty());
         // Tabla de Dias
-        tablaDias.setItems(datosRueda.diasProperty());
+        tablaDias.setItems(datosRueda.getDiasProperty());
         // Tabla de Lugares
-        tablaLugares.setItems(datosRueda.lugaresProperty());
+        tablaLugares.setItems(datosRueda.getLugaresProperty());
         //Tabla de Participantes
-        tablaParticipantes.setItems(datosRueda.participantesProperty());
+        tablaParticipantes.setItems(datosRueda.getParticipantesProperty());
         // Etiqueta de coste
-        lCoste.textProperty().bind(datosRueda.costeAsignacionProperty().asString("%,d"));
-        lCoste.visibleProperty().bind(datosRueda.costeAsignacionProperty().greaterThan(0));
-        mExportar.disableProperty().bind(datosRueda.costeAsignacionProperty().isEqualTo(0));
-        bExportar.disableProperty().bind(datosRueda.costeAsignacionProperty().isEqualTo(0));
+        lCoste.textProperty().bind(datosRueda.getCosteAsignacionProperty().asString("%,d"));
+        lCoste.visibleProperty().bind(datosRueda.getCosteAsignacionProperty().greaterThan(0));
+        mExportar.disableProperty().bind(datosRueda.getCosteAsignacionProperty().isEqualTo(0));
+        bExportar.disableProperty().bind(datosRueda.getCosteAsignacionProperty().isEqualTo(0));
     }
 
     /**
@@ -762,7 +753,7 @@ public class PrincipalController {
         barraEstado.textProperty().bind(resolutorService.messageProperty());
         indicadorProgreso.setProgress(-1);
         indicadorProgreso.progressProperty().bind(resolutorService.progressProperty().subtract(0.01));
-        datosRueda.asignacionProperty().clear(); // Borramos antes de empezar
+        datosRueda.getAsignacionProperty().clear(); // Borramos antes de empezar
         stage.getScene().setCursor(Cursor.WAIT);
         resolutorService.start();
         bCancelarCalculo.setDisable(false);
@@ -934,7 +925,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getLugares().add(new Lugar(datosRueda.getLugares().stream().mapToInt(Lugar::getId).max().orElse(0) + 1, tfNombreLugar.getText(), null, null, null, null, null));
+        datosRueda.getLugares().add(new Lugar(datosRueda.getLugares().stream().mapToInt(Lugar::getId).max().orElse(0) + 1, tfNombreLugar.getText()));
         tfNombreLugar.clear();
     }
 
@@ -980,7 +971,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), null, Collections.emptyList()));
+        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), Collections.emptyList()));
         tfNombreParticipante.clear();
     }
 

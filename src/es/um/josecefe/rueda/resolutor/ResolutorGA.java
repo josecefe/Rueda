@@ -373,7 +373,7 @@ public class ResolutorGA extends Resolutor {
 
         private int calculaAptitud(Map<Dia, AsignacionDia> genes) {
             Map<Participante, Integer> vecesCoche = genes.values().stream().flatMap(a -> a.getConductores().stream()).collect(Collectors.groupingBy(Function.identity(), reducing(0, e -> 1, Integer::sum)));
-            IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> Math.round(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i])).summaryStatistics();
+            IntSummaryStatistics est = IntStream.range(0, participantes.length).filter(i -> participantesConCoche[i]).map(i -> (int)(vecesCoche.getOrDefault(participantes[i], 0) * coefConduccion[i] + 0.5f)).summaryStatistics();
             int apt = est.getMax() * PESO_MAXIMO_VECES_CONDUCTOR + (est.getMax() - est.getMin()) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + genes.values().stream().mapToInt(AsignacionDia::getCoste).sum();
             if (estrategia == Estrategia.MINCONDUCTORES)
                 apt += est.getSum() * PESO_TOTAL_CONDUCTORES;
@@ -402,7 +402,7 @@ public class ResolutorGA extends Resolutor {
          *
          * @param probMutacionGen valor entre 0 y 1 indicando la probabilidad de
          *                        mutar de cada gen
-         * @return
+         * @return un nuevo individuo mutado
          */
         Individuo mutacion(double probMutacionGen) {
             Map<Dia, AsignacionDia> genesHijo = Stream.of(dias).collect(toMap(Function.identity(),
@@ -422,9 +422,9 @@ public class ResolutorGA extends Resolutor {
         }
 
         @Override
-        public int compareTo(Individuo o) {
+        public int compareTo(Individuo other) {
             //return Double.compare(getCosteEstimado(), o.getCosteEstimado());
-            return Integer.compare(getAptitud(), o.getAptitud());
+            return Integer.compare(getAptitud(), other.getAptitud());
         }
 
         @Override

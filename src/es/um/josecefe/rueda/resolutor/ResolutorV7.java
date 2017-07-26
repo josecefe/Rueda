@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.toList;
 public class ResolutorV7 extends ResolutorAcotado {
 
     private final static boolean DEBUG = true;
+    private final static boolean PARALELO = false;
     private final static boolean ESTADISTICAS = true;
     private final static int CADA_EXPANDIDOS = 1000;
     private final static int CADA_MILIS_EST = 1000;
@@ -141,13 +142,13 @@ public class ResolutorV7 extends ResolutorAcotado {
                     if (ESTADISTICAS) {
                         estGlobal.addTerminales(tamanosNivel[actual.getNivel() + 1]);
                     }
-                    Optional<Nodo> mejorHijo = actual.generaHijos(true).min(Nodo::compareTo); //true para paralelo
+                    Optional<Nodo> mejorHijo = actual.generaHijos(PARALELO).min(Nodo::compareTo); //true para paralelo
                     if (mejorHijo.isPresent() && mejorHijo.get().compareTo(mejor) < 0) {
                         if (mejor == RAIZ) {
                             // Cambiamos los pesos
                             contexto.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_FIN; //Después buscamos más equilibrado
                             contexto.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_FIN; //Después buscamos más equilibrado
-                            LNV.parallelStream().forEach(Nodo::calculaCosteEstimado);// Hay que forzar el calculo de nuevo de los costes de los nodos
+                            (PARALELO ? LNV.parallelStream() : LNV.stream()).forEach(Nodo::calculaCosteEstimado);// Hay que forzar el calculo de nuevo de los costes de los nodos
                             PriorityQueue<Nodo> colaNodosVivos;
                             colaNodosVivos = new PriorityQueue<>(LNV.size());
                             colaNodosVivos.addAll(LNV);
@@ -171,7 +172,7 @@ public class ResolutorV7 extends ResolutorAcotado {
                             // Limpiamos la lista de nodos vivos de los que no cumplan...
                             int antes;
                             if (ESTADISTICAS) {
-                                estGlobal.addDescartados(LNV.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getNivel()]).sum());
+                                estGlobal.addDescartados((PARALELO ? LNV.parallelStream() : LNV.stream()).filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getNivel()]).sum());
                                 estGlobal.setFitness(cotaInferiorCorte).actualizaProgreso();
                                 antes = LNV.size();
                             }
@@ -183,7 +184,7 @@ public class ResolutorV7 extends ResolutorAcotado {
                     }
                 } else { // Es un nodo intermedio
                     final int Corte = cotaInferiorCorte;
-                    List<Nodo> lNF = actual.generaHijos(true).filter(n -> n.getCotaInferior() < Corte).collect(toList()); //PARALELO poner true
+                    List<Nodo> lNF = actual.generaHijos(PARALELO).filter(n -> n.getCotaInferior() < Corte).collect(toList()); //PARALELO poner true
                     OptionalInt menorCotaSuperior = lNF.stream().mapToInt(Nodo::getCotaSuperior).min();
                     if (menorCotaSuperior.isPresent() && menorCotaSuperior.getAsInt() < cotaInferiorCorte) { // Mejora de C
                         if (DEBUG) {
@@ -195,7 +196,7 @@ public class ResolutorV7 extends ResolutorAcotado {
                         // Limpiamos la LNV
                         int antes;
                         if (ESTADISTICAS) {
-                            estGlobal.addDescartados(LNV.parallelStream().filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getNivel()]).sum());
+                            estGlobal.addDescartados((PARALELO ? LNV.parallelStream() : LNV.stream()).filter(n -> n.getCotaInferior() >= fC).mapToDouble(n -> nPosiblesSoluciones[n.getNivel()]).sum());
                             estGlobal.setFitness(cotaInferiorCorte).actualizaProgreso();
                             antes = LNV.size();
                         }

@@ -27,6 +27,7 @@ class ContextoResolucion {
     Participante[] participantes;
     Map<Dia, List<AsignacionDiaV5>> solucionesCandidatas;
     double[] coefConduccion; //Que tanto por 1 supone que use el coche cada conductor
+    boolean[] participantesConCoche;
     int[][] maxVecesCondDia;
     int[][] minVecesCondDia;
     int[] peorCosteDia;
@@ -43,6 +44,10 @@ class ContextoResolucion {
         long maxVecesParticipa = vecesParticipa.values().stream().mapToLong(Long::longValue).max().orElseThrow(()-> new IllegalArgumentException("Horarios incorrectos"));
 
         coefConduccion = Stream.of(participantes).mapToDouble(p -> (double) maxVecesParticipa / vecesParticipa.get(p) - 0.001).toArray(); // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+
+        participantesConCoche = new boolean[participantes.length];
+        for (int i=0; i<participantes.length; i++)
+            participantesConCoche[i]=participantes[i].getPlazasCoche()>0;
 
         maxVecesCondDia = new int[dias.length][participantes.length];
         minVecesCondDia = new int[dias.length][participantes.length];

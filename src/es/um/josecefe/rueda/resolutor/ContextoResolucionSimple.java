@@ -10,6 +10,7 @@ package es.um.josecefe.rueda.resolutor;
 import es.um.josecefe.rueda.modelo.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ class ContextoResolucionSimple {
     final List<Participante> participantes;
     //Map<Participante, Integer> participantesIndex;
     final Map<Dia, List<AsignacionDiaSimple>> solucionesCandidatas;
-    final HashMap<Dia,HashMap<Set<Participante>,AsignacionDiaSimple>> mapaParticipantesSoluciones;
+    final Map<Dia, Map<Set<Participante>, AsignacionDiaSimple>> mapaParticipantesSoluciones;
     final Map<Participante, Double> coefConduccion; //Que tanto por 1 supone que use el coche cada conductor
 
     ContextoResolucionSimple(final Set<Horario> horarios) {
@@ -56,8 +57,8 @@ class ContextoResolucionSimple {
         solucionesCandidatas = new LinkedHashMap<>();
         mapaParticipantesSoluciones = new HashMap<>();
         for (Dia d : dias) {
-            ArrayList<AsignacionDiaSimple> solucionesDia = new ArrayList<>();
-            HashMap<Set<Participante>,AsignacionDiaSimple> mapaParticipantesAsignacionDia = new HashMap<>();
+            List<AsignacionDiaSimple> solucionesDia = new Vector<>();
+            Map<Set<Participante>,AsignacionDiaSimple> mapaParticipantesAsignacionDia = new ConcurrentHashMap<>();
             Set<Horario> horariosDia = horarios.stream().filter(h -> h.getDia() == d).collect(toSet());
             Map<Participante, Horario> participanteHorario = horariosDia.stream().collect(toMap(Horario::getParticipante, Function.identity()));
             List<Participante> participantesDia = horariosDia.stream().map(Horario::getParticipante).sorted().collect(toList());
@@ -76,7 +77,8 @@ class ContextoResolucionSimple {
                     .map(key -> new SubSets<>(entradaConductor.get(key), 1, entradaConductor.get(key).size())).collect(Collectors.toList());
             Combinador<Set<Participante>> combinarConductoresDia = new Combinador<>(conductoresDia);
 
-            for (List<Set<Participante>> condDia : combinarConductoresDia) {
+            //for (List<Set<Participante>> condDia : combinarConductoresDia) {
+            combinarConductoresDia.parallelStream().forEach( condDia -> {
                 final Set<Participante> selCond = condDia.stream().flatMap(Collection::stream).collect(toSet());
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
                 Map<Integer, Integer> plazasIda = selCond.stream()
@@ -142,10 +144,10 @@ class ContextoResolucionSimple {
                         mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple); //Para acelerar la busqueda después
                     }
                 }
-            }
+            });
             solucionesDia.sort(null); //Ordenamos la soluciones parciales tras el barajado
-            solucionesCandidatas.put(d, solucionesDia);
-            mapaParticipantesSoluciones.put(d, mapaParticipantesAsignacionDia);
+            solucionesCandidatas.put(d, new ArrayList<>(solucionesDia));
+            mapaParticipantesSoluciones.put(d, new HashMap<>(mapaParticipantesAsignacionDia));
         }
     }
 }
