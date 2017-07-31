@@ -9,8 +9,7 @@ package es.um.josecefe.rueda.modelo
 
 import javafx.beans.property.*
 import javafx.collections.FXCollections
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * @author josec
@@ -25,7 +24,6 @@ class Participante
  * Constructor de la clase que debe usarse cuando se crea un objeto de este
  * tipo, reservando el constructor por defecto para labores de persistencia
  *
- * @param id              Identificador del participante, un número único a partir de 1
  * @param nombre          Nombre a mostrar del participante
  * @param plazasCoche     Nº de ocupantes del vehículo, incluido el conductor, 0 significa que no tiene coche
  * @param puntosEncuentro Lista con orden que contiene los lugares de encuentro admitidos
@@ -37,10 +35,10 @@ class Participante
          *
          * @return el id
          */
-        var id: Int = 0, nombre: String = "", plazasCoche: Int = 0,
+        nombre: String = "", plazasCoche: Int = 0,
         puntosEncuentro: List<Lugar> = emptyList()) : Comparable<Participante> {
-    private val nombreProp: StringProperty
-    private val plazasCocheProp: IntegerProperty
+    private val nombreProperty: StringProperty
+    private val plazasCocheProperty: IntegerProperty
     /*
      * SQL: CREATE TABLE punto_encuentro ( "participante" INTEGER NOT
 	 * NULL REFERENCES participante(id) ON DELETE CASCADE, "lugar" INTEGER NOT
@@ -51,8 +49,8 @@ class Participante
     private val puntosEncuentroProp: ListProperty<Lugar>
 
     init {
-        this.nombreProp = SimpleStringProperty(nombre)
-        this.plazasCocheProp = SimpleIntegerProperty(plazasCoche) // Incluido el conductor
+        this.nombreProperty = SimpleStringProperty(nombre)
+        this.plazasCocheProperty = SimpleIntegerProperty(plazasCoche) // Incluido el conductor
         this.puntosEncuentroProp = SimpleListProperty(FXCollections.observableArrayList(puntosEncuentro))
     }
 
@@ -60,15 +58,15 @@ class Participante
      * @return the nombre
      */
     var nombre: String
-        get() = nombreProp.get()
-        set(nombre) = this.nombreProp.set(nombre)
+        get() = nombreProperty.get()
+        set(nombre) = this.nombreProperty.set(nombre)
 
     /**
      * @return the plazasCoche
      */
     var plazasCoche: Int
-        get() = plazasCocheProp.get()
-        set(plazasCoche) = this.plazasCocheProp.set(plazasCoche)
+        get() = plazasCocheProperty.get()
+        set(plazasCoche) = this.plazasCocheProperty.set(plazasCoche)
 
     /**
      * @return the puntosEncuentro
@@ -80,29 +78,20 @@ class Participante
             this.puntosEncuentroProp.addAll(puntosEncuentro)
         }
 
-    fun nombreProperty(): StringProperty {
-        return nombreProp
-    }
+    fun nombreProperty(): StringProperty = nombreProperty
 
-    fun plazasCocheProperty(): IntegerProperty {
-        return plazasCocheProp
-    }
+    fun plazasCocheProperty(): IntegerProperty = plazasCocheProperty
 
-    fun puntosEncuentroProperty(): ListProperty<Lugar> {
-        return puntosEncuentroProp
-    }
+    fun puntosEncuentroProperty(): ListProperty<Lugar> = puntosEncuentroProp
 
-    /* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-     */
     override fun toString(): String {
-        return nombreProp.get()
+        return nombreProperty.get()
     }
 
     /* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
      */
     override fun compareTo(other: Participante): Int {
-        return Integer.compare(id, other.id)
+        return nombre.compareTo(other.nombre)
     }
 }

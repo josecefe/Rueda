@@ -37,9 +37,7 @@ class Asignacion(d: Dia, asignacionDia: AsignacionDia) : Comparable<Asignacion> 
         get() = diaProp.get()
         set(value) = diaProp.set(value)
 
-    fun diaProperty(): ObjectProperty<Dia> {
-        return diaProp
-    }
+    fun diaProperty(): ObjectProperty<Dia> = diaProp
 
     var conductores: List<Participante>
         get() = conductoresProp.get()

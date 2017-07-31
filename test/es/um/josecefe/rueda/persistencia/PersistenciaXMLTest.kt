@@ -10,17 +10,15 @@ package es.um.josecefe.rueda.persistencia
 
 import es.um.josecefe.rueda.modelo.*
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
 
 internal class PersistenciaXMLTest {
     @Test
     fun guardaDatosRueda() {
         val datosRueda = DatosRueda()
-        datosRueda.dias = listOf(Dia(1,"Lunes"),Dia(2,"Martes"),Dia(3,"Miercoles"),Dia(4,"Jueves"),Dia(5,"Viernes"))
-        datosRueda.lugares = listOf(Lugar(1, "LA"), Lugar(2, "LB"))
-        datosRueda.participantes = listOf(Participante(1, "PA", 5,listOf(datosRueda.lugares[0])), Participante(2, "PB", 5, listOf(datosRueda.lugares[0], datosRueda.lugares[1])))
+        datosRueda.dias = listOf(Dia("Lunes"),Dia("Martes"),Dia("Miercoles"),Dia("Jueves"),Dia("Viernes"))
+        datosRueda.lugares = listOf(Lugar("LA"), Lugar("LB"))
+        datosRueda.participantes = listOf(Participante("PA", 5,listOf(datosRueda.lugares[0])), Participante( "PB", 5, listOf(datosRueda.lugares[0], datosRueda.lugares[1])))
         datosRueda.horarios = listOf(
                 Horario(datosRueda.participantes[0], datosRueda.dias[0], 1, 6, true),
                 Horario(datosRueda.participantes[0], datosRueda.dias[1], 1, 6, true),

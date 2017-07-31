@@ -9,7 +9,6 @@
 package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.*
-import es.um.josecefe.rueda.resolutor.Pesos.PESO_MAXIMO_VECES_CONDUCTOR
 import es.um.josecefe.rueda.util.combinations
 import java.util.*
 import java.util.concurrent.atomic.AtomicStampedReference
@@ -23,9 +22,10 @@ private const val CADA_EXPANDIDOS_EST = 1000
 
 class ResolutorExhaustivo : Resolutor() {
     private val estGlobal = EstadisticasV8()
-    private var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
+    override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
+        private set
 
-    override fun resolver(horarios: Set<Horario>): Map<Dia, AsignacionDia>? {
+    override fun resolver(horarios: Set<Horario>): Map<Dia, AsignacionDia> {
         solucionFinal = emptyMap()
 
         if (horarios.isEmpty()) {
@@ -42,10 +42,10 @@ class ResolutorExhaustivo : Resolutor() {
         val contexto = ContextoResolucionSimple(horarios)
 
         val diasFijos: HashMap<Participante, MutableSet<Dia>> = HashMap()
-        for ((dia, solDia) in contexto.solucionesCandidatas){
+        for ((dia, solDia) in contexto.solucionesCandidatas) {
             val conductores: MutableSet<Participante> = contexto.participantes.toMutableSet()
             for (asignacion: AsignacionDia in solDia) conductores.retainAll(asignacion.conductores)
-            conductores.forEach { c -> diasFijos.computeIfAbsent(c, {HashSet()}).add(dia) }
+            conductores.forEach { c -> diasFijos.computeIfAbsent(c, { HashSet() }).add(dia) }
         }
         val minCond = Math.max(1, diasFijos.values.map { it.size }.max()?.toInt() ?: 0)
 
@@ -53,7 +53,7 @@ class ResolutorExhaustivo : Resolutor() {
         for (i in contexto.participantes.indices) {
             if (contexto.participantes[i].plazasCoche > 0) {
                 val p: Participante = contexto.participantes[i]
-                val setDias = horarios.filter { h -> h.isCoche && h.participante == p }.map { h -> h.dia }.filterNotNull().toSet()
+                val setDias = horarios.filter { h -> h.coche && h.participante == p }.map { h -> h.dia }.filterNotNull().toSet()
                 mapParticipanteDias[p] = setDias
             }
         }
@@ -69,7 +69,7 @@ class ResolutorExhaustivo : Resolutor() {
                     val numVecesCond = Math.max(1, (i.toFloat() / contexto.coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                     val porDiasFijos = diasFijos.getOrDefault(key, vacio).size.toLong()
                     //if (porDiasFijos >= numVecesCond) continue
-                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), Math.max(1,numVecesCond - porDiasFijos))
+                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), Math.max(1, numVecesCond - porDiasFijos))
                     if (DEBUG) print(" * $combinations")
                     comb *= combinations
                 }
@@ -81,7 +81,7 @@ class ResolutorExhaustivo : Resolutor() {
         /* Fin inicialización */
 
         if (ESTADISTICAS) {
-            estGlobal.setTotalPosiblesSoluciones(totalPosiblesSoluciones)
+            estGlobal.totalPosiblesSoluciones = totalPosiblesSoluciones
             estGlobal.actualizaProgreso()
             if (DEBUG) println("Tiempo inicializar = ${estGlobal.tiempoString}")
         }
@@ -105,12 +105,12 @@ class ResolutorExhaustivo : Resolutor() {
             for ((key, value) in mapParticipanteDias) {
                 val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!).toInt()) - diasFijos.getOrDefault(key, emptySet<Dia>().toMutableSet()).size //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                 val diasCambiantes: Set<Dia> = if (diasFijos[key] != null) value.minus(diasFijos[key]!!) else value
-                listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it}.toList())
+                listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it }.toList())
             }
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
 
             //TODO: Habría que ver las implicaciones del paralelismos, especialmente en las variables compartidas
-            combinaciones.parallelStream().forEach {c ->
+            combinaciones.parallelStream().forEach { c ->
                 if (!continuar) return@forEach
                 val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
@@ -132,7 +132,7 @@ class ResolutorExhaustivo : Resolutor() {
                         return@forEach // Aquí se queda en blanco, luego no sirve
                     }
 
-                    solCand[key] =  sol
+                    solCand[key] = sol
                 }
 
                 // Para ver si es valida bastaria con ver si hay solución en cada día
@@ -146,7 +146,9 @@ class ResolutorExhaustivo : Resolutor() {
                     } while (apt < costeAnt && !solucionRef.compareAndSet(solAnt, solCand, costeAnt, apt))
                     if (apt < costeAnt) {
                         if (DEBUG) println("---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
-                        if (ESTADISTICAS) estGlobal.setFitness(solucionRef.stamp).actualizaProgreso()
+                        if (ESTADISTICAS) {
+                            estGlobal.fitness = solucionRef.stamp; estGlobal.actualizaProgreso()
+                        }
                     }
                 }
                 if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L) {
@@ -161,7 +163,8 @@ class ResolutorExhaustivo : Resolutor() {
 
         //Estadisticas finales
         if (ESTADISTICAS) {
-            estGlobal.setFitness(solucionRef.stamp).actualizaProgreso()
+            estGlobal.fitness = solucionRef.stamp
+            estGlobal.actualizaProgreso()
             if (DEBUG) {
                 println("====================")
                 println("Estadísticas finales")
@@ -177,16 +180,10 @@ class ResolutorExhaustivo : Resolutor() {
 
     private fun calculaAptitud(sol: Map<Dia, AsignacionDia>, vecesCond: Int) = vecesCond * PESO_MAXIMO_VECES_CONDUCTOR + sol.values.map { it.coste }.sum()
 
-    override fun getSolucionFinal(): Map<Dia, AsignacionDia> {
-        return solucionFinal
-    }
+    override val estadisticas: Estadisticas
+        get() = estGlobal
 
-    override fun getEstadisticas(): Estadisticas {
-        return estGlobal
-    }
-
-    override fun setEstrategia(estrategia: Resolutor.Estrategia) {
-        //Nada
-    }
-
+    override var estrategia
+        get() = Resolutor.Estrategia.EQUILIBRADO
+        set(value) { /* Nada */}
 }

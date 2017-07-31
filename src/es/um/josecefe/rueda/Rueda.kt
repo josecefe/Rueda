@@ -12,14 +12,9 @@ import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
 import es.um.josecefe.rueda.persistencia.PersistenciaXML
 import es.um.josecefe.rueda.resolutor.*
-
 import java.io.File
 import java.util.*
-import java.util.function.Function
 import java.util.stream.Collectors
-
-import java.util.stream.Collectors.toList
-import java.util.stream.Collectors.toMap
 
 /**
  * Clase principal de la aplicación Rueda
@@ -28,18 +23,16 @@ import java.util.stream.Collectors.toMap
  */
 
 private const val RUEDA_BASE = "rueda"
-private const val RUEDAXML_HORARIOS = RUEDA_BASE + "_alberca201617.xml"
+private const val RUEDAXML_HORARIOS = RUEDA_BASE + "_test.xml"
 private const val RUEDAXML_ASIGNACION = RUEDA_BASE + "_asignacion.xml"
-private const val COMPARANDO = false
+private const val COMPARANDO = true
 private const val AMPLIADO = false
 
 private fun duplicarHorario(horarios: Set<Horario>): Set<Horario> {
     val nHorarios = HashSet(horarios)
-    val estadisticas = horarios.stream().mapToInt { h -> h.dia!!.id }.summaryStatistics()
-    val desplazamiento = estadisticas.max - estadisticas.min + 1
     val dias: Map<Dia, Dia> = horarios.stream().map { it.dia }.sorted().distinct().collect(
-            Collectors.toMap({ it }, { Dia(it!!.id + desplazamiento, it.descripcion + "Ex") }))
-    nHorarios.addAll(horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.isCoche) })
+            Collectors.toMap({ it }, { Dia(it?.descripcion + "Ex") }))
+    nHorarios.addAll(horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
 
     return nHorarios
 }
@@ -51,9 +44,12 @@ fun pruebaResolutor() {
     // Vamos a guardarlo en XML
     //PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
 
-    val resolutores = Arrays.asList(
+    val resolutores: List<Resolutor> = Arrays.asList(
             ResolutorV7(),
             ResolutorV8(),
+            ResolutorIterativo(),
+            ResolutorCombinado(),
+            ResolutorGA(),
             ResolutorExhaustivo()
     )
     if (COMPARANDO) {

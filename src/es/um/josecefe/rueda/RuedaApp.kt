@@ -28,7 +28,7 @@ import java.util.prefs.Preferences
 /**
  * @author josec
  */
-class RuedaFX : Application() {
+class RuedaApp : javafx.application.Application() {
     private val datosRueda: DatosRueda
     private var primaryStage: Stage? = null
 
@@ -68,7 +68,7 @@ class RuedaFX : Application() {
                 cargaHorarios(file)
             }
         } catch (ex: IOException) {
-            Logger.getLogger(RuedaFX::class.java.name).log(Level.SEVERE, "Fallo inicializando la ventana principal", ex)
+            Logger.getLogger(RuedaApp::class.java.name).log(Level.SEVERE, "Fallo inicializando la ventana principal", ex)
         }
 
     }
@@ -172,5 +172,5 @@ class RuedaFX : Application() {
 }
 
 fun main(args: Array<String>) {
-    Application.launch(*args)
+    Application.launch(RuedaApp::class.java, *args)
 }

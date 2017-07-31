@@ -7,7 +7,7 @@
  */
 package es.um.josecefe.rueda.vista;
 
-import es.um.josecefe.rueda.RuedaFX;
+import es.um.josecefe.rueda.RuedaApp;
 import es.um.josecefe.rueda.modelo.*;
 import es.um.josecefe.rueda.resolutor.Resolutor;
 import javafx.animation.*;
@@ -164,7 +164,7 @@ public class PrincipalController {
     ChoiceBox<Resolutor> cbAlgoritmo;
     @FXML
     ChoiceBox<Resolutor.Estrategia> cbEstrategia;
-    private RuedaFX mainApp;
+    private RuedaApp mainApp;
     private DatosRueda datosRueda;
     @FXML
     private MenuItem mCalcular;
@@ -355,7 +355,7 @@ public class PrincipalController {
         cbEstrategia.getSelectionModel().select(0);
     }
 
-    public void setMainApp(RuedaFX mainApp) {
+    public void setMainApp(RuedaApp mainApp) {
         this.mainApp = mainApp;
         this.stage = mainApp.getPrimaryStage();
         tablaHorario.setItems(datosRueda.getHorariosProperty());
@@ -788,10 +788,8 @@ public class PrincipalController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Set<Horario> nHorarios = new HashSet<>(datosRueda.getHorarios());
-            IntSummaryStatistics estadisticas = datosRueda.getHorarios().stream().mapToInt(h -> h.getDia().getId()).summaryStatistics();
-            int desplazamiento = estadisticas.getMax() - estadisticas.getMin() + 1;
-            Map<Dia, Dia> dias = datosRueda.getHorarios().stream().map(Horario::getDia).sorted().distinct().collect(toMap(Function.identity(), d -> new Dia(d.getId() + desplazamiento, d.getDescripcion() + "Ex")));
-            nHorarios.addAll(datosRueda.getHorarios().stream().map(h -> new Horario(h.getParticipante(), dias.get(h.getDia()), h.getEntrada(), h.getSalida(), h.isCoche())).collect(toList()));
+            Map<Dia, Dia> dias = datosRueda.getHorarios().stream().map(Horario::getDia).sorted().distinct().collect(toMap(Function.identity(), d -> new Dia(d.getDescripcion() + "Ex")));
+            nHorarios.addAll(datosRueda.getHorarios().stream().map(h -> new Horario(h.getParticipante(), dias.get(h.getDia()), h.getEntrada(), h.getSalida(), h.getCoche())).collect(toList()));
             datosRueda.poblarDesdeHorarios(nHorarios);
             mainApp.setLastFilePath(null); // Eliminamos la referencia al último fichero guardado para evitar lios...
         }
@@ -861,7 +859,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, descripcion));
+        datosRueda.getDias().add(new Dia(descripcion));
         tfDescripcionDia.clear();
     }
 
@@ -878,7 +876,7 @@ public class PrincipalController {
             while (compruebaDia(diaProp)) {
                 diaProp = dias[i] + (++intento);
             }
-            datosRueda.getDias().add(new Dia(datosRueda.getDias().stream().mapToInt(Dia::getId).max().orElse(0) + 1, diaProp));
+            datosRueda.getDias().add(new Dia(diaProp));
         }
     }
 
@@ -925,7 +923,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getLugares().add(new Lugar(datosRueda.getLugares().stream().mapToInt(Lugar::getId).max().orElse(0) + 1, tfNombreLugar.getText()));
+        datosRueda.getLugares().add(new Lugar(tfNombreLugar.getText()));
         tfNombreLugar.clear();
     }
 
@@ -971,7 +969,7 @@ public class PrincipalController {
             alert.showAndWait();
             return;
         }
-        datosRueda.getParticipantes().add(new Participante(datosRueda.getParticipantes().stream().mapToInt(Participante::getId).max().orElse(0) + 1, nombre, sPlazas.getValue(), Collections.emptyList()));
+        datosRueda.getParticipantes().add(new Participante(nombre, sPlazas.getValue(), Collections.emptyList()));
         tfNombreParticipante.clear();
     }
 

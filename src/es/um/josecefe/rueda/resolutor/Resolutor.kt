@@ -5,20 +5,17 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.um.josecefe.rueda.resolutor;
+package es.um.josecefe.rueda.resolutor
 
-import es.um.josecefe.rueda.modelo.AsignacionDia;
-import es.um.josecefe.rueda.modelo.Dia;
-import es.um.josecefe.rueda.modelo.Horario;
-
-import java.util.Map;
-import java.util.Set;
+import es.um.josecefe.rueda.modelo.AsignacionDia
+import es.um.josecefe.rueda.modelo.Dia
+import es.um.josecefe.rueda.modelo.Horario
 
 /**
  * @author josecefe
  */
-public abstract class Resolutor {
-    protected boolean continuar;
+abstract class Resolutor {
+    protected var continuar: Boolean = false
 
     /**
      * Resuelve el problema de optimización de la rueda dado un horario de entrada.
@@ -26,14 +23,14 @@ public abstract class Resolutor {
      * @param horarios Entradas del horario
      * @return Resultado de la optimización
      */
-    public abstract Map<Dia, ? extends AsignacionDia> resolver(Set<Horario> horarios);
+    abstract fun resolver(horarios: Set<Horario>): Map<Dia, AsignacionDia>
 
     /**
      * Estadisticas referidas a la última resolución realizada
      *
      * @return Un opción con las estadisticas
      */
-    public abstract Estadisticas getEstadisticas();
+    abstract val estadisticas: Estadisticas
 
     /**
      * Solución de la última resolución realizada
@@ -41,13 +38,13 @@ public abstract class Resolutor {
      * @return Solución de la última resolución realizada. Puede ser null si no hubo solución o aún no
      * se ha realizado ninguna resolución.
      */
-    public abstract Map<Dia, ? extends AsignacionDia> getSolucionFinal();
+    abstract val solucionFinal: Map<Dia, AsignacionDia>
 
     /**
      * Permite detener el algoritmo y obtener el resultado actual (si hay alguno), que puede no se óptimo.
      */
-    public void parar() {
-        continuar = false;
+    open fun parar() {
+        continuar = false
     }
 
     /**
@@ -55,9 +52,9 @@ public abstract class Resolutor {
      *
      * @param estrategia Tipo de estrategia a seguir para la optimización
      */
-    public abstract void setEstrategia(Estrategia estrategia);
+    abstract var estrategia: Estrategia
 
-    public enum Estrategia {
+    enum class Estrategia {
         /**
          * Estrategia equilibrado persigue conseguir que todos el mundo sea
          * el mismo número de veces conductor, minimizando a la vez el número

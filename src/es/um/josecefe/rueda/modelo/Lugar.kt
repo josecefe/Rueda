@@ -19,45 +19,31 @@ import javafx.beans.property.SimpleStringProperty
  *
  * @author josec
  */
-class Lugar
 /**
  * Crea un lugar. Este construtor es el que debe usarse para crear un nuevo
  * objeto del tipo Lugar. Se debe reservar el constructor por defecto para
  * labores de persistencia.
  *
- * @param id
  * @param nombre
  */
-(
-        /**
-         * @return the id
-         */
-        var id: Int = 0, nombre: String = ""
-) : Comparable<Lugar> {
+class Lugar(nombre: String = "Lugar Desconocido") : Comparable<Lugar> {
 
-    private val nombreproperty: SimpleStringProperty
-
-    init {
-        this.nombreproperty = SimpleStringProperty(nombre)
-    }
+    private val nombreProperty: SimpleStringProperty = SimpleStringProperty(nombre)
 
     /**
      * @return the nombre
      */
     var nombre: String
-        get() = nombreproperty.get()
-        set(nombre) = this.nombreproperty.set(nombre)
+        get() = nombreProperty.get()
+        set(nombre) = this.nombreProperty.set(nombre)
 
-    fun nombreProperty(): SimpleStringProperty {
-        return nombreproperty
-    }
+    /**
+     * Propiedad JavaFX siguiendo sus convenciones
+     */
+    fun nombreProperty(): SimpleStringProperty = nombreProperty
 
-    override fun toString(): String {
-        return nombreproperty.get()
-    }
+    override fun toString(): String = nombre
 
-    override fun compareTo(other: Lugar): Int {
-        return Integer.compare(id, other.id)
-    }
+    override fun compareTo(other: Lugar): Int = nombre.compareTo(other.nombre)
 }
 

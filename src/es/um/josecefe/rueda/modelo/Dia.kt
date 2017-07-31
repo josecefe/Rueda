@@ -7,8 +7,6 @@
  */
 package es.um.josecefe.rueda.modelo
 
-import javafx.beans.property.IntegerProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 
@@ -18,26 +16,15 @@ import javafx.beans.property.StringProperty
  *
  * @author josecefe
  */
-class Dia
-/**
- * El Identificador debe ser un número único a partir de 1. Los valores por defecto son para la persistencia
- *
- * @param id          Número único de identificación a partir del 1
- * @param descripcion Descripción del día en texto
- */(var id: Int = 0, descripcion: String = "") : Comparable<Dia> {
-    val descriptionProperty: SimpleStringProperty
+class Dia(descripcion: String = "Día Desconocido") : Comparable<Dia> {
+    private val descriptionProperty: SimpleStringProperty = SimpleStringProperty(descripcion)
     var descripcion: String
         get() = descriptionProperty.get()
         set(value) = descriptionProperty.set(value)
 
-    override fun compareTo(other: Dia): Int = Integer.compare(id, other.id)
+    fun descriptionProperty(): StringProperty = descriptionProperty
 
-    /* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-     */
+    override fun compareTo(other: Dia): Int = descripcion.compareTo(other.descripcion)
+
     override fun toString(): String = descripcion
-
-    init {
-        this.descriptionProperty = SimpleStringProperty(descripcion)
-    }
 }

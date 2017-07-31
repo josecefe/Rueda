@@ -30,11 +30,11 @@ class Horario
  */
 (participante: Participante? = null, dia: Dia? = null, entrada: Int = 0, salida: Int = 0, coche: Boolean = false) : Comparable<Horario> {
 
-    val participanteProperty: ObjectProperty<Participante>
-    val diaProperty: ObjectProperty<Dia>
-    val entradaProperty: IntegerProperty
-    val salidaProperty: IntegerProperty
-    val cocheProperty: BooleanProperty
+    private val participanteProperty: ObjectProperty<Participante>
+    private val diaProperty: ObjectProperty<Dia>
+    private val entradaProperty: IntegerProperty
+    private val salidaProperty: IntegerProperty
+    private val cocheProperty: BooleanProperty
 
     init {
         this.participanteProperty = SimpleObjectProperty(participante)
@@ -52,6 +52,8 @@ class Horario
         get() = participanteProperty.get()
         set(participante) = this.participanteProperty.set(participante)
 
+    fun participanteProperty() = participanteProperty
+
     /**
      * Permite fija el dia de esta entrada de horario. Perticipante + Dia no se
      * pueden repetir Nota: Este método se incluye para la persistencia
@@ -61,6 +63,7 @@ class Horario
         get() = diaProperty.get()
         set(dia) = this.diaProperty.set(dia)
 
+    fun diaProperty() = diaProperty
     /**
      * Permite fijar la hora de entrada (entendida como un entero, usualmente
      * empezando por 1 para primera hora, 2 para la segunda, etc.) Nota: Este
@@ -69,6 +72,8 @@ class Horario
     var entrada: Int
         get() = entradaProperty.get()
         set(entrada) = this.entradaProperty.set(entrada)
+
+    fun entradaProperty() = entradaProperty
 
     /**
      * Permite fijar la hora de salida (entendida como un entero, usualmente
@@ -79,11 +84,15 @@ class Horario
         get() = salidaProperty.get()
         set(salida) = this.salidaProperty.set(salida)
 
-    var isCoche: Boolean
+    fun salidaProperty() = salidaProperty
+
+    var coche: Boolean
         get() = cocheProperty.get()
         set(coche) = this.cocheProperty.set(coche)
 
-    override fun toString(): String = "Horario [participante=$participante, dia=$dia, entrada=$entrada, salida=$salida, coche=$isCoche]"
+    fun cocheProperty() = cocheProperty
+
+    override fun toString(): String = "Horario [participante=$participante, dia=$dia, entrada=$entrada, salida=$salida, coche=$coche]"
 
     override fun hashCode(): Int {
         val prime = 31
