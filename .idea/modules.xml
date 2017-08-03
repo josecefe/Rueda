@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Resolutor/Resolutor.iml" filepath="$PROJECT_DIR$/Resolutor/Resolutor.iml" />
       <module fileurl="file://$PROJECT_DIR$/Rueda.iml" filepath="$PROJECT_DIR$/Rueda.iml" />
     </modules>
   </component>

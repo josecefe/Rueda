@@ -43,16 +43,16 @@ class ResolutorIterativo : ResolutorAcotado {
     }
 
     override fun resolver(horarios: Set<Horario>, cotaInfCorte: Int): Map<Dia, AsignacionDia> {
-        val numDias = horarios.stream().map{ it.dia }.distinct().count()
-        val numParticipantes = horarios.stream().map{ it.participante}.distinct().sorted().count()
-        val conductores = horarios.stream().filter{ it.coche }.map{ it.participante }.distinct().sorted().collect(Collectors.toList()).toTypedArray()
-        val tamMedioCoche = Stream.of(*conductores).mapToInt{ it!!.plazasCoche }.average().orElse(1.0)
+        val numDias = horarios.map{ it.dia }.distinct().count()
+        val numParticipantes = horarios.map{ it.participante}.distinct().count()
+        val conductores = horarios.filter{ it.coche }.map{ it.participante!! }.distinct().sorted().toTypedArray()
+        val tamMedioCoche = conductores.map{ it.plazasCoche }.average()
         val cotaCorteBase = (numParticipantes / tamMedioCoche * numDias / conductores.size + 1).toInt() * PESO_MAXIMO_VECES_CONDUCTOR - 1
         return resolver(horarios, cotaInfCorte, cotaCorteBase)
     }
 
     override fun resolver(horarios: Set<Horario>): Map<Dia, AsignacionDia> {
-        return resolver(horarios, (horarios.stream().map{ it.dia}.distinct().count() + 1).toInt() * PESO_MAXIMO_VECES_CONDUCTOR - 1)
+        return resolver(horarios, (horarios.map{ it.dia}.distinct().count() + 1) * PESO_MAXIMO_VECES_CONDUCTOR - 1)
     }
 
     override val estadisticas: Estadisticas

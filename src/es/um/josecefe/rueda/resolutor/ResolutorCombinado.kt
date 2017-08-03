@@ -24,17 +24,9 @@ import es.um.josecefe.rueda.modelo.Horario
 class ResolutorCombinado : Resolutor {
     override val estadisticas: EstadisticasCombinado
 
-    var primero: Resolutor
-        set(value) {
-            field = value
-            estadisticas.primera = value.estadisticas
-        }
+    private var primero: Resolutor
 
-    var segundo: ResolutorAcotado
-        set(value) {
-            field = value
-            estadisticas.segunda = value.estadisticas
-        }
+    private var segundo: ResolutorAcotado
 
     private var solucion: Map<Dia, AsignacionDia> = emptyMap()
 

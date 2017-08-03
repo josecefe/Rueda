@@ -69,7 +69,7 @@ class ResolutorV8 : ResolutorAcotado() {
 
             for (i in tamanosNivel!!.indices.reversed()) {
                 nPosiblesSoluciones!![i] = acum
-                acum = acum * tamanosNivel!![i]
+                acum *= tamanosNivel!![i]
             }
         }
 
@@ -87,7 +87,7 @@ class ResolutorV8 : ResolutorAcotado() {
         var mejor = actual
         cotaInferiorCorte = AtomicInteger(cotaInfCorte + 1) //Lo tomamos como cota superior
 
-        mejor = branchAndBound(actual, mejor).orElse(mejor) //Cogemos el nuevo mejor
+        mejor = branchAndBound(actual, mejor) ?: mejor //Cogemos el nuevo mejor
 
         //Estadisticas finales
         if (ESTADISTICAS) {
@@ -112,7 +112,7 @@ class ResolutorV8 : ResolutorAcotado() {
         return solucionFinal
     }
 
-    private fun branchAndBound(actual: Nodo, mejorPadre: Nodo): Optional<Nodo> {
+    private fun branchAndBound(actual: Nodo, mejorPadre: Nodo): Nodo? {
         var mejor = mejorPadre
         if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L && System.currentTimeMillis() - ultMilisEst > CADA_MILIS_EST) {
             ultMilisEst = System.currentTimeMillis()
@@ -131,10 +131,10 @@ class ResolutorV8 : ResolutorAcotado() {
                 if (ESTADISTICAS) {
                     estGlobal.addTerminales(tamanosNivel!![actual.nivel + 1].toDouble())
                 }
-                val mejorHijo = actual.generaHijos(true).min { obj, other -> obj.compareTo(other) } //true para paralelo
+                val mejorHijo = actual.generaHijos(PARALELO).min()
 
-                if (mejorHijo.isPresent && mejorHijo.get() < mejor) {
-                    mejor = mejorHijo.get()
+                if (mejorHijo!=null && mejorHijo < mejor) {
+                    mejor = mejorHijo
                     var cota: Int
                     do {
                         cota = cotaInferiorCorte!!.get()
@@ -151,32 +151,32 @@ class ResolutorV8 : ResolutorAcotado() {
                     }
                 }
             } else { // Es un nodo intermedio
-                val lNF = actual.generaHijos(true).filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.collect(toList()) //PARALELO poner true
-                val menorCotaSuperior = lNF.stream().mapToInt{ it.cotaSuperior }.min()
-                if (menorCotaSuperior.isPresent) {
+                val lNF = actual.generaHijos(PARALELO).filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.toMutableList()
+                val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
+                if (menorCotaSuperior != null) {
                     var cota: Int
                     do {
                         cota = cotaInferiorCorte!!.get()
-                    } while (menorCotaSuperior.asInt < cota && !cotaInferiorCorte!!.compareAndSet(cota, menorCotaSuperior.asInt))
-                    if (menorCotaSuperior.asInt < cota) {
+                    } while (menorCotaSuperior< cota && !cotaInferiorCorte!!.compareAndSet(cota, menorCotaSuperior))
+                    if (menorCotaSuperior < cota) {
                         if (ESTADISTICAS) {
-                            estGlobal.fitness = menorCotaSuperior.asInt
+                            estGlobal.fitness = menorCotaSuperior
                             estGlobal.actualizaProgreso()
                         }
                         if (DEBUG) {
-                            System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cota, menorCotaSuperior.asInt)
+                            System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cota, menorCotaSuperior)
                         }
                     }
-                    lNF.removeIf { n -> n.cotaInferior >= cotaInferiorCorte!!.get() } //Recalculamos lNF
+                    lNF.removeAll { n -> n.cotaInferior >= cotaInferiorCorte!!.get() } //Recalculamos lNF
                     // Limpiamos la LNV
                 }
                 if (ESTADISTICAS) {
                     estGlobal.addDescartados((tamanosNivel!![actual.nivel + 1] - lNF.size) * nPosiblesSoluciones!![actual.nivel + 1])
                 }
                 val mejorAhora = mejor
-                val mejorHijo = lNF.parallelStream().sorted().map { n -> branchAndBound(n, mejorAhora) }.filter{ it.isPresent }.map{ it.get() }.min { obj, other -> obj.compareTo(other) }
-                if (mejorHijo.isPresent && mejorHijo.get() < mejor) { // Tenemos un hijo que mejora
-                    mejor = mejorHijo.get()
+                val mejorHijo = lNF.sorted().map { n -> branchAndBound(n, mejorAhora) }.filterNotNull().min()
+                if (mejorHijo!=null && mejorHijo < mejor) { // Tenemos un hijo que mejora
+                    mejor = mejorHijo
                 }
             }
         } else if (ESTADISTICAS) {
@@ -185,7 +185,7 @@ class ResolutorV8 : ResolutorAcotado() {
             }
         }
 
-        return Optional.ofNullable(mejor)
+        return mejor
     }
 
     override val estadisticas: Estadisticas
@@ -195,7 +195,9 @@ class ResolutorV8 : ResolutorAcotado() {
 
     companion object {
 
-        private const val DEBUG = true
+        private const val DEBUG = false
+
+        private const val PARALELO = false
 
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS_EST = 1000

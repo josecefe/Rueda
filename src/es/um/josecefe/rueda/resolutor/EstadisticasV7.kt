@@ -13,10 +13,10 @@ import org.apache.commons.lang3.time.DurationFormatUtils
  * @author josec
  */
 class EstadisticasV7 : Estadisticas() {
-    var expandidos: Long = 0
-    var descartados = 0.0
-    var terminales = 0.0
-    var generados = 0.0
+    private var expandidos: Long = 0
+    private var descartados = 0.0
+    private var terminales = 0.0
+    private var generados = 0.0
     var totalPosiblesSoluciones: Double = 0.0
 
     override fun inicia(): Estadisticas {

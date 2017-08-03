@@ -9,6 +9,7 @@ package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5
 import es.um.josecefe.rueda.modelo.Dia
+import es.um.josecefe.rueda.util.pmap
 import java.util.*
 import java.util.stream.Stream
 
@@ -24,7 +25,7 @@ internal class Nodo : Comparable<Nodo> {
     }
 
     private val padre: Nodo?
-    val eleccion: AsignacionDiaV5?
+    private val eleccion: AsignacionDiaV5?
     private val vecesConductor: ByteArray
     val nivel: Int
     private val costeAcumulado: Int
@@ -81,14 +82,14 @@ internal class Nodo : Comparable<Nodo> {
                     minimo = vecesConductorVirt
                 }
                 if (!terminal) {
-                    val vecesConductorVirtCS = (((vecesConductor[i] + contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]).toFloat() + 0.5f).toInt()
+                    val vecesConductorVirtCS = (((vecesConductor[i] + contexto.maxVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]) + 0.5f).toInt()
                     if (vecesConductorVirtCS > maxCS) {
                         maxCS = vecesConductorVirtCS
                     }
                     if (vecesConductorVirtCS < minCS) {
                         minCS = vecesConductorVirtCS
                     }
-                    val vecesConductorVirtCI = (((vecesConductor[i] + contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]).toFloat() + 0.5f).toInt()
+                    val vecesConductorVirtCI = (((vecesConductor[i] + contexto.minVecesCondDia[contexto.ordenExploracionDias[nivel + 1]][i]) * contexto.coefConduccion[i]) + 0.5f).toInt()
                     if (vecesConductorVirtCI > maxCI) {
                         maxCI = vecesConductorVirtCI
                     }
@@ -130,7 +131,7 @@ internal class Nodo : Comparable<Nodo> {
         costeEstimado = (contexto.pesoCotaInferiorNum * cotaInferior + cotaSuperior * (contexto.pesoCotaInferiorDen - contexto.pesoCotaInferiorNum)) / contexto.pesoCotaInferiorDen
     }
 
-    val dia: Dia?
+    private val dia: Dia?
         get() = if (nivel >= 0) contexto.dias[contexto.ordenExploracionDias[nivel]] else null
 
     val solucion: MutableMap<Dia, AsignacionDiaV5>
@@ -142,16 +143,9 @@ internal class Nodo : Comparable<Nodo> {
             return solucion
         }
 
-    fun generaHijos(paralelo: Boolean): Stream<Nodo> {
-        return (if (paralelo)
-            contexto.solucionesCandidatas[contexto.dias[contexto.ordenExploracionDias[nivel + 1]]]!!.parallelStream()
-        else
-            contexto.solucionesCandidatas[contexto.dias[contexto.ordenExploracionDias[nivel + 1]]]!!.stream()).map { this.generaHijo(it) }
-    }
+    fun generaHijos(paralelo: Boolean = false): List<Nodo> = contexto.solucionesCandidatas[contexto.dias[contexto.ordenExploracionDias[nivel + 1]]]!!.map { generaHijo(it) }
 
-    private fun generaHijo(solDia: AsignacionDiaV5): Nodo {
-        return Nodo(this, solDia, contexto)
-    }
+    private fun generaHijo(solDia: AsignacionDiaV5): Nodo = Nodo(this, solDia, contexto)
 
     override fun compareTo(other: Nodo): Int {
         return costeEstimado - other.costeEstimado
@@ -161,15 +155,8 @@ internal class Nodo : Comparable<Nodo> {
         return Objects.hash(this.eleccion, padre, nivel)
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        return other != null && other is Nodo && nivel == other.nivel && eleccion == other.eleccion && padre == other.padre
-    }
+    override fun equals(other: Any?): Boolean = this === other || (other != null && other is Nodo && nivel == other.nivel && eleccion == other.eleccion && padre == other.padre)
 
-    override fun toString(): String {
-        return String.format("Nodo{nivel=%d, estimado=%,d, inferior=%,d, superior=%,d}", nivel, costeEstimado, cotaInferior, cotaSuperior)
-    }
+    override fun toString(): String = String.format("Nodo{nivel=%d, estimado=%,d, inferior=%,d, superior=%,d}", nivel, costeEstimado, cotaInferior, cotaSuperior)
 
 }

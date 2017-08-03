@@ -29,9 +29,8 @@ private const val COMPARANDO = true
 private const val AMPLIADO = false
 
 private fun duplicarHorario(horarios: Set<Horario>): Set<Horario> {
-    val nHorarios = HashSet(horarios)
-    val dias: Map<Dia, Dia> = horarios.stream().map { it.dia }.sorted().distinct().collect(
-            Collectors.toMap({ it }, { Dia(it?.descripcion + "Ex") }))
+    val nHorarios: HashSet<Horario> = HashSet(horarios)
+    val dias: Map<Dia, Dia> = horarios.map { it.dia }.distinct().filterNotNull().associate { Pair(it, Dia(it.descripcion + "Ex")) }
     nHorarios.addAll(horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
 
     return nHorarios
@@ -45,12 +44,9 @@ fun pruebaResolutor() {
     //PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
 
     val resolutores: List<Resolutor> = Arrays.asList(
+            ResolutorExhaustivo(),
             ResolutorV7(),
-            ResolutorV8(),
-            ResolutorIterativo(),
-            ResolutorCombinado(),
-            ResolutorGA(),
-            ResolutorExhaustivo()
+            ResolutorV8()
     )
     if (COMPARANDO) {
         resolutores.forEach { r ->

@@ -9,16 +9,19 @@
 package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.*
+import es.um.josecefe.rueda.util.Combinador
+import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.combinations
+import es.um.josecefe.rueda.util.pforEach
 import java.util.*
 import java.util.concurrent.atomic.AtomicStampedReference
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
-private const val DEBUG = true
+private const val DEBUG = false
 private const val ESTADISTICAS = true
-private const val CADA_EXPANDIDOS_EST = 1000
+private const val CADA_EXPANDIDOS_EST = 10000
 
 class ResolutorExhaustivo : Resolutor() {
     private val estGlobal = EstadisticasV8()
@@ -99,19 +102,22 @@ class ResolutorExhaustivo : Resolutor() {
                 break
             } // Hemos terminado
 
-            if (DEBUG) println("*** Probando soluciones de nivel $i...")
             if (!continuar) break
+
+            if (DEBUG) println("*** Probando soluciones de nivel $i...")
+
             val listSubcon: MutableList<Iterable<Set<Dia>>> = ArrayList(mapParticipanteDias.size)
             for ((key, value) in mapParticipanteDias) {
                 val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!).toInt()) - diasFijos.getOrDefault(key, emptySet<Dia>().toMutableSet()).size //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                 val diasCambiantes: Set<Dia> = if (diasFijos[key] != null) value.minus(diasFijos[key]!!) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it }.toList())
             }
-            val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
+            val combinaciones: Combinador<Set<Dia>> = Combinador(
+                    listSubcon)
 
             //TODO: Habría que ver las implicaciones del paralelismos, especialmente en las variables compartidas
-            combinaciones.parallelStream().forEach { c ->
-                if (!continuar) return@forEach
+            for (c in combinaciones) {
+                if (!continuar) break
                 val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
                 val participaIt = mapParticipanteDias.keys.iterator()
@@ -121,15 +127,15 @@ class ResolutorExhaustivo : Resolutor() {
                 }
                 if (asignacion.size < contexto.solucionesCandidatas.size) {
                     if (ESTADISTICAS) estGlobal.incExpandidos()
-                    return@forEach
+                    break
                 }
                 val solCand = HashMap<Dia, AsignacionDiaSimple>()
                 for ((key, value) in asignacion) {
-                    val sol = contexto.mapaParticipantesSoluciones.get(key)?.get(value)
+                    val sol = contexto.mapaParticipantesSoluciones[key]?.get(value)
 
                     if (sol == null) {
                         if (ESTADISTICAS) estGlobal.incExpandidos()
-                        return@forEach // Aquí se queda en blanco, luego no sirve
+                        break // Aquí se queda en blanco, luego no sirve
                     }
 
                     solCand[key] = sol

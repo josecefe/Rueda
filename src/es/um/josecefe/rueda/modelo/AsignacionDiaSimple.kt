@@ -10,55 +10,12 @@ package es.um.josecefe.rueda.modelo
 /**
  * @author josecefe
  */
-class AsignacionDiaSimple : Comparable<AsignacionDiaSimple>, AsignacionDia {
-    override var conductores: Set<Participante> = emptySet()
-    override var peIda: Map<Participante, Lugar> = emptyMap()
-    override var peVuelta: Map<Participante, Lugar> = emptyMap()
-    override var coste: Int = 0
-
-    /**
-     * Constructor pensado para la persistencia
-     */
-    internal constructor() {}
-
-    /**
-     * Constructor normal
-     *
-     * @param conductores
-     * @param puntoEncuentroIda
-     * @param puntoEncuentroVuelta
-     * @param coste
-     */
-    constructor(conductores: Set<Participante>, puntoEncuentroIda: Map<Participante, Lugar>, puntoEncuentroVuelta: Map<Participante, Lugar>, coste: Int) {
-        this.conductores = conductores.toSet()
-        this.peIda = puntoEncuentroIda.toMap()
-        this.peVuelta = puntoEncuentroVuelta.toMap()
-        this.coste = coste
-    }
+data class AsignacionDiaSimple(
+        override var conductores: Set<Participante> = emptySet(),
+        override var peIda: Map<Participante, Lugar> = emptyMap(),
+        override var peVuelta: Map<Participante, Lugar> = emptyMap(),
+        override var coste: Int = 0
+) : Comparable<AsignacionDiaSimple>, AsignacionDia {
 
     override fun compareTo(other: AsignacionDiaSimple) = Integer.compare(conductores.size * 1000 + coste, other.conductores.size * 1000 + other.coste)
-
-    override fun hashCode() = ((201 + conductores.hashCode()) * 67 + peIda.hashCode()) * 67 + peVuelta.hashCode()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null) {
-            return false
-        }
-        if (other !is AsignacionDia) {
-            return false
-        }
-        if (this.conductores != other.conductores) {
-            return false
-        }
-        return if (this.peIda != other.peIda) {
-            false
-        } else this.peVuelta == other.peVuelta
-    }
-
-    override fun toString(): String {
-        return "AsignacionDia{ coste=$coste, conductores=$conductores, peIda=$peIda, peVuelta=$peVuelta}"
-    }
 }

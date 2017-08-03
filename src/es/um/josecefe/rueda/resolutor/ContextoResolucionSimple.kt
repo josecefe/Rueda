@@ -8,10 +8,10 @@
 package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.*
+import es.um.josecefe.rueda.util.Combinador
+import es.um.josecefe.rueda.util.SubSets
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Collectors.groupingBy
-import java.util.stream.Collectors.summingInt
 
 /**
  * @author josecefe
@@ -28,15 +28,12 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
     init {
         //Construimos la lista de Dias (usamos un lista para tener un orden)
         val diasSet = TreeSet<Dia>() //Lo queremos ordenado
-        for (horario in horarios) diasSet.add(horario.dia!!)
+        horarios.map { it.dia }.filterNotNull().mapTo(diasSet) { it }
         dias = ArrayList(diasSet) // Podría ser un array si lo vemos necesario
 
         //Construimos ahora la lista de conductores (también usamos una lista por lo mismo que en dias
         val participanteSet = TreeSet<Participante>() //Lo queremos ordenado
-        for (horario in horarios) {
-            val participante = horario.participante
-            participanteSet.add(participante!!)
-        }
+        horarios.map { it.participante }.filterNotNull().mapTo(participanteSet) { it }
         participantes = ArrayList(participanteSet)
 
         // Y aquí ajustamos el coeficiente que nos mide su grado de participación (gente que solo va parte de los días)
@@ -65,52 +62,51 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
 
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
-            val conductoresDia = entradaConductor.keys.map { key -> SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size) }
-            val combinarConductoresDia = Combinador<Set<Participante>>(conductoresDia)
+            val conductoresDia = entradaConductor.keys.map { key ->
+                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size)
+            }
+            val combinarConductoresDia = Combinador(conductoresDia)
 
             //for (List<Set<Participante>> condDia : combinarConductoresDia) {
-            combinarConductoresDia.parallelStream().forEach { condDia ->
+            for (condDia in combinarConductoresDia) {
                 val selCond = condDia.flatMap { it }.filterNotNull().toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
                 val plazasIda = selCond.map { participanteHorario[it] }.groupBy{ it!!.entrada }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
                 val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
 
-                if (nParticipantesIda.entries.stream().allMatch { e -> plazasIda.getOrDefault(e.key, 0) >= e.value } && nParticipantesVuelta.entries.stream().allMatch { e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
+                if (nParticipantesIda.entries.all { e -> plazasIda.getOrDefault(e.key, 0) >= e.value }
+                        && nParticipantesVuelta.entries.all{ e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
 
                     // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
                     val posiblesLugares = participantesDia.map{ it.puntosEncuentro }.plus(selCond.map{ it.puntosEncuentro })
 
                     var mejorCoste = Integer.MAX_VALUE
-                    var mejorLugaresIda: Map<Participante, Lugar>? = null
-                    var mejorLugaresVuelta: Map<Participante, Lugar>? = null
+                    var mejorLugaresIda: Map<Participante, Lugar> = emptyMap()
+                    var mejorLugaresVuelta: Map<Participante, Lugar> = emptyMap()
 
                     for (selLugares in Combinador(posiblesLugares)) {
-                        val lugaresIda: MutableMap<Participante, Lugar>
-                        val lugaresVuelta: MutableMap<Participante, Lugar>
-                        lugaresIda = HashMap()
-                        lugaresVuelta = HashMap()
+                        val lugaresIda: MutableMap<Participante, Lugar> = HashMap()
+                        val lugaresVuelta: MutableMap<Participante, Lugar> = HashMap()
                         val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
                         for (i in participantesDia.indices) {
                             lugaresIda.put(participantesDia[i], selLugares[i])
-                            lugaresVuelta.put(participantesDia[i], if (selCond.contains(participantesDia[i]))
-                                il.next()
-                            else
-                                selLugares[i])
+                            lugaresVuelta.put(participantesDia[i], if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
                         }
-                        val plazasDisponiblesIda = selCond.stream()
-                                .collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
+                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
 
-                        val plazasDisponiblesVuelta = selCond.stream()
-                                .collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
+                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
                         val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
                         val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.stream().allMatch { e -> e.value.entries.stream().allMatch { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } } && plazasNecesariasVuelta.entries.stream().allMatch { e -> e.value.entries.stream().allMatch { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
+                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } }
+                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
                             // Calculamos coste
-                            val coste = participantesDia.stream().mapToInt { e -> e!!.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }.sum()
+                            val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste
@@ -121,7 +117,7 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                     }
                     if (mejorCoste < Integer.MAX_VALUE) {
                         // Tenemos una solución válida
-                        val asignacionDiaSimple = AsignacionDiaSimple(selCond, mejorLugaresIda!!, mejorLugaresVuelta!!, mejorCoste)
+                        val asignacionDiaSimple = AsignacionDiaSimple(selCond, mejorLugaresIda, mejorLugaresVuelta, mejorCoste)
                         solucionesDia.add(asignacionDiaSimple)
                         mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple) //Para acelerar la busqueda después
                     }

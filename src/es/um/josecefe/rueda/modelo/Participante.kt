@@ -71,7 +71,7 @@ class Participante
     /**
      * @return the puntosEncuentro
      */
-    var puntosEncuentro: List<Lugar>
+    var puntosEncuentro: MutableList<Lugar>
         get() = ArrayList(puntosEncuentroProp)
         set(puntosEncuentro) {
             this.puntosEncuentroProp.clear()

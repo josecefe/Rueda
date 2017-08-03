@@ -47,11 +47,6 @@ abstract class Resolutor {
         continuar = false
     }
 
-    /**
-     * Fija la estrategia de optimización
-     *
-     * @param estrategia Tipo de estrategia a seguir para la optimización
-     */
     abstract var estrategia: Estrategia
 
     enum class Estrategia {

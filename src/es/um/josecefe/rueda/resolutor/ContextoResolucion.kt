@@ -8,11 +8,10 @@
 package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.*
+import es.um.josecefe.rueda.util.Combinador
+import es.um.josecefe.rueda.util.SubSets
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Collectors.groupingBy
-import java.util.stream.Collectors.summingInt
-import java.util.stream.IntStream
 
 /**
  * @author josec
@@ -23,7 +22,7 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
     val participantes: List<Participante>
     //Map<Participante, Integer> participantesIndex;
     val solucionesCandidatas: MutableMap<Dia, List<AsignacionDiaV5>>
-    val mapaParticipantesSoluciones: MutableMap<Dia, Map<Set<Participante>, AsignacionDiaV5>>
+    private val mapaParticipantesSoluciones: MutableMap<Dia, Map<Set<Participante>, AsignacionDiaV5>>
     val coefConduccion: FloatArray  //Que tanto por 1 supone que use el coche cada conductor
     var participantesConCoche: BooleanArray
     var ordenExploracionDias: IntArray
@@ -38,15 +37,14 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
     init {
         //Construimos la lista de Dias (usamos un lista para tener un orden)
         val diasSet = TreeSet<Dia>() //Lo queremos ordenado
-        for (horario in horarios) diasSet.add(horario.dia!!)
+        horarios.mapTo(diasSet) { it.dia!! }
         dias = ArrayList(diasSet) // Podría ser un array si lo vemos necesario
 
         //Construimos ahora la lista de conductores (también usamos una lista por lo mismo que en dias
         val participanteSet = TreeSet<Participante>() //Lo queremos ordenado
-        for (horario in horarios) {
-            val participante = horario.participante
-            participanteSet.add(participante!!)
-        }
+        horarios
+                .map { it.participante }
+                .mapTo(participanteSet) { it!! }
         participantes = ArrayList(participanteSet)
 
         // Y aquí ajustamos el coeficiente que nos mide su grado de participación (gente que solo va parte de los días)
@@ -88,18 +86,20 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
 
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
-            val conductoresDia = entradaConductor.keys.map { key -> SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size) }
-            val combinarConductoresDia = Combinador<Set<Participante>>(conductoresDia)
+            val conductoresDia = entradaConductor.keys.map { key ->
+                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size)
+            }
+            val combinarConductoresDia = Combinador(conductoresDia)
 
-            //for (List<Set<Participante>> condDia : combinarConductoresDia) {
-            combinarConductoresDia.parallelStream().forEach { condDia ->
+            for (condDia in combinarConductoresDia) {
                 val selCond = condDia.flatMap { it }.filterNotNull().toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
                 val plazasIda = selCond.map { participanteHorario[it] }.groupBy{ it!!.entrada }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
                 val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
 
-                if (nParticipantesIda.entries.stream().allMatch { e -> plazasIda.getOrDefault(e.key, 0) >= e.value } && nParticipantesVuelta.entries.stream().allMatch { e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
+                if (nParticipantesIda.entries.all { e -> plazasIda.getOrDefault(e.key, 0) >= e.value }
+                        && nParticipantesVuelta.entries.all{ e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
 
                     // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
                     val posiblesLugares = participantesDia.map{ it.puntosEncuentro }.plus(selCond.map{ it.puntosEncuentro })
@@ -121,19 +121,21 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
                             else
                                 selLugares[i])
                         }
-                        val plazasDisponiblesIda = selCond.stream()
-                                .collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
 
-                        val plazasDisponiblesVuelta = selCond.stream()
-                                .collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
+                        val plazasDisponiblesIda: Map<Int, Map<Lugar, Int>> = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                                //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
+
+                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                                //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
                         val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
                         val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.stream().allMatch { e -> e.value.entries.stream().allMatch { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } } && plazasNecesariasVuelta.entries.stream().allMatch { e -> e.value.entries.stream().allMatch { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
+                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } }
+                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
                             // Calculamos coste
-                            val coste = participantesDia.stream().mapToInt { e -> e!!.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }.sum()
+                            val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste
@@ -171,10 +173,9 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
 
         //Vamos a ver cual sería el mejor orden para ir explorando los días, empezando por el que menos soluciones posibles ofrece
         if (ORDEN_IMPORTA) {
-            val comparator = Comparator.comparingInt {  e: Map.Entry<Dia, List<AsignacionDiaV5>> -> e.value.size }
-            ordenExploracionDias = solucionesCandidatas.entries.stream().sorted(comparator.reversed()).mapToInt { e -> dias.indexOf(e.key) }.toArray()
+            ordenExploracionDias = solucionesCandidatas.entries.sortedByDescending { it.value.size }.map { e -> dias.indexOf(e.key) }.toTypedArray().toIntArray()
         } else {
-            ordenExploracionDias = IntStream.range(0, solucionesCandidatas.size).toArray()
+            ordenExploracionDias = (0 until solucionesCandidatas.size).toList().toIntArray()
         }
 
 
@@ -182,7 +183,7 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
         for (i in peorCosteDia.size - 2 downTo 0) {
             peorCosteDia[ordenExploracionDias[i]] += peorCosteDia[ordenExploracionDias[i + 1]]
             mejorCosteDia[ordenExploracionDias[i]] += mejorCosteDia[ordenExploracionDias[i + 1]]
-            for (j in 0..minVecesCondDia[ordenExploracionDias[i]].size - 1) {
+            for (j in 0 until minVecesCondDia[ordenExploracionDias[i]].size) {
                 minVecesCondDia[ordenExploracionDias[i]][j] += minVecesCondDia[ordenExploracionDias[i + 1]][j]
                 maxVecesCondDia[ordenExploracionDias[i]][j] += maxVecesCondDia[ordenExploracionDias[i + 1]][j]
             }

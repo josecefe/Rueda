@@ -41,7 +41,7 @@ class EstadisticasCombinado(primera: Estadisticas, segunda: Estadisticas) : Esta
 
     override var tiempo: Long
         get() = primera.tiempo + segunda.tiempo
-        set(value: Long) {
+        set(value) {
             super.tiempo = value
         }
 

@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="org.apache.commons.lang3">
+  <library name="org.apache.commons.lang-3">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.6.jar!/" />
     </CLASSES>

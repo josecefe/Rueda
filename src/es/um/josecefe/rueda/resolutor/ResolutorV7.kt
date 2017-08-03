@@ -35,7 +35,7 @@ class ResolutorV7 : ResolutorAcotado() {
     override fun resolver(horarios: Set<Horario>, cotaInfCorte: Int): Map<Dia, AsignacionDia> {
 
         if (horarios.isEmpty()) {
-            return emptyMap<Dia, AsignacionDia>()
+            return emptyMap()
         }
 
         if (ESTADISTICAS) {
@@ -65,7 +65,7 @@ class ResolutorV7 : ResolutorAcotado() {
 
             for (i in tamanosNivel.indices.reversed()) {
                 nPosiblesSoluciones[i] = acum
-                acum = acum * tamanosNivel[i]
+                acum *= tamanosNivel[i]
             }
             estGlobal.totalPosiblesSoluciones = totalPosiblesSoluciones
             estGlobal.actualizaProgreso()
@@ -114,15 +114,14 @@ class ResolutorV7 : ResolutorAcotado() {
                     if (ESTADISTICAS) {
                         estGlobal.addTerminales(tamanosNivel[actual.nivel + 1].toDouble())
                     }
-                    val mejorHijo = actual.generaHijos(PARALELO).min { obj, other -> obj.compareTo(other) } //true para paralelo
-                    if (mejorHijo.isPresent && mejorHijo.get() < mejor) {
+                    val mejorHijo = actual.generaHijos(PARALELO).min()
+                    if (mejorHijo!=null && mejorHijo < mejor) {
                         if (mejor === RAIZ) {
                             // Cambiamos los pesos
                             contex.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_FIN //Después buscamos más equilibrado
                             contex.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_FIN //Después buscamos más equilibrado
-                            (if (PARALELO) LNV.parallelStream() else LNV.stream()).forEach{ it.calculaCosteEstimado() }// Hay que forzar el calculo de nuevo de los costes de los nodos
-                            val colaNodosVivos: PriorityQueue<Nodo>
-                            colaNodosVivos = PriorityQueue(LNV.size)
+                            LNV.forEach{ it.calculaCosteEstimado() }// Hay que forzar el calculo de nuevo de los costes de los nodos
+                            val colaNodosVivos: PriorityQueue<Nodo> = PriorityQueue(LNV.size)
                             colaNodosVivos.addAll(LNV)
                             if (DEBUG) {
                                 println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS")
@@ -131,7 +130,7 @@ class ResolutorV7 : ResolutorAcotado() {
                             LNV = colaNodosVivos
                         }
 
-                        mejor = mejorHijo.get()
+                        mejor = mejorHijo
                         if (DEBUG) {
                             System.out.format("$$$$ A partir del padre=%s\n    -> mejoramos con el hijo=%s\n", actual, mejor)
                         }
@@ -145,7 +144,7 @@ class ResolutorV7 : ResolutorAcotado() {
                             // Limpiamos la lista de nodos vivos de los que no cumplan...
                             val antes = LNV.size
                             if (ESTADISTICAS) {
-                                estGlobal.addDescartados((if (PARALELO) LNV.parallelStream() else LNV.stream()).filter { n -> n.cotaInferior >= fC }.mapToDouble { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                                estGlobal.addDescartados(LNV.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
                                 estGlobal.fitness = cotaInferiorCorte
                                 estGlobal.actualizaProgreso()
                             }
@@ -157,23 +156,23 @@ class ResolutorV7 : ResolutorAcotado() {
                     }
                 } else { // Es un nodo intermedio
                     val Corte = cotaInferiorCorte
-                    val lNF = actual.generaHijos(PARALELO).filter { n -> n.cotaInferior < Corte }.collect(toList()) //PARALELO poner true
-                    val menorCotaSuperior = lNF.stream().mapToInt{ it.cotaSuperior }.min()
-                    if (menorCotaSuperior.isPresent && menorCotaSuperior.asInt < cotaInferiorCorte) { // Mejora de C
+                    val lNF = actual.generaHijos(PARALELO).filter { n -> n.cotaInferior < Corte }.toMutableList()
+                    val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
+                    if (menorCotaSuperior!=null && menorCotaSuperior < cotaInferiorCorte) { // Mejora de C
                         if (DEBUG) {
-                            System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cotaInferiorCorte, menorCotaSuperior.asInt)
+                            System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cotaInferiorCorte, menorCotaSuperior)
                         }
-                        cotaInferiorCorte = menorCotaSuperior.asInt //Actualizamos C
+                        cotaInferiorCorte = menorCotaSuperior //Actualizamos C
                         val fC = cotaInferiorCorte
-                        lNF.removeIf { n -> n.cotaInferior >= fC } //Recalculamos lNF
+                        lNF.removeAll { n -> n.cotaInferior >= fC } //Recalculamos lNF
                         // Limpiamos la LNV
                         val antes = LNV.size
                         if (ESTADISTICAS) {
-                            estGlobal.addDescartados((if (PARALELO) LNV.parallelStream() else LNV.stream()).filter { n -> n.cotaInferior >= fC }.mapToDouble { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                            estGlobal.addDescartados(LNV.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
                             estGlobal.fitness = cotaInferiorCorte
                             estGlobal.actualizaProgreso()
                         }
-                        val removeIf = LNV.removeIf { n -> n.cotaInferior >= fC }
+                        val removeIf = LNV.removeAll { n -> n.cotaInferior >= fC }
                         if (ESTADISTICAS && DEBUG && removeIf) {
                             System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size)
                         }
@@ -218,8 +217,8 @@ class ResolutorV7 : ResolutorAcotado() {
         get() = estGlobal
 
     companion object {
-        private const val DEBUG = true
-        private const val PARALELO = true
+        private const val DEBUG = false
+        private const val PARALELO = false
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS = 1000
         private const val CADA_MILIS_EST = 1000

@@ -29,14 +29,10 @@ import java.util.prefs.Preferences
  * @author josec
  */
 class RuedaApp : javafx.application.Application() {
-    private val datosRueda: DatosRueda
-    private var primaryStage: Stage? = null
+    private val datosRueda: DatosRueda = DatosRueda()
+    private lateinit var primaryStage: Stage
 
-    init {
-        this.datosRueda = DatosRueda()
-    }
-
-    fun getPrimaryStage(): Window? {
+    fun getPrimaryStage(): Window {
         return primaryStage
     }
 
@@ -92,10 +88,10 @@ class RuedaApp : javafx.application.Application() {
             val prefs = Preferences.userNodeForPackage(javaClass)
             if (file != null) {
                 prefs.put("lastSave", file.path)
-                primaryStage!!.title = TITLE + " [" + file.name + "] - " + COPYRIGHT
+                primaryStage.title = TITLE + " [" + file.name + "] - " + COPYRIGHT
             } else {
                 prefs.remove("filePath")
-                primaryStage!!.title = TITLE + " - " + COPYRIGHT
+                primaryStage.title = TITLE + " - " + COPYRIGHT
             }
         }
 

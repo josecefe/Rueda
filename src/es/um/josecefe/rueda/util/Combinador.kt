@@ -5,11 +5,9 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package es.um.josecefe.rueda.resolutor
+package es.um.josecefe.rueda.util
 
 import java.util.*
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 
 /**
  * Esta clase contiene un generador de todas las combinaciones resultantes del producto cartesiano
@@ -22,14 +20,6 @@ class Combinador<T>(private val conjuntos: List<Iterable<T>>) : Iterable<List<T>
 
     override fun iterator(): Iterator<List<T>> {
         return CombinadorIterator()
-    }
-
-    fun stream(): Stream<List<T>> {
-        return StreamSupport.stream(spliterator(), false)
-    }
-
-    fun parallelStream(): Stream<List<T>> {
-        return StreamSupport.stream(spliterator(), true)
     }
 
     private inner class CombinadorIterator : Iterator<List<T>> {
@@ -51,10 +41,10 @@ class Combinador<T>(private val conjuntos: List<Iterable<T>>) : Iterable<List<T>
                 act = a.next()
                 if (!act.hasNext()) {
                     act = conjuntos[a.previousIndex()].iterator()
-                    ultimo.set(a.previousIndex(), act.next())
+                    ultimo[a.previousIndex()] = act.next()
                     a.set(act)
                 } else {
-                    ultimo.set(a.previousIndex(), act.next())
+                    ultimo[a.previousIndex()] = act.next()
                     hayMas = true
                     break
                 }

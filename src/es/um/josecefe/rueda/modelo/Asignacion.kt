@@ -11,14 +11,12 @@ import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.util.Pair
 
-import java.util.stream.Collectors.toList
-
 /**
  * @author josec
  */
 class Asignacion(d: Dia, asignacionDia: AsignacionDia) : Comparable<Asignacion> {
 
-    private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty<Dia>()
+    private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty()
     private val conductoresProp: SimpleListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList<Participante>())
     private val peidaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList<Pair<Participante, Lugar>>())
     private val pevueltaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList<Pair<Participante, Lugar>>())

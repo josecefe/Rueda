@@ -16,17 +16,10 @@ import javafx.beans.property.StringProperty
  * @author josec
  */
 class AsignacionParticipante(participante: String = "", ida: String = "", vuelta: String = "", conductor: Boolean = false) {
-    private val participanteProperty: SimpleStringProperty
-    private val idaProperty: SimpleStringProperty
-    private val vueltaProperty: SimpleStringProperty
-    private val conductorProperty: SimpleBooleanProperty
-
-    init {
-        participanteProperty = SimpleStringProperty(participante)
-        idaProperty = SimpleStringProperty(ida)
-        vueltaProperty = SimpleStringProperty(vuelta)
-        conductorProperty = SimpleBooleanProperty(conductor)
-    }
+    private val participanteProperty: SimpleStringProperty = SimpleStringProperty(participante)
+    private val idaProperty: SimpleStringProperty = SimpleStringProperty(ida)
+    private val vueltaProperty: SimpleStringProperty = SimpleStringProperty(vuelta)
+    private val conductorProperty: SimpleBooleanProperty = SimpleBooleanProperty(conductor)
 
     var participante: String
         get() = participanteProperty.get()

@@ -16,10 +16,10 @@ internal class PersistenciaXMLTest {
     @Test
     fun guardaDatosRueda() {
         val datosRueda = DatosRueda()
-        datosRueda.dias = listOf(Dia("Lunes"),Dia("Martes"),Dia("Miercoles"),Dia("Jueves"),Dia("Viernes"))
-        datosRueda.lugares = listOf(Lugar("LA"), Lugar("LB"))
-        datosRueda.participantes = listOf(Participante("PA", 5,listOf(datosRueda.lugares[0])), Participante( "PB", 5, listOf(datosRueda.lugares[0], datosRueda.lugares[1])))
-        datosRueda.horarios = listOf(
+        datosRueda.dias = mutableListOf(Dia("Lunes"),Dia("Martes"),Dia("Miercoles"),Dia("Jueves"),Dia("Viernes"))
+        datosRueda.lugares = mutableListOf(Lugar("LA"), Lugar("LB"))
+        datosRueda.participantes = mutableListOf(Participante("PA", 5,listOf(datosRueda.lugares[0])), Participante( "PB", 5, listOf(datosRueda.lugares[0], datosRueda.lugares[1])))
+        datosRueda.horarios = mutableListOf(
                 Horario(datosRueda.participantes[0], datosRueda.dias[0], 1, 6, true),
                 Horario(datosRueda.participantes[0], datosRueda.dias[1], 1, 6, true),
                 Horario(datosRueda.participantes[0], datosRueda.dias[2], 1, 6, true),

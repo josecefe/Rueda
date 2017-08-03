@@ -12,29 +12,18 @@ import java.util.*
 /**
  * @author josecefe
  */
-class AsignacionDiaV5
-/**
- * Constructor normal
- *
- * @param participantes
- * @param conductores
- * @param puntoEncuentroIda
- * @param puntoEncuentroVuelta
- * @param coste
- */(private val participantes: Array<Participante> = emptyArray(), conductores: Set<Participante> = emptySet(),
-    puntoEncuentroIda: Map<Participante, Lugar> = emptyMap(),
-    puntoEncuentroVuelta: Map<Participante, Lugar> = emptyMap(),
-    override var coste: Int = 0) : Comparable<AsignacionDiaV5>, AsignacionDia {
+class AsignacionDiaV5(
+        private val participantes: Array<Participante> = emptyArray(),
+        conductores: Set<Participante> = emptySet(),
+        override var peIda: Map<Participante, Lugar> = emptyMap(),
+        override var peVuelta: Map<Participante, Lugar> = emptyMap(),
+        override var coste: Int = 0
+) : Comparable<AsignacionDiaV5>, AsignacionDia {
     val conductoresArray: BooleanArray = BooleanArray(participantes.size)
-    override var peIda: Map<Participante, Lugar> = puntoEncuentroIda
-    override var peVuelta: Map<Participante, Lugar> = puntoEncuentroVuelta
     private val numConductores: Int
 
     override val conductores: Set<Participante>
-        get() = (0..conductoresArray.lastIndex)
-                .filter { conductoresArray[it] }
-                .map { participantes[it] }
-                .toSet()
+        get() = (0..conductoresArray.lastIndex).filter { conductoresArray[it] }.map { participantes[it] }.toSet()
 
     override fun compareTo(other: AsignacionDiaV5): Int = Integer.compare(numConductores * 1000 + coste,
             other.numConductores * 1000 + other.coste)
@@ -43,27 +32,11 @@ class AsignacionDiaV5
             this.peIda)) * 67 + Objects.hashCode(this.peVuelta)
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null) {
-            return false
-        }
-        if (javaClass != other.javaClass) {
-            return false
-        }
-        val other1 = other as AsignacionDiaV5
-        if (this.conductoresArray != other1.conductoresArray) {
-            return false
-        }
-        return if (this.peIda != other1.peIda) {
-            false
-        } else this.peVuelta == other1.peVuelta
+        return this === other || (other != null && other is AsignacionDiaV5 && coste == other.coste
+                 && Arrays.equals(conductoresArray, other.conductoresArray) && this.peIda == other.peIda && this.peVuelta == other.peVuelta)
     }
 
-    override fun toString(): String {
-        return "AsignacionDia{ coste=$coste, conductores=$conductores, peIda=$peIda, peVuelta=$peVuelta}"
-    }
+    override fun toString(): String = "AsignacionDia{ coste=$coste, conductores=$conductores, peIda=$peIda, peVuelta=$peVuelta}"
 
     init {
         for (i in participantes.indices)

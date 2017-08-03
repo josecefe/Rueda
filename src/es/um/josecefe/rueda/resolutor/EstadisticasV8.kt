@@ -17,9 +17,9 @@ import java.util.concurrent.atomic.DoubleAdder
  */
 class EstadisticasV8 : Estadisticas() {
     var expandidos = AtomicLong()
-    var descartados = DoubleAdder()
+    private var descartados = DoubleAdder()
     var terminales = DoubleAdder()
-    var generados = DoubleAdder()
+    private var generados = DoubleAdder()
     var totalPosiblesSoluciones: Double = 0.0
 
     override fun inicia(): Estadisticas {
@@ -28,14 +28,6 @@ class EstadisticasV8 : Estadisticas() {
         terminales.reset()
         generados.reset()
         return super.inicia()
-    }
-
-    fun acumular(otro: EstadisticasV8): EstadisticasV8 {
-        expandidos.getAndAdd(otro.expandidos.get())
-        generados.add(otro.generados.sum())
-        descartados.add(otro.descartados.sum())
-        terminales.add(otro.terminales.sum())
-        return this
     }
 
     override fun toString(): String {

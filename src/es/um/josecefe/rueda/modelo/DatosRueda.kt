@@ -12,7 +12,6 @@ import javafx.beans.property.ListProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
-import java.util.stream.Stream
 
 /**
  * @author josec
@@ -32,35 +31,35 @@ class DatosRueda {
     var mensajeValidacion: String? = null
         private set
 
-    var dias: List<Dia>
+    var dias: MutableList<Dia>
         get() = diasProperty.get()
         set(value) {
             diasProperty.clear()
             diasProperty.addAll(value)
         }
 
-    var lugares: List<Lugar>
+    var lugares: MutableList<Lugar>
         get() = lugaresProperty.get()
         set(value) {
             lugaresProperty.clear()
             lugaresProperty.addAll(value)
         }
 
-    var participantes: List<Participante>
+    var participantes: MutableList<Participante>
         get() = participantesProperty.get()
         set(value) {
             participantesProperty.clear()
             participantesProperty.addAll(value)
         }
 
-    var horarios: List<Horario>
+    var horarios: MutableList<Horario>
         get() = horariosProperty.get()
         set(value) {
             horariosProperty.clear()
             horariosProperty.addAll(value)
         }
 
-    var asignacion: List<Asignacion>
+    var asignacion: MutableList<Asignacion>
         get() = asignacionProperty.get()
         set(value) {
             asignacionProperty.clear()
@@ -96,21 +95,16 @@ class DatosRueda {
         // Creamos las demas cosas a partir de solo los horarios de entrada
         horariosProperty.addAll(FXCollections.observableArrayList(horariosBase))
         // Dias
-        horariosProperty.stream().map{ it.dia}.distinct().sorted().collect({ diasProperty },
-                { c, e -> c.add(e) }) { c, ce -> c.addAll(ce) }
+        horariosProperty.map{ it.dia}.distinct().mapTo(diasProperty){ it }
         // Participantes
-        horariosProperty.stream().map{ it.participante }.distinct().sorted().collect(
-                { participantesProperty }, { c, e -> c.add(e) }) { c, ce -> c.addAll(ce) }
+        horariosProperty.map{ it.participante }.distinct().mapTo(participantesProperty) { it }
         // Y a partir de los participantes, los Lugares
-        participantesProperty.stream().map{ it.puntosEncuentro }.flatMap{ it.stream() }.distinct().collect({ lugaresProperty },
-                { c, e -> c.add(e) }) { c, ce -> c.addAll(ce) }
+        participantesProperty.map{ it.puntosEncuentro }.flatMap{ it }.distinct().mapTo(lugaresProperty){ it }
     }
 
-    fun setSolucion(resolver: Map<Dia, AsignacionDia>?, costeTotal: Int) {
+    fun setSolucion(resolver: Map<Dia, AsignacionDia>, costeTotal: Int) {
         asignacionProperty.clear()
-        resolver?.entries?.stream()?.map { entry -> Asignacion(entry.key, entry.value) }?.collect(
-                { asignacionProperty },
-                { c, e -> c.add(e) }) { c, ce -> c.addAll(ce) }
+        resolver.entries.map { entry -> Asignacion(entry.key, entry.value) }.mapTo(asignacionProperty) {it}
         costeAsignacion = costeTotal
     }
 
