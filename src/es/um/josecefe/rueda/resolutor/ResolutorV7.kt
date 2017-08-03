@@ -13,7 +13,6 @@ import es.um.josecefe.rueda.modelo.Horario
 import java.util.*
 import java.util.function.Supplier
 import java.util.stream.Collectors
-import java.util.stream.Collectors.toList
 import java.util.stream.IntStream
 
 /**
@@ -114,7 +113,7 @@ class ResolutorV7 : ResolutorAcotado() {
                     if (ESTADISTICAS) {
                         estGlobal.addTerminales(tamanosNivel[actual.nivel + 1].toDouble())
                     }
-                    val mejorHijo = actual.generaHijos(PARALELO).min()
+                    val mejorHijo = actual.generaHijos().min()
                     if (mejorHijo!=null && mejorHijo < mejor) {
                         if (mejor === RAIZ) {
                             // Cambiamos los pesos
@@ -156,7 +155,7 @@ class ResolutorV7 : ResolutorAcotado() {
                     }
                 } else { // Es un nodo intermedio
                     val Corte = cotaInferiorCorte
-                    val lNF = actual.generaHijos(PARALELO).filter { n -> n.cotaInferior < Corte }.toMutableList()
+                    val lNF = actual.generaHijos().filter { n -> n.cotaInferior < Corte }.toMutableList()
                     val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
                     if (menorCotaSuperior!=null && menorCotaSuperior < cotaInferiorCorte) { // Mejora de C
                         if (DEBUG) {

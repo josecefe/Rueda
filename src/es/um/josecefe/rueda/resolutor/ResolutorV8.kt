@@ -10,10 +10,8 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Collectors
-import java.util.stream.Collectors.toList
 import java.util.stream.IntStream
 
 /**
@@ -131,7 +129,7 @@ class ResolutorV8 : ResolutorAcotado() {
                 if (ESTADISTICAS) {
                     estGlobal.addTerminales(tamanosNivel!![actual.nivel + 1].toDouble())
                 }
-                val mejorHijo = actual.generaHijos(PARALELO).min()
+                val mejorHijo = actual.generaHijos().min()
 
                 if (mejorHijo!=null && mejorHijo < mejor) {
                     mejor = mejorHijo
@@ -151,7 +149,7 @@ class ResolutorV8 : ResolutorAcotado() {
                     }
                 }
             } else { // Es un nodo intermedio
-                val lNF = actual.generaHijos(PARALELO).filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.toMutableList()
+                val lNF = actual.generaHijos().filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.toMutableList()
                 val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
                 if (menorCotaSuperior != null) {
                     var cota: Int

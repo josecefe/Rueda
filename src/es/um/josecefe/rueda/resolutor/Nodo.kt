@@ -9,9 +9,7 @@ package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.AsignacionDiaV5
 import es.um.josecefe.rueda.modelo.Dia
-import es.um.josecefe.rueda.util.pmap
 import java.util.*
-import java.util.stream.Stream
 
 /**
  * Nodo
@@ -143,7 +141,7 @@ internal class Nodo : Comparable<Nodo> {
             return solucion
         }
 
-    fun generaHijos(paralelo: Boolean = false): List<Nodo> = contexto.solucionesCandidatas[contexto.dias[contexto.ordenExploracionDias[nivel + 1]]]!!.map { generaHijo(it) }
+    fun generaHijos(): List<Nodo> = contexto.solucionesCandidatas[contexto.dias[contexto.ordenExploracionDias[nivel + 1]]]!!.map { generaHijo(it) }
 
     private fun generaHijo(solDia: AsignacionDiaV5): Nodo = Nodo(this, solDia, contexto)
 
