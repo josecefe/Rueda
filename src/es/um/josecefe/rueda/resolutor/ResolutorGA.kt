@@ -14,7 +14,8 @@ import es.um.josecefe.rueda.util.summarizingInt
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Collectors
-import java.util.stream.Collectors.*
+import java.util.stream.Collectors.toConcurrentMap
+import java.util.stream.Collectors.toList
 import java.util.stream.IntStream
 import java.util.stream.Stream
 
@@ -47,7 +48,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             participantesConCoche!![i] = participantes!![i].plazasCoche > 0
         }
 
-        val vecesParticipa = horarios!!.groupingBy{ it.participante!! }.eachCount()
+        val vecesParticipa = horarios!!.groupingBy { it.participante }.eachCount()
         val maxVecesParticipa = vecesParticipa.values.max() ?: 0
 
         coefConduccion = FloatArray(participantes!!.size)
@@ -62,8 +63,8 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             val d = dias!![indDia]
             val solucionesDia = ArrayList<AsignacionDiaV5>()
             val horariosDia = horarios!!.filter { it.dia == d }.toSet()
-            val participanteHorario = horariosDia.associate{Pair(it.participante!!, it)  }
-            val participantesDia = horariosDia.map{ it.participante!! }.sortedBy { it.nombre }
+            val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
+            val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
 
             // Para cada hora de entrada, obtenemos los conductores disponibles
             val entradaConductor = horariosDia.filter{ it.coche }.groupBy ({ it.entrada}, {it.participante})
@@ -81,8 +82,8 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
                 val selCond = condDia.flatMap { it }.filterNotNull().toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
-                val plazasIda = selCond.map { participanteHorario[it] }.groupBy{ it!!.entrada }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
-                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
+                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
+                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
 
                 if (nParticipantesIda.entries.all{ e -> plazasIda.getOrDefault(e.key, 0) >= e.value }
                         && nParticipantesVuelta.entries.all { e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {

@@ -11,8 +11,6 @@ import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 
 /**
  * ResolutorV8
@@ -27,7 +25,7 @@ class ResolutorV8 : ResolutorAcotado() {
     private var contexto : ContextoResolucion? = null
     private var tamanosNivel : IntArray? = null
     private var nPosiblesSoluciones : DoubleArray? = null
-    private val estGlobal = EstadisticasV8()
+    private val estGlobal = EstadisticasV7()
     override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
         private set
     private var cotaInferiorCorte: AtomicInteger? = null
@@ -55,12 +53,12 @@ class ResolutorV8 : ResolutorAcotado() {
 
         solucionFinal = emptyMap()
 
-        tamanosNivel = IntStream.of(*contexto1.ordenExploracionDias).map { i -> contexto1.solucionesCandidatas[contexto1.dias[i]]!!.size }.toArray()
-        val totalPosiblesSoluciones = IntStream.of(*tamanosNivel!!).mapToDouble { i -> i.toDouble() }.reduce(1.0) { a, b -> a * b }
+        tamanosNivel = contexto1.ordenExploracionDias.map { i -> contexto1.solucionesCandidatas[contexto1.dias[i]]!!.size }.toIntArray()
+        val totalPosiblesSoluciones = tamanosNivel!!.map { i -> i.toDouble() }.fold(1.0) { a, b -> a * b }
         nPosiblesSoluciones = DoubleArray(tamanosNivel!!.size)
         if (ESTADISTICAS) {
             if (DEBUG) {
-                println("Nº de posibles soluciones: " + IntStream.of(*tamanosNivel!!).mapToObj{ java.lang.Double.toString(it.toDouble()) }.collect(Collectors.joining(" * ")) + " = "
+                println("Nº de posibles soluciones: " + tamanosNivel!!.map { it.toDouble().toString() }.joinToString(" * ") + " = "
                         + totalPosiblesSoluciones)
             }
             var acum = 1.0
@@ -195,7 +193,7 @@ class ResolutorV8 : ResolutorAcotado() {
 
         private const val DEBUG = false
 
-        private const val PARALELO = false
+        //private const val PARALELO = false
 
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS_EST = 1000

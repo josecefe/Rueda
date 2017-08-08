@@ -7,6 +7,8 @@
  */
 package es.um.josecefe.rueda.modelo
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.util.Pair
@@ -14,6 +16,7 @@ import javafx.util.Pair
 /**
  * @author josec
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
 class Asignacion(d: Dia, asignacionDia: AsignacionDia) : Comparable<Asignacion> {
 
     private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty()

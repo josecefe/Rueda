@@ -15,7 +15,7 @@ import java.util.*
  * @param <T>
  * @author josecefe@um.es
 </T> */
-class SubSets<T>(conjunto: Collection<T>, minSize: Int, maxSize: Int) : Iterable<Set<T>> {
+class SubSets<out T>(conjunto: Collection<T>, minSize: Int, maxSize: Int) : Iterable<Set<T>> {
     private val base: List<T> = conjunto.toList()
     private val size: Int = conjunto.size
     private val minSize: Int

@@ -10,8 +10,6 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
-import java.util.stream.Collectors
-import java.util.stream.Stream
 
 /**
  * @author josecefe
@@ -45,7 +43,7 @@ class ResolutorIterativo : ResolutorAcotado {
     override fun resolver(horarios: Set<Horario>, cotaInfCorte: Int): Map<Dia, AsignacionDia> {
         val numDias = horarios.map{ it.dia }.distinct().count()
         val numParticipantes = horarios.map{ it.participante}.distinct().count()
-        val conductores = horarios.filter{ it.coche }.map{ it.participante!! }.distinct().sorted().toTypedArray()
+        val conductores = horarios.filter { it.coche }.map { it.participante }.distinct().sorted().toTypedArray()
         val tamMedioCoche = conductores.map{ it.plazasCoche }.average()
         val cotaCorteBase = (numParticipantes / tamMedioCoche * numDias / conductores.size + 1).toInt() * PESO_MAXIMO_VECES_CONDUCTOR - 1
         return resolver(horarios, cotaInfCorte, cotaCorteBase)

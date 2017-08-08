@@ -7,14 +7,15 @@
  */
 package es.um.josecefe.rueda
 
-import es.um.josecefe.rueda.modelo.DatosRueda
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
-import es.um.josecefe.rueda.persistencia.PersistenciaXML
-import es.um.josecefe.rueda.resolutor.*
+import es.um.josecefe.rueda.persistencia.Persistencia
+import es.um.josecefe.rueda.resolutor.Resolutor
+import es.um.josecefe.rueda.resolutor.ResolutorExhaustivo
+import es.um.josecefe.rueda.resolutor.ResolutorV7
+import es.um.josecefe.rueda.resolutor.ResolutorV8
 import java.io.File
 import java.util.*
-import java.util.stream.Collectors
 
 /**
  * Clase principal de la aplicación Rueda
@@ -24,8 +25,8 @@ import java.util.stream.Collectors
 
 private const val RUEDA_BASE = "rueda"
 private const val RUEDAXML_HORARIOS = RUEDA_BASE + "_test.xml"
-private const val RUEDAXML_ASIGNACION = RUEDA_BASE + "_asignacion.xml"
-private const val COMPARANDO = true
+private const val RUEDAJSON_HORARIOS = RUEDA_BASE + "_test.json"
+private const val COMPARANDO = false
 private const val AMPLIADO = false
 
 private fun duplicarHorario(horarios: Set<Horario>): Set<Horario> {
@@ -37,16 +38,16 @@ private fun duplicarHorario(horarios: Set<Horario>): Set<Horario> {
 }
 
 fun pruebaResolutor() {
-    val datos = DatosRueda()
-    PersistenciaXML.cargaDatosRueda(File(RUEDAXML_HORARIOS), datos)
-    val horarios = HashSet(datos.horarios)
+    val datos = Persistencia.cargaDatosRuedaJSON(File(RUEDAJSON_HORARIOS))
+    //val datos = Persistencia.cargaDatosRuedaXML(File(RUEDAXML_HORARIOS))
+    val horarios: HashSet<Horario> = HashSet(datos.horarios)
     // Vamos a guardarlo en XML
-    //PersistenciaXML.guardaDatosRueda(new File(RUEDAXML_HORARIOS), datos);
+    //Persistencia.guardaDatosRuedaXML(new File(RUEDAXML_HORARIOS), datos);
 
     val resolutores: List<Resolutor> = Arrays.asList(
-            ResolutorExhaustivo(),
+            ResolutorV8(),
             ResolutorV7(),
-            ResolutorV8()
+            ResolutorExhaustivo()
     )
     if (COMPARANDO) {
         resolutores.forEach { r ->
@@ -66,8 +67,9 @@ fun pruebaResolutor() {
         r.resolver(horarios)
         println("\n**********************************\n")
         System.out.format("Resolutor %s:\n=%s\n->%s\n", r.javaClass.simpleName, r.solucionFinal, r.estadisticas)
-        //PersistenciaSQL.guardaAsignacionRueda(RUEDABD, r.getSolucionFinal());
-        PersistenciaXML.guardaAsignacionRueda(RUEDAXML_ASIGNACION, r.solucionFinal)
+        //PersistenciaSQL.guardaAsignacionRuedaXML(RUEDABD, r.getSolucionFinal());
+        datos.setSolucion(r.solucionFinal, r.estadisticas.fitness)
+        Persistencia.guardaDatosRuedaJSON(File(RUEDAJSON_HORARIOS), datos)
     }
     if (AMPLIADO) {
         val horariosAmpliado = duplicarHorario(horarios)

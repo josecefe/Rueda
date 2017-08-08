@@ -160,7 +160,7 @@ class PrincipalController {
     private lateinit var mainApp: RuedaApp
     private lateinit var stage: Window
 
-    private var datosRueda: DatosRueda = DatosRueda()
+    private var datosRuedaFX: DatosRuedaFX = DatosRuedaFX()
     private var cerrandoAcercade: Boolean = false
     private var resolutorService: ResolutorService? = null
 
@@ -188,7 +188,7 @@ class PrincipalController {
 
         tablaResultado.selectionModel.selectedItemProperty().addListener { _: ObservableValue<out Asignacion?>, _: Asignacion?, n: Asignacion? ->
             if (n != null) {
-                val mapa = HashMap<Participante, AsignacionParticipante>(datosRueda.participantes.size)
+                val mapa = HashMap<Participante, AsignacionParticipante>(datosRuedaFX.participantes.size)
                 for (p in n.conductores) {
                     val a = AsignacionParticipante()
                     a.participante = p.toString()
@@ -225,7 +225,7 @@ class PrincipalController {
         columnaDescripcionDia.cellFactory = TextFieldTableCell.forTableColumn()
         columnaDescripcionDia.setOnEditCommit { v: TableColumn.CellEditEvent<Dia, String> ->
             val descripcion = v.newValue
-            if (descripcion.isEmpty() || datosRueda.dias.map{ it.descripcion }.any {
+            if (descripcion.isEmpty() || datosRuedaFX.dias.map { it.descripcion }.any {
                 it.equals(descripcion, ignoreCase = true)
             }) {
                 val alert = Alert(AlertType.WARNING)
@@ -245,7 +245,7 @@ class PrincipalController {
         columnaNombreLugar.cellFactory = TextFieldTableCell.forTableColumn()
         columnaNombreLugar.setOnEditCommit { v: TableColumn.CellEditEvent<Lugar, String> ->
             val nombre = v.newValue
-            if (nombre.isEmpty() || datosRueda.lugares.map{ it.nombre }.any { it.equals(nombre, ignoreCase = true) }) {
+            if (nombre.isEmpty() || datosRuedaFX.lugares.map { it.nombre }.any { it.equals(nombre, ignoreCase = true) }) {
                 val alert = Alert(AlertType.WARNING)
                 alert.initOwner(stage)
                 alert.title = "Nombre de Lugar inválido"
@@ -263,7 +263,7 @@ class PrincipalController {
         columnaNombreParticipante.cellFactory = TextFieldTableCell.forTableColumn()
         columnaNombreParticipante.setOnEditCommit { v: TableColumn.CellEditEvent<Participante, String> ->
             val nombre = v.newValue
-            if (nombre.isEmpty() || datosRueda.participantes.map{ it.nombre }.any {
+            if (nombre.isEmpty() || datosRuedaFX.participantes.map { it.nombre }.any {
                 it.equals(nombre, ignoreCase = true)
             }) {
                 val alert = Alert(AlertType.WARNING)
@@ -343,32 +343,32 @@ class PrincipalController {
     fun setMainApp(mainApp: RuedaApp) {
         this.mainApp = mainApp
         this.stage = mainApp.getPrimaryStage()
-        tablaHorario.items = datosRueda.horariosProperty
-        columnaDia.cellFactory = ComboBoxTableCell.forTableColumn(datosRueda.diasProperty)
-        columnaParticipante.cellFactory = ComboBoxTableCell.forTableColumn(datosRueda.participantesProperty)
-        tablaResultado.items = datosRueda.asignacionProperty
+        tablaHorario.items = datosRuedaFX.horariosProperty
+        columnaDia.cellFactory = ComboBoxTableCell.forTableColumn(datosRuedaFX.diasProperty)
+        columnaParticipante.cellFactory = ComboBoxTableCell.forTableColumn(datosRuedaFX.participantesProperty)
+        tablaResultado.items = datosRuedaFX.asignacionProperty
         // Combos
-        cbDia.items = datosRueda.diasProperty
-        cbParticipante.items = datosRueda.participantesProperty
-        cbLugares.items = datosRueda.lugaresProperty
+        cbDia.items = datosRuedaFX.diasProperty
+        cbParticipante.items = datosRuedaFX.participantesProperty
+        cbLugares.items = datosRuedaFX.lugaresProperty
         // Tabla de Dias
-        tablaDias.items = datosRueda.diasProperty
+        tablaDias.items = datosRuedaFX.diasProperty
         // Tabla de Lugares
-        tablaLugares.items = datosRueda.lugaresProperty
+        tablaLugares.items = datosRuedaFX.lugaresProperty
         //Tabla de Participantes
-        tablaParticipantes.items = datosRueda.participantesProperty
+        tablaParticipantes.items = datosRuedaFX.participantesProperty
         // Etiqueta de coste
-        lCoste.textProperty().bind(datosRueda.costeAsignacionProperty.asString("%,d"))
-        lCoste.visibleProperty().bind(datosRueda.costeAsignacionProperty.greaterThan(0))
-        mExportar.disableProperty().bind(datosRueda.costeAsignacionProperty.isEqualTo(0))
-        bExportar.disableProperty().bind(datosRueda.costeAsignacionProperty.isEqualTo(0))
+        lCoste.textProperty().bind(datosRuedaFX.costeAsignacionProperty.asString("%,d"))
+        lCoste.visibleProperty().bind(datosRuedaFX.costeAsignacionProperty.greaterThan(0))
+        mExportar.disableProperty().bind(datosRuedaFX.costeAsignacionProperty.isEqualTo(0))
+        bExportar.disableProperty().bind(datosRuedaFX.costeAsignacionProperty.isEqualTo(0))
     }
 
     /**
      * Borra todos los datos y deja un horario vacío
      */
     @FXML
-    internal fun handleNew() {
+    fun handleNew() {
         val alert = Alert(AlertType.CONFIRMATION)
         alert.initOwner(stage)
         alert.title = "Nuevo horario"
@@ -377,7 +377,7 @@ class PrincipalController {
         val result = alert.showAndWait()
         if (result.isPresent && result.get() == ButtonType.OK) {
             mainApp.lastFilePath = null
-            datosRueda.reemplazar(DatosRueda())
+            datosRuedaFX.reemplazar(DatosRueda())
         }
     }
 
@@ -385,21 +385,21 @@ class PrincipalController {
      * Opens a FileChooser to let the user select an address book to load.
      */
     @FXML
-    internal fun handleOpen() {
+    fun handleOpen() {
         val fileChooser = FileChooser()
         if (mainApp.lastFilePath != null && mainApp.lastFilePath!!.parentFile.isDirectory) {
             fileChooser.initialDirectory = mainApp.lastFilePath!!.parentFile
         }
         // Set extension filter
         val extFilter = FileChooser.ExtensionFilter(
-                "Archivos XML (*.xml)", "*.xml")
+                "Archivos de horarios (*,json;*.xml)", "*.json", "*.xml")
         fileChooser.extensionFilters.add(extFilter)
 
         // Show save file dialog
         val file = fileChooser.showOpenDialog(stage)
 
         if (file != null) {
-            mainApp.cargaHorarios(file)
+            datosRuedaFX.reemplazar(mainApp.cargaHorarios(file))
         }
     }
 
@@ -408,10 +408,10 @@ class PrincipalController {
      * open file, the "save as" dialog is shown.
      */
     @FXML
-    internal fun handleSave() {
+    fun handleSave() {
         val personFile = mainApp.lastFilePath
         if (personFile != null) {
-            mainApp.guardaHorarios(personFile)
+            mainApp.guardaHorarios(personFile, datosRuedaFX.toDatosRueda())
         } else {
             handleSaveAs()
         }
@@ -421,7 +421,7 @@ class PrincipalController {
      * Opens a FileChooser to let the user select a file to save to.
      */
     @FXML
-    private fun handleSaveAs() {
+    fun handleSaveAs() {
         val fileChooser = FileChooser()
 
         // Set extension filter
@@ -429,7 +429,7 @@ class PrincipalController {
             fileChooser.initialDirectory = mainApp.lastFilePath!!.parentFile
         }
         val extFilter = FileChooser.ExtensionFilter(
-                "Archivos XML (*.xml)", "*.xml")
+                "Archivos de horario (*.json)", "*.json")
         fileChooser.extensionFilters.add(extFilter)
 
         // Show save file dialog
@@ -437,21 +437,21 @@ class PrincipalController {
 
         if (file != null) {
             // Make sure it has the correct extension
-            if (!file.path.endsWith(".xml")) {
-                file = File(file.path + ".xml")
+            if (!file.path.endsWith(".json")) {
+                file = File(file.path + ".json")
             }
-            mainApp.guardaHorarios(file)
+            mainApp.guardaHorarios(file, datosRuedaFX.toDatosRueda())
         }
     }
 
     @FXML
-    internal fun handleExportar() {
+    fun handleExportar() {
         val fileChooser = FileChooser()
 
         // Set extension filter
         if (mainApp.lastFilePath != null && mainApp.lastFilePath!!.parentFile.isDirectory) {
             fileChooser.initialDirectory = mainApp.lastFilePath!!.parentFile
-            fileChooser.initialFileName = mainApp.lastFilePath!!.name.replace(".xml", ".html")
+            fileChooser.initialFileName = mainApp.lastFilePath!!.name.replace(".json", ".html")
         }
         val extFilter = FileChooser.ExtensionFilter(
                 "Archivos HTML (*.html)", "*.html")
@@ -466,7 +466,7 @@ class PrincipalController {
             if (!file.path.endsWith(".html")) {
                 file = File(file.path + ".html")
             }
-            if (mainApp.exportaAsignacion(file)) {
+            if (mainApp.exportaAsignacion(file, datosRuedaFX.toDatosRueda())) {
                 barraEstado.text = "Exportación completada con éxito"
                 val comando = (if (SystemUtils.IS_OS_WINDOWS) "explorer" else "xdg-open") + " \"" + file.path + "\""
                 try {
@@ -486,7 +486,7 @@ class PrincipalController {
      * Opens an about dialog.
      */
     @FXML
-    internal fun handleAbout() {
+    fun handleAbout() {
         // Preparamos la ventana
         cerrandoAcercade = false
         val acercadeStage = Stage(StageStyle.TRANSPARENT)
@@ -653,18 +653,18 @@ class PrincipalController {
      * Closes the application.
      */
     @FXML
-    internal fun handleExit() {
+    fun handleExit() {
         System.exit(0)
     }
 
     @FXML
-    internal fun handleCalculaAsignacion() {
-        if (!datosRueda.validar()) {
+    fun handleCalculaAsignacion() {
+        if (!datosRuedaFX.validar()) {
             val alert = Alert(AlertType.WARNING)
             alert.initOwner(stage)
             alert.title = "Estado de los datos incoherente"
             alert.headerText = "Ha fallado la validación de los datos"
-            alert.contentText = datosRueda.mensajeValidacion
+            alert.contentText = datosRuedaFX.mensajeValidacion
             alert.showAndWait()
             return
         }
@@ -674,16 +674,16 @@ class PrincipalController {
         r.estrategia = cbEstrategia.value
         with(service) {
             setResolutor(cbAlgoritmo.value)
-            setHorarios(HashSet(datosRueda.horarios))
+            setHorarios(HashSet(datosRuedaFX.horarios))
         }
         service.setOnSucceeded { _: WorkerStateEvent ->
             barraEstado.textProperty().unbind()
             if (service.value == null || service.value.isEmpty()) {
                 barraEstado.text = "Optimización finalizada, NO HAY SOLUCIÓN"
-                datosRueda.setSolucion(emptyMap(), 0)
+                datosRuedaFX.setSolucion(emptyMap(), 0)
             } else {
                 barraEstado.text = "Optimización finalizada, calculo de asignación realizado en " + service.getResolutor().estadisticas.tiempoString
-                datosRueda.setSolucion(service.value,
+                datosRuedaFX.setSolucion(service.value,
                         service.getResolutor().estadisticas.fitness)
             }
             indicadorProgreso.progressProperty().unbind()
@@ -752,7 +752,7 @@ class PrincipalController {
         barraEstado.textProperty().bind(service.messageProperty())
         indicadorProgreso.progress = -1.0
         indicadorProgreso.progressProperty().bind(service.progressProperty().subtract(0.01))
-        datosRueda.asignacionProperty.clear() // Borramos antes de empezar
+        datosRuedaFX.asignacionProperty.clear() // Borramos antes de empezar
         stage.scene.cursor = Cursor.WAIT
         service.start()
         bCancelarCalculo.isDisable = false
@@ -763,7 +763,7 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleCancelaCalculo() {
+    fun handleCancelaCalculo() {
         bCancelarCalculo.isDisable = true
         if (resolutorService != null) {
             resolutorService!!.getResolutor().parar()
@@ -775,7 +775,7 @@ class PrincipalController {
      * correspondientes
      */
     @FXML
-    internal fun handleExtiendeHorario() {
+    fun handleExtiendeHorario() {
         val alert = Alert(AlertType.CONFIRMATION)
         alert.initOwner(stage)
         alert.title = "Extender horario"
@@ -783,16 +783,16 @@ class PrincipalController {
         alert.contentText = "Atención: usando esta función perderá la configuración del horario actual, creandose uno nuevo consistente en duplicar el nº de días repitiendo el patrón actual. Es útil para intentar mejorar la asignación en una extensión de tiempo mayor. ¿Desea continuar?"
         val result = alert.showAndWait()
         if (result.isPresent && result.get() == ButtonType.OK) {
-            val nHorarios = HashSet(datosRueda.horarios)
-            val dias = datosRueda.horarios.sorted().map{ it.dia!! }.distinct().associate { Pair(it, Dia(it.descripcion + "Ex")) }
-            nHorarios.addAll(datosRueda.horarios.map {Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche)})
-            datosRueda.poblarDesdeHorarios(nHorarios)
+            val nHorarios = HashSet(datosRuedaFX.horarios)
+            val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associate { Pair(it, Dia(it.descripcion + "Ex")) }
+            nHorarios.addAll(datosRuedaFX.horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
+            datosRuedaFX.poblarDesdeHorarios(nHorarios)
             mainApp.lastFilePath = null // Eliminamos la referencia al último fichero guardado para evitar lios...
         }
     }
 
     @FXML
-    internal fun handleAdd() {
+    fun handleAdd() {
         var mensaje: String? = null
         try {
             val d = cbDia.value
@@ -806,10 +806,10 @@ class PrincipalController {
                     mensaje = "La hora de entrada debe ser anterior a la de salida"
                 } else {
                     val h = Horario(p, d, entrada, salida, cCoche.isSelected)
-                    if (datosRueda.horarios.contains(h)) {
+                    if (datosRuedaFX.horarios.contains(h)) {
                         mensaje = "Entrada duplicada: ya existen una entrada para el día y el participante indicados. Si lo desea puede modificarla a través de la tabla."
                     } else {
-                        datosRueda.horarios.add(h)
+                        datosRuedaFX.horarios.add(h)
                     }
                 }
             }
@@ -830,7 +830,7 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleDelete() {
+    fun handleDelete() {
         val selectedIndex = tablaHorario.selectionModel.selectedIndex
         if (selectedIndex >= 0) {
             tablaHorario.items.removeAt(selectedIndex)
@@ -845,7 +845,7 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleAddDia() {
+    fun handleAddDia() {
         val descripcion = tfDescripcionDia.text
         if (descripcion.isEmpty() || compruebaDia(descripcion)) {
             val alert = Alert(AlertType.WARNING)
@@ -856,15 +856,16 @@ class PrincipalController {
             alert.showAndWait()
             return
         }
-        datosRueda.dias.add(Dia(descripcion))
+        datosRuedaFX.dias.add(Dia(descripcion))
         tfDescripcionDia.clear()
     }
 
-    private fun compruebaDia(nombreDia: String): Boolean = datosRueda.dias.map{ it.descripcion }.any {it.equals(nombreDia, ignoreCase = true)
+    private fun compruebaDia(nombreDia: String): Boolean = datosRuedaFX.dias.map { it.descripcion }.any {
+        it.equals(nombreDia, ignoreCase = true)
     }
 
     @FXML
-    internal fun handleAddDiasSemana() {
+    fun handleAddDiasSemana() {
         val dias = DateFormatSymbols.getInstance().weekdays
         for (i in intArrayOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY,
                 Calendar.FRIDAY)) {
@@ -873,17 +874,17 @@ class PrincipalController {
             while (compruebaDia(diaProp)) {
                 diaProp = dias[i] + ++intento
             }
-            datosRueda.dias.add(Dia(diaProp))
+            datosRuedaFX.dias.add(Dia(diaProp))
         }
     }
 
     @FXML
-    internal fun handleDeleteDia() {
+    fun handleDeleteDia() {
         val selectedIndex = tablaDias.selectionModel.selectedIndex
 
         if (selectedIndex >= 0) {
             val ds = tablaDias.items[selectedIndex]
-            if (datosRueda.horarios.map{ it.dia}.any { it == ds }) {
+            if (datosRuedaFX.horarios.map { it.dia }.any { it == ds }) {
                 val alert = Alert(AlertType.CONFIRMATION)
                 alert.initOwner(stage)
                 alert.title = "Dia en uso"
@@ -891,8 +892,8 @@ class PrincipalController {
                 alert.contentText = "El día seleccionado está en uso, si continua se eliminarán todas las entradas del horario que lo usen. ¿Desea continuar?"
                 val result = alert.showAndWait()
                 if (result.isPresent && result.get() == ButtonType.OK) {
-                    val aBorrar = datosRueda.horarios.filter { h -> h.dia == ds }
-                    datosRueda.horarios.removeAll(aBorrar)
+                    val aBorrar = datosRuedaFX.horarios.filter { h -> h.dia == ds }
+                    datosRuedaFX.horarios.removeAll(aBorrar)
                 } else {
                     return
                 }
@@ -909,9 +910,9 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleAddLugar() {
+    fun handleAddLugar() {
         val nombre = tfNombreLugar.text
-        if (nombre.isEmpty() || datosRueda.lugares.map{ it.nombre }.any { it.equals(nombre, ignoreCase = true) }) {
+        if (nombre.isEmpty() || datosRuedaFX.lugares.map { it.nombre }.any { it.equals(nombre, ignoreCase = true) }) {
             val alert = Alert(AlertType.WARNING)
             alert.initOwner(stage)
             alert.title = "Nombre de Lugar inválido"
@@ -920,17 +921,17 @@ class PrincipalController {
             alert.showAndWait()
             return
         }
-        datosRueda.lugares.add(Lugar(tfNombreLugar.text))
+        datosRuedaFX.lugares.add(Lugar(tfNombreLugar.text))
         tfNombreLugar.clear()
     }
 
     @FXML
-    internal fun handleDeleteLugar() {
+    fun handleDeleteLugar() {
         val selectedIndex = tablaLugares.selectionModel.selectedIndex
 
         if (selectedIndex >= 0) {
             val ds = tablaLugares.items[selectedIndex]
-            if (datosRueda.participantes.map { it.puntosEncuentro }.flatMap { it }.any { it == ds }) {
+            if (datosRuedaFX.participantes.map { it.puntosEncuentro }.flatMap { it }.any { it == ds }) {
                 val alert = Alert(AlertType.CONFIRMATION)
                 alert.initOwner(stage)
                 alert.title = "Lugar en uso"
@@ -938,7 +939,7 @@ class PrincipalController {
                 alert.contentText = "El Lugar seleccionado está en uso como punto de encuentro de algún participante. Si continua se eliminarán todos los puntos de encuentro que lo usen. ¿Desea continuar?"
                 val result = alert.showAndWait()
                 if (result.isPresent && result.get() == ButtonType.OK) {
-                    datosRueda.participantes.forEach { p: Participante -> p.puntosEncuentro.remove(ds) }
+                    datosRuedaFX.participantes.forEach { p: Participante -> p.puntosEncuentro.remove(ds) }
                 } else {
                     return
                 }
@@ -955,9 +956,9 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleAddParticipante() {
+    fun handleAddParticipante() {
         val nombre = tfNombreParticipante.text
-        if (nombre.isEmpty() || datosRueda.participantes.map{ it.nombre }.any {
+        if (nombre.isEmpty() || datosRuedaFX.participantes.map { it.nombre }.any {
             it.equals(nombre, ignoreCase = true)
         }) {
             val alert = Alert(AlertType.WARNING)
@@ -968,17 +969,17 @@ class PrincipalController {
             alert.showAndWait()
             return
         }
-        datosRueda.participantes.add(Participante(nombre, sPlazas.value, emptyList()))
+        datosRuedaFX.participantes.add(Participante(nombre, sPlazas.value, emptyList()))
         tfNombreParticipante.clear()
     }
 
     @FXML
-    internal fun handleDeleteParticipante() {
+    fun handleDeleteParticipante() {
         val selectedIndex = tablaParticipantes.selectionModel.selectedIndex
 
         if (selectedIndex >= 0) {
             val ps = tablaParticipantes.items[selectedIndex]
-            if (datosRueda.horarios.map{ it.participante }.any { it == ps }) {
+            if (datosRuedaFX.horarios.map { it.participante }.any { it == ps }) {
                 val alert = Alert(AlertType.CONFIRMATION)
                 alert.initOwner(stage)
                 alert.title = "Participante con horario asignado"
@@ -986,8 +987,8 @@ class PrincipalController {
                 alert.contentText = "El Participante seleccionado tiene datos en el horario. Si continua se eliminarán todas las entradas del horario que lo referencien. ¿Desea continuar?"
                 val result = alert.showAndWait()
                 if (result.isPresent && result.get() == ButtonType.OK) {
-                    val aBorrar = datosRueda.horarios.filter { h -> h.participante == ps }
-                    datosRueda.horarios.removeAll(aBorrar)
+                    val aBorrar = datosRuedaFX.horarios.filter { h -> h.participante == ps }
+                    datosRuedaFX.horarios.removeAll(aBorrar)
                 } else {
                     return
                 }
@@ -1004,19 +1005,19 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleAddLugarEncuentro() {
+    fun handleAddLugarEncuentro() {
         if (!lvLugaresEncuentro.items.contains(cbLugares.value)) {
             lvLugaresEncuentro.items.add(cbLugares.value)
         }
     }
 
     @FXML
-    internal fun handleDeleteLugarEncuentro() {
+    fun handleDeleteLugarEncuentro() {
         lvLugaresEncuentro.items.remove(lvLugaresEncuentro.selectionModel.selectedItem)
     }
 
     @FXML
-    internal fun handleUpLugarEncuentro() {
+    fun handleUpLugarEncuentro() {
         val pos = lvLugaresEncuentro.selectionModel.selectedIndex
         if (pos > 0) {
             val l = lvLugaresEncuentro.selectionModel.selectedItem
@@ -1027,7 +1028,7 @@ class PrincipalController {
     }
 
     @FXML
-    internal fun handleDownLugarEncuentro() {
+    fun handleDownLugarEncuentro() {
         val pos = lvLugaresEncuentro.selectionModel.selectedIndex
         if (pos < lvLugaresEncuentro.items.size - 1) {
             val l = lvLugaresEncuentro.selectionModel.selectedItem
@@ -1038,7 +1039,7 @@ class PrincipalController {
     }
 
     fun setDatosRueda(datosRueda: DatosRueda) {
-        this.datosRueda.reemplazar(datosRueda)
+        this.datosRuedaFX.reemplazar(datosRueda)
     }
 
     private class ResolutorService internal constructor() : Service<Map<Dia, AsignacionDia>>() {

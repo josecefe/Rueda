@@ -48,7 +48,7 @@ class Horario
      * Permite fijar el participante de esta entrada en el horario Nota: Este
      * método se incluye para la persistencia
      */
-    var participante: Participante?
+    var participante: Participante
         get() = participanteProperty.get()
         set(participante) = this.participanteProperty.set(participante)
 
@@ -59,7 +59,7 @@ class Horario
      * pueden repetir Nota: Este método se incluye para la persistencia
      *
      */
-    var dia: Dia?
+    var dia: Dia
         get() = diaProperty.get()
         set(dia) = this.diaProperty.set(dia)
 
@@ -97,45 +97,20 @@ class Horario
     override fun hashCode(): Int {
         val prime = 31
         var result = 100
-        result = prime * result + if (dia == null) 0 else dia!!.hashCode()
-        result = prime * result + if (participante == null) 0 else participante!!.hashCode()
+        result = prime * result + dia.hashCode()
+        result = prime * result + participante.hashCode()
         return result
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null) {
-            return false
-        }
-        if (javaClass != other.javaClass) {
-            return false
-        }
-        val other1 = other as Horario?
-        if (dia == null) {
-            if (other1!!.dia != null) {
-                return false
-            }
-        } else if (dia != other1!!.dia) {
-            return false
-        }
-        if (participante == null) {
-            if (other1.participante != null) {
-                return false
-            }
-        } else if (participante != other1.participante) {
-            return false
-        }
-        return true
-    }
+    override fun equals(other: Any?): Boolean =
+            (this === other) || (other != null && other is Horario && dia == other.dia && participante == other.participante)
 
     /* (non-Javadoc)
 	 * @see java.lang.comparable#compareTo(java.lang.Object)
      */
     override fun compareTo(other: Horario): Int {
-        var res = dia!!.compareTo(other.dia!!)
-        if (res == 0) res = participante!!.compareTo(other.participante!!)
+        var res = dia.compareTo(other.dia)
+        if (res == 0) res = participante.compareTo(other.participante)
 
         return res
     }

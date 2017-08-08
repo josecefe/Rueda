@@ -7,12 +7,13 @@
  */
 package es.um.josecefe.rueda.persistencia
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import es.um.josecefe.rueda.COPYRIGHT
 import es.um.josecefe.rueda.TITLE
 import es.um.josecefe.rueda.VERSION
 import es.um.josecefe.rueda.modelo.*
 import htmlflow.HtmlView
-import javafx.util.Pair
 import org.apache.commons.text.StringEscapeUtils.escapeHtml4
 import java.beans.*
 import java.io.*
@@ -26,9 +27,9 @@ import java.util.logging.Logger
 /**
  * @author josec
  */
-object PersistenciaXML {
+object Persistencia {
 
-    fun guardaDatosRueda(xmlfile: File, datosRueda: DatosRueda) {
+    fun guardaDatosRuedaXML(xmlfile: File, datosRueda: DatosRueda) {
         try {
             XMLEncoder(
                     BufferedOutputStream(
@@ -46,55 +47,56 @@ object PersistenciaXML {
                 }
             }
         } catch (ex: Exception) {
-            Logger.getLogger(PersistenciaXML::class.java.name).log(Level.SEVERE, null, ex)
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
         }
 
     }
 
-    fun cargaDatosRueda(xmlfile: File, datosRueda: DatosRueda) {
+    fun cargaDatosRuedaXML(xmlfile: File): DatosRueda {
         try {
             XMLDecoder(
                     BufferedInputStream(
                             FileInputStream(xmlfile))).use { decoder ->
-                decoder.setExceptionListener { e -> Logger.getLogger(PersistenciaXML::class.java.name).log(Level.SEVERE, null, e) }
+                decoder.setExceptionListener { e -> Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, e) }
                 val ld = decoder.readObject() as List<*>
-                datosRueda.dias = ld.map { e -> e as Dia }.toMutableList()
+                val dias = ld.map { e -> e as Dia }.toMutableList()
                 val ll = decoder.readObject() as List<*>
-                datosRueda.lugares = ll.map { e -> e as Lugar }.toMutableList()
+                val lugares = ll.map { e -> e as Lugar }.toMutableList()
                 val lp = decoder.readObject() as List<*>
-                datosRueda.participantes = lp.map { e -> e as Participante }.toMutableList()
+                val participantes = lp.map { e -> e as Participante }.toMutableList()
                 val lh = decoder.readObject() as List<*>
-                datosRueda.horarios = lh.map { e -> e as Horario }.toMutableList()
+                val horarios = lh.map { e -> e as Horario }.toMutableList()
                 val la = decoder.readObject() as List<*>
-                datosRueda.asignacion = la.map { e -> e as Asignacion }.toMutableList()
-                datosRueda.costeAsignacion = decoder.readObject() as Int
+                val asignacion = la.map { e -> e as Asignacion }.toMutableList()
+                val costeAsignacion = decoder.readObject() as Int
+                return DatosRueda(dias, lugares, participantes, horarios, asignacion, costeAsignacion)
             }
         } catch (ex: Exception) {
-            Logger.getLogger(PersistenciaXML::class.java.name).log(Level.SEVERE, null, ex)
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
         }
-
+        return DatosRueda()
     }
 
-    fun guardaAsignacionRueda(xmlfile: String, solucionFinal: Map<Dia, AsignacionDia>) {
+    fun guardaAsignacionRuedaXML(xmlfile: String, solucionFinal: Map<Dia, AsignacionDia>) {
         try {
             XMLEncoder(
                     BufferedOutputStream(
                             FileOutputStream(xmlfile))).use { encoder -> encoder.writeObject(solucionFinal) }
         } catch (ex: FileNotFoundException) {
-            Logger.getLogger(PersistenciaXML::class.java.name).log(Level.SEVERE, null, ex)
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
         }
 
     }
 
-    fun exportaAsignacion(htmlfile: File, datosRueda: DatosRueda) {
+    fun exportaAsignacionHTML(htmlfile: File, datosRueda: DatosRueda) {
 
         try {
             PrintStream(htmlfile).use { out ->
-                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda}.map{ it.value }.distinct().count() > 1
+                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda }.map { it.value }.distinct().count() > 1
 
                 // Todas las horas con actividad:
-                val horasActivas = datosRueda.horarios.map{ it.entrada}.toMutableSet()
-                horasActivas.addAll(datosRueda.horarios.map{ it.salida }.toSet())
+                val horasActivas = datosRueda.horarios.map { it.entrada }.toMutableSet()
+                horasActivas.addAll(datosRueda.horarios.map { it.salida }.toSet())
 
                 // Vamos a guardar en una tabla "virtual"
                 val datosTabla: MutableMap<Dia, MutableMap<Int, MutableList<ParticipanteIdaConduceLugar>>> = HashMap(datosRueda.dias.size)
@@ -151,16 +153,16 @@ object PersistenciaXML {
                         var valor = ""
                         if (t != null) {
                             valor = t.sortedWith(kotlin.Comparator { p1, p2 ->
-                                        if (p1.ida != p2.ida)
-                                            if (p1.ida) -1 else 1
-                                        else if (p1.lugar!!.compareTo(p2.lugar!!) != 0)
-                                            p1.lugar!!.compareTo(p2.lugar!!)
-                                        else
-                                            if (p1.conduce != p2.conduce)
-                                                if (p1.conduce) -1 else 1
-                                            else
-                                                p1.participante!!.compareTo(p2.participante!!)
-                                    })
+                                if (p1.ida != p2.ida)
+                                    if (p1.ida) -1 else 1
+                                else if (p1.lugar!!.compareTo(p2.lugar!!) != 0)
+                                    p1.lugar!!.compareTo(p2.lugar!!)
+                                else
+                                    if (p1.conduce != p2.conduce)
+                                        if (p1.conduce) -1 else 1
+                                    else
+                                        p1.participante!!.compareTo(p2.participante!!)
+                            })
                                     .joinToString(separator = "<br>\n") { p ->
                                         val res = StringBuilder()
                                         if (p.ida) {
@@ -208,8 +210,8 @@ object PersistenciaXML {
                 cabecera.th().text(escapeHtml4("Días"))
                 cabecera.th().text(escapeHtml4("Total"))
                 datosRueda.participantes.sorted().forEach { participante ->
-                    val dias = datosRueda.asignacion.filter { a -> a.conductores.contains(participante) }.map{ it.dia }.sorted()
-                    if (dias.size > 0) {
+                    val dias = datosRueda.asignacion.filter { a -> a.conductores.contains(participante) }.map { it.dia }.sorted()
+                    if (dias.isNotEmpty()) {
                         val tr = tabla.tr()
                         tr.td().text(escapeHtml4(participante.nombre))
                         tr.td().text(escapeHtml4(dias.toString()))
@@ -237,7 +239,7 @@ object PersistenciaXML {
                 htmlView.write()
             }
         } catch (ex: Exception) {
-            Logger.getLogger(PersistenciaXML::class.java.name).log(Level.SEVERE, "Problemas generando la exportación a HTML: ", ex)
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, "Problemas generando la exportación a HTML: ", ex)
         }
 
     }
@@ -251,12 +253,64 @@ object PersistenciaXML {
     }
 
     private class PairPersistenceDelegate : DefaultPersistenceDelegate(arrayOf("key", "value")) {
-
         override fun instantiate(oldInstance: Any, out: Encoder): Expression {
             val par = oldInstance as Pair<*, *>
-            val constructorArgs = arrayOf(par.key, par.value)
+            val constructorArgs = arrayOf(par.first, par.second)
             return Expression(oldInstance, oldInstance.javaClass, "new", constructorArgs)
         }
     }
 
+    fun guardaDatosRuedaJSON(file: File, datosRueda: DatosRueda) {
+        try {
+
+            BufferedOutputStream(
+                    FileOutputStream(file)).use { f ->
+                val mapper = jacksonObjectMapper()
+
+                with(mapper) {
+                    writeValue(f, datosRueda)
+/*
+                    writeValue(f, datosRueda.dias)
+                    writeValue(f, datosRueda.lugares)
+                    writeValue(f, datosRueda.participantes)
+                    writeValue(f, datosRueda.horarios)
+                    writeValue(f, datosRueda.asignacion)
+                    writeValue(f, datosRueda.costeAsignacion)
+*/
+                }
+            }
+        } catch (ex: Exception) {
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
+        }
+    }
+
+    fun cargaDatosRuedaJSON(file: File): DatosRueda {
+        try {
+
+            BufferedInputStream(
+                    FileInputStream(file)).use { f ->
+                val mapper = jacksonObjectMapper()
+
+                with(mapper) {
+                    return mapper.readValue(f)
+/*
+                    val ld = mapper.readValue<List<Dia>>(f)
+                    datosRuedaFX.dias = ld.toMutableList()
+                    val ll = mapper.readValue<List<Lugar>>(f)
+                    datosRuedaFX.lugares = ll.toMutableList()
+                    val lp = mapper.readValue<List<Participante>>(f)
+                    datosRuedaFX.participantes = lp.toMutableList()
+                    val lh = mapper.readValue<List<Horario>>(f)
+                    datosRuedaFX.horarios = lh.toMutableList()
+                    val la = mapper.readValue<List<Asignacion>>(f)
+                    datosRuedaFX.asignacion = la.toMutableList()
+                    datosRuedaFX.costeAsignacion = mapper.readValue<Int>(f)
+*/
+                }
+            }
+        } catch (ex: Exception) {
+            Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
+        }
+        return DatosRueda()
+    }
 }

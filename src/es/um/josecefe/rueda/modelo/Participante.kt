@@ -7,6 +7,8 @@
  */
 package es.um.josecefe.rueda.modelo
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo
+import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import java.util.*
@@ -19,6 +21,7 @@ import java.util.*
  * NULL, "nombre" TEXT NOT NULL, "plazasCoche" INTEGER NOT NULL, "residencia"
  * INTEGER REFERENCES lugar(id) )
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
 class Participante
 /**
  * Constructor de la clase que debe usarse cuando se crea un objeto de este

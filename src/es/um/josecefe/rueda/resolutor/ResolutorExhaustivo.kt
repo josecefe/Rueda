@@ -12,7 +12,6 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.combinations
-import es.um.josecefe.rueda.util.pforEach
 import java.util.*
 import java.util.concurrent.atomic.AtomicStampedReference
 import kotlin.collections.ArrayList
@@ -24,7 +23,7 @@ private const val ESTADISTICAS = true
 private const val CADA_EXPANDIDOS_EST = 10000
 
 class ResolutorExhaustivo : Resolutor() {
-    private val estGlobal = EstadisticasV8()
+    private val estGlobal = EstadisticasV7()
     override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
         private set
 
@@ -48,7 +47,14 @@ class ResolutorExhaustivo : Resolutor() {
         for ((dia, solDia) in contexto.solucionesCandidatas) {
             val conductores: MutableSet<Participante> = contexto.participantes.toMutableSet()
             for (asignacion: AsignacionDia in solDia) conductores.retainAll(asignacion.conductores)
-            conductores.forEach { c -> diasFijos.computeIfAbsent(c, { HashSet() }).add(dia) }
+            conductores.forEach { c ->
+                var d = diasFijos[c]
+                if (d == null) {
+                    d = HashSet()
+                    diasFijos[c] = d
+                }
+                d.add(dia)
+            }
         }
         val minCond = Math.max(1, diasFijos.values.map { it.size }.max()?.toInt() ?: 0)
 
@@ -61,8 +67,6 @@ class ResolutorExhaustivo : Resolutor() {
             }
         }
 
-        val vacio = emptySet<Dia>().toMutableSet()
-
         var totalPosiblesSoluciones = 0.0
         if (ESTADISTICAS) {
             for (i in minCond..contexto.dias.size) {
@@ -70,7 +74,7 @@ class ResolutorExhaustivo : Resolutor() {
                 if (DEBUG) print("Para $i veces conducir por participante tenemos ")
                 for ((key, value) in mapParticipanteDias) {
                     val numVecesCond = Math.max(1, (i.toFloat() / contexto.coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
-                    val porDiasFijos = diasFijos.getOrDefault(key, vacio).size.toLong()
+                    val porDiasFijos = (diasFijos[key]?.size ?: 0).toLong()
                     //if (porDiasFijos >= numVecesCond) continue
                     val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), Math.max(1, numVecesCond - porDiasFijos))
                     if (DEBUG) print(" * $combinations")
@@ -95,8 +99,8 @@ class ResolutorExhaustivo : Resolutor() {
         bucledias@ for (i in minCond..contexto.dias.size) {
             if (solucionRef.stamp < Int.MAX_VALUE) {
                 if (ESTADISTICAS) {
-                    estGlobal.terminales.add(estGlobal.expandidos.toDouble() - estGlobal.terminales.toDouble())
-                    estGlobal.addDescartados(totalPosiblesSoluciones - estGlobal.expandidos.get())
+                    estGlobal.addTerminales(estGlobal.expandidos - estGlobal.terminales)
+                    estGlobal.addDescartados(totalPosiblesSoluciones - estGlobal.expandidos)
                 }
 
                 break
@@ -108,7 +112,7 @@ class ResolutorExhaustivo : Resolutor() {
 
             val listSubcon: MutableList<Iterable<Set<Dia>>> = ArrayList(mapParticipanteDias.size)
             for ((key, value) in mapParticipanteDias) {
-                val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!).toInt()) - diasFijos.getOrDefault(key, emptySet<Dia>().toMutableSet()).size //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
+                val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!).toInt()) - (diasFijos[key]?.size ?: 0)//Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                 val diasCambiantes: Set<Dia> = if (diasFijos[key] != null) value.minus(diasFijos[key]!!) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it }.toList())
             }
@@ -123,7 +127,15 @@ class ResolutorExhaustivo : Resolutor() {
                 val participaIt = mapParticipanteDias.keys.iterator()
                 for (e: Set<Dia> in c) {
                     val p = participaIt.next()
-                    e.map { asignacion.computeIfAbsent(it) { HashSet() } }.forEach { it.add(p) }
+
+                    for (dia in e) {
+                        var participantesSet = asignacion[dia]
+                        if (participantesSet == null) {
+                            participantesSet = HashSet()
+                            asignacion[dia] = participantesSet
+                        }
+                        participantesSet.add(p)
+                    }
                 }
                 if (asignacion.size < contexto.solucionesCandidatas.size) {
                     if (ESTADISTICAS) estGlobal.incExpandidos()
@@ -158,7 +170,7 @@ class ResolutorExhaustivo : Resolutor() {
                     }
                 }
                 if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L) {
-                    estGlobal.terminales.add(estGlobal.expandidos.toDouble() - estGlobal.terminales.toDouble())
+                    estGlobal.addTerminales(estGlobal.expandidos - estGlobal.terminales)
                     estGlobal.actualizaProgreso()
                     if (DEBUG) println(estGlobal)
                 }
@@ -191,5 +203,6 @@ class ResolutorExhaustivo : Resolutor() {
 
     override var estrategia
         get() = Resolutor.Estrategia.EQUILIBRADO
-        set(value) { /* Nada */}
+        set(value) { /* Nada */
+        }
 }

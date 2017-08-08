@@ -8,7 +8,7 @@
 package es.um.josecefe.rueda
 
 import es.um.josecefe.rueda.modelo.DatosRueda
-import es.um.josecefe.rueda.persistencia.PersistenciaXML
+import es.um.josecefe.rueda.persistencia.Persistencia
 import es.um.josecefe.rueda.vista.PrincipalController
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -18,7 +18,6 @@ import javafx.scene.image.Image
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import javafx.stage.Window
-
 import java.io.File
 import java.io.IOException
 import java.util.logging.Level
@@ -29,7 +28,6 @@ import java.util.prefs.Preferences
  * @author josec
  */
 class RuedaApp : javafx.application.Application() {
-    private val datosRueda: DatosRueda = DatosRueda()
     private lateinit var primaryStage: Stage
 
     fun getPrimaryStage(): Window {
@@ -48,7 +46,7 @@ class RuedaApp : javafx.application.Application() {
 
             // Give the controller access to the main app.
             val controller = loader.getController<PrincipalController>()
-            controller.setDatosRueda(datosRueda)
+            //controller.setDatosRueda(datosRueda)
             controller.setMainApp(this)
 
             // Show the scene containing the root layout.
@@ -61,7 +59,8 @@ class RuedaApp : javafx.application.Application() {
             // Try to load last opened person file.
             val file = lastFilePath
             if (file != null) {
-                cargaHorarios(file)
+                controller.setDatosRueda(cargaHorarios(file))
+
             }
         } catch (ex: IOException) {
             Logger.getLogger(RuedaApp::class.java.name).log(Level.SEVERE, "Fallo inicializando la ventana principal", ex)
@@ -96,17 +95,22 @@ class RuedaApp : javafx.application.Application() {
         }
 
     /**
-     * Loads horario data from the specified file. The current datosRueda data will
+     * Loads horario data from the specified file. The current datosRuedaFX data will
      * be replaced.
      *
      * @param file Fichero del que cargar los datos
      */
-    fun cargaHorarios(file: File) {
+    fun cargaHorarios(file: File): DatosRueda {
         try {
-            PersistenciaXML.cargaDatosRueda(file, datosRueda)
+            val datos = if (file.extension == "xml")
+                Persistencia.cargaDatosRuedaXML(file)
+            else
+                Persistencia.cargaDatosRuedaJSON(file)
+
             // Save the file path to the registry.
-            //datosRueda.reemplazar(hs);
+            //datosRuedaFX.reemplazar(hs);
             lastFilePath = file
+            return datos
 
         } catch (e: Exception) { // catches ANY exception
             Logger.getLogger(javaClass.name).log(Level.WARNING,
@@ -117,17 +121,18 @@ class RuedaApp : javafx.application.Application() {
             alert.contentText = e.toString()
             alert.showAndWait()
         }
-
+        lastFilePath = null
+        return DatosRueda()
     }
 
     /**
      * Saves the current horario data to the specified file.
      *
-     * @param file Fichero en el que guardar los datosRueda
+     * @param file Fichero en el que guardar los datosRuedaFX
      */
-    fun guardaHorarios(file: File) {
+    fun guardaHorarios(file: File, datosRueda: DatosRueda) {
         try {
-            PersistenciaXML.guardaDatosRueda(file, datosRueda)
+            Persistencia.guardaDatosRuedaJSON(file, datosRueda)
             // Save the file path to the registry.
             lastFilePath = file
         } catch (e: Exception) { // catches ANY exception
@@ -148,9 +153,9 @@ class RuedaApp : javafx.application.Application() {
      * @param file Fichero en el que guardar el HTML generado
      * @return indica si se completo con exito la operación
      */
-    fun exportaAsignacion(file: File): Boolean {
+    fun exportaAsignacion(file: File, datosRueda: DatosRueda): Boolean {
         try {
-            PersistenciaXML.exportaAsignacion(file, datosRueda)
+            Persistencia.exportaAsignacionHTML(file, datosRueda)
             return true
             //Duda: ¿Guardar dónde se hizo la última exportación o no?
         } catch (e: Exception) { // catches ANY exception

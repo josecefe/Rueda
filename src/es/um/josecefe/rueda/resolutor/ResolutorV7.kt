@@ -11,9 +11,6 @@ import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
 import java.util.*
-import java.util.function.Supplier
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 
 /**
  * ResolutorV7
@@ -50,14 +47,14 @@ class ResolutorV7 : ResolutorAcotado() {
 
         solucionFinal = emptyMap()
 
-        val tamanosNivel= IntStream.of(*contex.ordenExploracionDias).map { i -> contex.solucionesCandidatas[contex.dias[i]]!!.size }.toArray()
-        val totalPosiblesSoluciones = IntStream.of(*tamanosNivel!!).mapToDouble { i -> i.toDouble() }.reduce(1.0) { a, b -> a * b }
+        val tamanosNivel = contex.ordenExploracionDias.map { i -> contex.solucionesCandidatas[contex.dias[i]]!!.size }.toIntArray()
+        val totalPosiblesSoluciones = tamanosNivel.map { i -> i.toDouble() }.fold(1.0) { a, b -> a * b }
         val nPosiblesSoluciones = DoubleArray(tamanosNivel.size)
 
         if (ESTADISTICAS) {
 
             if (DEBUG) {
-                println("Nº de posibles soluciones: " + IntStream.of(*tamanosNivel).mapToObj{java.lang.Double.toString(it.toDouble())}.collect(Collectors.joining(" * ")) + " = "
+                println("Nº de posibles soluciones: " + tamanosNivel.map { it.toDouble().toString() }.joinToString(separator = " * ") + " = "
                         + totalPosiblesSoluciones)
             }
             var acum = 1.0
@@ -78,23 +75,23 @@ class ResolutorV7 : ResolutorAcotado() {
         var mejor = actual
         var cotaInferiorCorte = if (cotaInfCorte < Integer.MAX_VALUE) cotaInfCorte + 1 else cotaInfCorte
         var LNV: MutableCollection<Nodo>
-        var opPull: Supplier<Nodo>
+        var opPull: () -> Nodo
         contex.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_INI //Primero buscamos en profundidad
         contex.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_INI //Primero buscamos en profundidad
         if (CON_CAMBIO_DE_ESTRATEGIA) {
             val pilaNodosVivos = ArrayDeque<Nodo>() // Inicialmente es una cola LIFO (pila)
             LNV = pilaNodosVivos
-            opPull = Supplier { pilaNodosVivos.removeLast() } //Para controlar si es pila o cola, inicialmente pila
+            opPull = { pilaNodosVivos.removeLast() } //Para controlar si es pila o cola, inicialmente pila
         } else {
             val colaNodosVivos = PriorityQueue<Nodo>()
             LNV = colaNodosVivos
-            opPull = Supplier { colaNodosVivos.poll() }
+            opPull = { colaNodosVivos.poll() }
         }
         LNV.add(actual)
 
         // Bucle principal
         do {
-            actual = opPull.get()
+            actual = opPull()
             if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS == 0L && System.currentTimeMillis() - ultMilisEst > CADA_MILIS_EST) {
                 ultMilisEst = System.currentTimeMillis()
                 estGlobal.fitness = cotaInferiorCorte
@@ -125,7 +122,7 @@ class ResolutorV7 : ResolutorAcotado() {
                             if (DEBUG) {
                                 println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS")
                             }
-                            opPull = Supplier { colaNodosVivos.poll() }
+                            opPull = { colaNodosVivos.poll() }
                             LNV = colaNodosVivos
                         }
 
@@ -147,7 +144,7 @@ class ResolutorV7 : ResolutorAcotado() {
                                 estGlobal.fitness = cotaInferiorCorte
                                 estGlobal.actualizaProgreso()
                             }
-                            val removeIf = LNV.removeIf { n -> n.cotaInferior >= fC }
+                            val removeIf = LNV.removeAll { n -> n.cotaInferior >= fC }
                             if (ESTADISTICAS && DEBUG && removeIf) {
                                 System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size)
                             }
@@ -217,7 +214,7 @@ class ResolutorV7 : ResolutorAcotado() {
 
     companion object {
         private const val DEBUG = false
-        private const val PARALELO = false
+        //private const val PARALELO = false
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS = 1000
         private const val CADA_MILIS_EST = 1000

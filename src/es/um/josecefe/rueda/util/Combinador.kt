@@ -16,7 +16,7 @@ import java.util.*
  * @author josecefe@um.es
  * @param <T>
 </T> */
-class Combinador<T>(private val conjuntos: List<Iterable<T>>) : Iterable<List<T>> {
+class Combinador<out T>(private val conjuntos: List<Iterable<T>>) : Iterable<List<T>> {
 
     override fun iterator(): Iterator<List<T>> {
         return CombinadorIterator()

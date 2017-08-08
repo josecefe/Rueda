@@ -11,7 +11,6 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author josecefe
@@ -28,20 +27,20 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
     init {
         //Construimos la lista de Dias (usamos un lista para tener un orden)
         val diasSet = TreeSet<Dia>() //Lo queremos ordenado
-        horarios.map { it.dia }.filterNotNull().mapTo(diasSet) { it }
+        horarios.map { it.dia }.mapTo(diasSet) { it }
         dias = ArrayList(diasSet) // Podría ser un array si lo vemos necesario
 
         //Construimos ahora la lista de conductores (también usamos una lista por lo mismo que en dias
         val participanteSet = TreeSet<Participante>() //Lo queremos ordenado
-        horarios.map { it.participante }.filterNotNull().mapTo(participanteSet) { it }
+        horarios.map { it.participante }.mapTo(participanteSet) { it }
         participantes = ArrayList(participanteSet)
 
         // Y aquí ajustamos el coeficiente que nos mide su grado de participación (gente que solo va parte de los días)
-        val vecesParticipa = horarios.groupingBy { it.participante!! }.eachCount()
+        val vecesParticipa = horarios.groupingBy { it.participante }.eachCount()
         val maxVecesParticipa = vecesParticipa.values.max() ?: 0
         coefConduccion = LinkedHashMap(participantes.size)
         for (p in participantes) {
-            coefConduccion.put(p, maxVecesParticipa.toDouble() / vecesParticipa.getOrDefault(p, 0).toDouble() - 0.001) // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+            coefConduccion.put(p, maxVecesParticipa.toDouble() / (vecesParticipa[p]?.toDouble() ?: 0.0) - 0.001) // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
         }
 
         // Vamos a trabajar día a día
@@ -50,13 +49,13 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
         mapaParticipantesSoluciones = HashMap()
         for (d in dias) {
             val solucionesDia = Vector<AsignacionDiaSimple>()
-            val mapaParticipantesAsignacionDia = ConcurrentHashMap<Set<Participante>, AsignacionDiaSimple>()
+            val mapaParticipantesAsignacionDia = HashMap<Set<Participante>, AsignacionDiaSimple>() //ConcurrentHashMap
             val horariosDia = horarios.filter { it.dia == d }.toSet()
-            val participanteHorario = horariosDia.associate{Pair(it.participante!!, it)  }
-            val participantesDia = horariosDia.map{ it.participante!! }.sortedBy { it.nombre }
+            val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
+            val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
 
             // Para cada hora de entrada, obtenemos los conductores disponibles
-            val entradaConductor = horariosDia.filter{ it.coche }.groupBy ({ it.entrada}, {it.participante!!})
+            val entradaConductor = horariosDia.filter { it.coche }.groupBy({ it.entrada }, { it.participante })
             // Para comprobar, vemos los participantes, sus entradas y salidas
             val nParticipantesIda = horariosDia.groupingBy { it.entrada }.eachCount()
 
@@ -69,14 +68,14 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
 
             //for (List<Set<Participante>> condDia : combinarConductoresDia) {
             for (condDia in combinarConductoresDia) {
-                val selCond = condDia.flatMap { it }.filterNotNull().toSet()
+                val selCond = condDia.flatMap { it }.toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
-                val plazasIda = selCond.map { participanteHorario[it] }.groupBy{ it!!.entrada }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
-                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante!!.plazasCoche }}
+                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
+                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
 
-                if (nParticipantesIda.entries.all { e -> plazasIda.getOrDefault(e.key, 0) >= e.value }
-                        && nParticipantesVuelta.entries.all{ e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
+                if (nParticipantesIda.entries.all { e -> plazasIda[e.key] ?: 0 >= e.value }
+                        && nParticipantesVuelta.entries.all { e -> (plazasVuelta[e.key] ?: 0) >= e.value }) {
 
                     // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
                     val posiblesLugares = participantesDia.map{ it.puntosEncuentro }.plus(selCond.map{ it.puntosEncuentro })
@@ -103,8 +102,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
 
                         val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } }
-                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
+                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]?.get(ll.key) ?: 0 } }
+                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]?.get(ll.key) ?: 0 } }) {
                             // Calculamos coste
                             val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
 

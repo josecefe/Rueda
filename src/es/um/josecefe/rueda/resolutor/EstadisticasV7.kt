@@ -9,14 +9,15 @@ package es.um.josecefe.rueda.resolutor
 
 import org.apache.commons.lang3.time.DurationFormatUtils
 
-/**
- * @author josec
- */
 class EstadisticasV7 : Estadisticas() {
-    private var expandidos: Long = 0
-    private var descartados = 0.0
-    private var terminales = 0.0
-    private var generados = 0.0
+    var expandidos: Long = 0
+        private set
+    var descartados = 0.0
+        private set
+    var terminales = 0.0
+        private set
+    var generados = 0.0
+        private set
     var totalPosiblesSoluciones: Double = 0.0
 
     override fun inicia(): Estadisticas {
