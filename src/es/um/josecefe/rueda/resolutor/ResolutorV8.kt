@@ -10,6 +10,10 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -22,9 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author josecefe
  */
 class ResolutorV8 : ResolutorAcotado() {
-    private var contexto : ContextoResolucion? = null
-    private var tamanosNivel : IntArray? = null
-    private var nPosiblesSoluciones : DoubleArray? = null
+    private var contexto: ContextoResolucion? = null
+    private var tamanosNivel: IntArray? = null
+    private var nPosiblesSoluciones: DoubleArray? = null
     private val estGlobal = EstadisticasV7()
     override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
         private set
@@ -46,7 +50,7 @@ class ResolutorV8 : ResolutorAcotado() {
 
         continuar = true
 
-        val contexto1=ContextoResolucion(horarios)
+        val contexto1 = ContextoResolucion(horarios)
         contexto = contexto1
         contexto1.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF
         contexto1.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF
@@ -80,10 +84,9 @@ class ResolutorV8 : ResolutorAcotado() {
 
         // Preparamos el algoritmo
         val actual = Nodo(contexto1)
-        var mejor = actual
         cotaInferiorCorte = AtomicInteger(cotaInfCorte + 1) //Lo tomamos como cota superior
 
-        mejor = branchAndBound(actual, mejor) ?: mejor //Cogemos el nuevo mejor
+        var mejor = runBlocking { branchAndBound(actual, actual) }
 
         //Estadisticas finales
         if (ESTADISTICAS) {
@@ -108,7 +111,7 @@ class ResolutorV8 : ResolutorAcotado() {
         return solucionFinal
     }
 
-    private fun branchAndBound(actual: Nodo, mejorPadre: Nodo): Nodo? {
+    private suspend fun branchAndBound(actual: Nodo, mejorPadre: Nodo): Nodo {
         var mejor = mejorPadre
         if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L && System.currentTimeMillis() - ultMilisEst > CADA_MILIS_EST) {
             ultMilisEst = System.currentTimeMillis()
@@ -129,7 +132,7 @@ class ResolutorV8 : ResolutorAcotado() {
                 }
                 val mejorHijo = actual.generaHijos().min()
 
-                if (mejorHijo!=null && mejorHijo < mejor) {
+                if (mejorHijo != null && mejorHijo < mejor) {
                     mejor = mejorHijo
                     var cota: Int
                     do {
@@ -148,12 +151,12 @@ class ResolutorV8 : ResolutorAcotado() {
                 }
             } else { // Es un nodo intermedio
                 val lNF = actual.generaHijos().filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.toMutableList()
-                val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
+                val menorCotaSuperior = lNF.map { it.cotaSuperior }.min()
                 if (menorCotaSuperior != null) {
                     var cota: Int
                     do {
                         cota = cotaInferiorCorte!!.get()
-                    } while (menorCotaSuperior< cota && !cotaInferiorCorte!!.compareAndSet(cota, menorCotaSuperior))
+                    } while (menorCotaSuperior < cota && !cotaInferiorCorte!!.compareAndSet(cota, menorCotaSuperior))
                     if (menorCotaSuperior < cota) {
                         if (ESTADISTICAS) {
                             estGlobal.fitness = menorCotaSuperior
@@ -163,15 +166,25 @@ class ResolutorV8 : ResolutorAcotado() {
                             System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cota, menorCotaSuperior)
                         }
                     }
-                    lNF.removeAll { n -> n.cotaInferior >= cotaInferiorCorte!!.get() } //Recalculamos lNF
+                    lNF.removeAll { it.cotaInferior >= cotaInferiorCorte!!.get() } //Recalculamos lNF
                     // Limpiamos la LNV
                 }
                 if (ESTADISTICAS) {
                     estGlobal.addDescartados((tamanosNivel!![actual.nivel + 1] - lNF.size) * nPosiblesSoluciones!![actual.nivel + 1])
                 }
-                val mejorAhora = mejor
-                val mejorHijo = lNF.sorted().map { n -> branchAndBound(n, mejorAhora) }.filterNotNull().min()
-                if (mejorHijo!=null && mejorHijo < mejor) { // Tenemos un hijo que mejora
+                lNF.sort();
+                var mejorHijo = if (lNF.size > 1 && actual.nivel + 3 < contexto!!.dias.size) { // Los hijos estan lejos de ser terminales)
+                    val mejorHijoDef: MutableList<Deferred<Nodo>> = ArrayList<Deferred<Nodo>>(lNF.size)
+                    //println("Lanzando una corutina en nivel ${actual.nivel} con ${lNF.size} hilos")
+                    for (n in lNF) {
+                        mejorHijoDef.add(async(CommonPool) { branchAndBound(n, mejor) })
+                    }
+
+                    mejorHijoDef.map { it.await() }.min()
+                } else {
+                    lNF.map { branchAndBound(it, mejor) }.min()
+                }
+                if (mejorHijo != null && mejorHijo < mejor) { // Tenemos un hijo que mejora
                     mejor = mejorHijo
                 }
             }
@@ -181,7 +194,7 @@ class ResolutorV8 : ResolutorAcotado() {
             }
         }
 
-        return mejor
+        return mejor //Devolvemos el mejor hijo
     }
 
     override val estadisticas: Estadisticas
