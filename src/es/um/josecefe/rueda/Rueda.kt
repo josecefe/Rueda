@@ -69,7 +69,7 @@ fun pruebaResolutor() {
         System.out.format("Resolutor %s:\n=%s\n->%s\n", r.javaClass.simpleName, r.solucionFinal, r.estadisticas)
         //PersistenciaSQL.guardaAsignacionRuedaXML(RUEDABD, r.getSolucionFinal());
         datos.setSolucion(r.solucionFinal, r.estadisticas.fitness)
-        Persistencia.guardaDatosRuedaJSON(File(RUEDAJSON_HORARIOS), datos)
+        //Persistencia.guardaDatosRuedaJSON(File(RUEDAJSON_HORARIOS), datos)
     }
     if (AMPLIADO) {
         val horariosAmpliado = duplicarHorario(horarios)

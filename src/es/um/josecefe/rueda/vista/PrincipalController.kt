@@ -196,16 +196,16 @@ class PrincipalController {
                     mapa.put(p, a)
                 }
                 for (e in n.peIda) {
-                    val a = mapa.getOrDefault(e.key, AsignacionParticipante())
-                    a.participante = e.key.toString()
-                    a.ida = e.value.toString()
-                    mapa.putIfAbsent(e.key, a)
+                    val a = mapa.getOrDefault(e.first, AsignacionParticipante())
+                    a.participante = e.first.toString()
+                    a.ida = e.second.toString()
+                    mapa.putIfAbsent(e.first, a)
                 }
                 for (e in n.peVuelta) {
-                    val a = mapa.getOrDefault(e.key, AsignacionParticipante())
-                    a.participante = e.key.toString()
-                    a.vuelta = e.value.toString()
-                    mapa.putIfAbsent(e.key, a)
+                    val a = mapa.getOrDefault(e.first, AsignacionParticipante())
+                    a.participante = e.first.toString()
+                    a.vuelta = e.second.toString()
+                    mapa.putIfAbsent(e.first, a)
                 }
                 tablaResultadoLugares.setItems(FXCollections.observableArrayList(mapa.values))
             } else {

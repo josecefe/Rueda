@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo
 import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javafx.beans.property.*
 import javafx.collections.FXCollections
-import javafx.util.Pair
 
 /**
  * @author josec

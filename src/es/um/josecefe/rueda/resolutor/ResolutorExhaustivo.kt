@@ -12,15 +12,11 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.combinations
-import java.util.*
 import java.util.concurrent.atomic.AtomicStampedReference
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
-private const val DEBUG = false
+private const val DEBUG = true
 private const val ESTADISTICAS = true
-private const val CADA_EXPANDIDOS_EST = 10000
+private const val CADA_EXPANDIDOS_EST = 1000000
 
 class ResolutorExhaustivo : Resolutor() {
     private val estGlobal = EstadisticasV7()
@@ -81,6 +77,7 @@ class ResolutorExhaustivo : Resolutor() {
                     comb *= combinations
                 }
                 if (DEBUG) println(" = $comb")
+                if (DEBUG && comb > Int.MAX_VALUE) print(" $comb es mayor que ${Int.MAX_VALUE}, lo cual es problematico!")
                 totalPosiblesSoluciones += comb
             }
             if (DEBUG) println("Nº total de posibles soluciones: $totalPosiblesSoluciones")
@@ -116,12 +113,14 @@ class ResolutorExhaustivo : Resolutor() {
                 val diasCambiantes: Set<Dia> = if (diasFijos[key] != null) value.minus(diasFijos[key]!!) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it }.toList())
             }
-            val combinaciones: Combinador<Set<Dia>> = Combinador(
-                    listSubcon)
+            val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
 
             //TODO: Habría que ver las implicaciones del paralelismos, especialmente en las variables compartidas
+            //runBlocking {
             for (c in combinaciones) {
                 if (!continuar) break
+
+                //launch(CommonPool) {
                 val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
                 val participaIt = mapParticipanteDias.keys.iterator()
@@ -139,6 +138,7 @@ class ResolutorExhaustivo : Resolutor() {
                 }
                 if (asignacion.size < contexto.solucionesCandidatas.size) {
                     if (ESTADISTICAS) estGlobal.incExpandidos()
+                    //return@launch
                     break
                 }
                 val solCand = HashMap<Dia, AsignacionDiaSimple>()
@@ -174,7 +174,9 @@ class ResolutorExhaustivo : Resolutor() {
                     estGlobal.actualizaProgreso()
                     if (DEBUG) println(estGlobal)
                 }
+                //}
             }
+            //}
         }
 
         solucionFinal = solucionRef.reference

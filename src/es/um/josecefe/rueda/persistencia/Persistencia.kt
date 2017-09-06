@@ -92,7 +92,7 @@ object Persistencia {
 
         try {
             PrintStream(htmlfile).use { out ->
-                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda }.map { it.value }.distinct().count() > 1
+                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda }.map { it.second }.distinct().count() > 1
 
                 // Todas las horas con actividad:
                 val horasActivas = datosRueda.horarios.map { it.entrada }.toMutableSet()
@@ -121,12 +121,12 @@ object Persistencia {
                         pIda.participante = pVuelta.participante
                         pVuelta.conduce = a.conductores.contains(pIda.participante)
                         pIda.conduce = pVuelta.conduce
-                        a.peIda.find { it.key == pIda.participante }?.let {
-                            pIda.lugar = it.value
+                        a.peIda.find { it.first == pIda.participante }?.let {
+                            pIda.lugar = it.second
                             celdaIda.add(pIda)
                         }
-                        a.peVuelta.find { p -> p.key == pVuelta.participante }?.let {
-                            pVuelta.lugar = it.value
+                        a.peVuelta.find { p -> p.first == pVuelta.participante }?.let {
+                            pVuelta.lugar = it.second
                             celdaVuelta.add(pVuelta)
                         }
                     }
@@ -252,11 +252,11 @@ object Persistencia {
         internal var lugar: Lugar? = null
     }
 
-    private class PairPersistenceDelegate : DefaultPersistenceDelegate(arrayOf("key", "value")) {
+    private class PairPersistenceDelegate : DefaultPersistenceDelegate(arrayOf("first", "second")) {
         override fun instantiate(oldInstance: Any, out: Encoder): Expression {
             val par = oldInstance as Pair<*, *>
             val constructorArgs = arrayOf(par.first, par.second)
-            return Expression(oldInstance, oldInstance.javaClass, "new", constructorArgs)
+            return Expression(oldInstance, oldInstance::class.java, "new", constructorArgs)
         }
     }
 

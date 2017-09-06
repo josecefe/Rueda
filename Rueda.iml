@@ -6,22 +6,23 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="JDK-8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" name="com.github.fmcarvalho:htmlflow:1.1" level="project" />
+    <orderEntry type="library" name="org.apache.commons.lang-3" level="project" />
+    <orderEntry type="library" name="org.apache.commons.text-1" level="project" />
+    <orderEntry type="library" name="com.fasterxml.jackson.module" level="project" />
+    <orderEntry type="library" name="kotlinx-coroutines-core-0.17" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library name="JUnit5">
         <CLASSES>
-          <root url="jar://$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-jupiter-api-5.0.0-M6.jar!/" />
-          <root url="jar://$APPLICATION_HOME_DIR$/plugins/junit/lib/opentest4j-1.0.0-M3.jar!/" />
+          <root url="jar://$APPLICATION_HOME_DIR$/plugins/junit/lib/junit-jupiter-api-5.0.0-RC2.jar!/" />
+          <root url="jar://$APPLICATION_HOME_DIR$/plugins/junit/lib/opentest4j-1.0.0-RC1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="com.fasterxml.jackson.module:jackson-module-kotlin:Release" level="project" />
-    <orderEntry type="library" name="com.github.fmcarvalho:htmlflow:1.1" level="project" />
-    <orderEntry type="library" name="org.apache.commons.lang-3" level="project" />
-    <orderEntry type="library" name="org.apache.commons.text-1" level="project" />
   </component>
 </module>
