@@ -1,0 +1,464 @@
+{
+  "dias": [
+    {
+      "@id": 1,
+      "descripcion": "Lunes",
+      "orden": 1
+    },
+    {
+      "@id": 2,
+      "descripcion": "Martes",
+      "orden": 2
+    },
+    {
+      "@id": 3,
+      "descripcion": "Miercoles",
+      "orden": 3
+    },
+    {
+      "@id": 4,
+      "descripcion": "Jueves",
+      "orden": 4
+    },
+    {
+      "@id": 5,
+      "descripcion": "Viernes",
+      "orden": 5
+    }
+  ],
+  "lugares": [
+    {
+      "@id": 6,
+      "nombre": "A"
+    },
+    {
+      "@id": 7,
+      "nombre": "M"
+    }
+  ],
+  "participantes": [
+    {
+      "@id": 8,
+      "nombre": "Peter",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 9,
+      "nombre": "Josep",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 10,
+      "nombre": "Lorenzo",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 11,
+      "nombre": "Noelia",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 12,
+      "nombre": "Elisa",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        7,
+        6
+      ]
+    },
+    {
+      "@id": 13,
+      "nombre": "Juan",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        7,
+        6
+      ]
+    },
+    {
+      "@id": 14,
+      "nombre": "Lucia",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 15,
+      "nombre": "Dolores",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        7,
+        6
+      ]
+    },
+    {
+      "@id": 16,
+      "nombre": "Maria",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    },
+    {
+      "@id": 17,
+      "nombre": "Josema",
+      "plazasCoche": 4,
+      "puntosEncuentro": [
+        6
+      ]
+    }
+  ],
+  "horarios": [
+    {
+      "participante": 8,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 9,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 10,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 11,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 12,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 13,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 16,
+      "dia": 1,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 14,
+      "dia": 1,
+      "entrada": 3,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 15,
+      "dia": 1,
+      "entrada": 7,
+      "salida": 8,
+      "coche": true
+    },
+    {
+      "participante": 8,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 9,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 10,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 11,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 12,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 13,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 14,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 15,
+      "dia": 2,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 16,
+      "dia": 2,
+      "entrada": 3,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 8,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 9,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 10,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 12,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 13,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 15,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 16,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 17,
+      "dia": 3,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 11,
+      "dia": 3,
+      "entrada": 2,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 14,
+      "dia": 3,
+      "entrada": 2,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 10,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 12,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 13,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 14,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 16,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 8,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 9,
+      "dia": 4,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 11,
+      "dia": 4,
+      "entrada": 2,
+      "salida": 7,
+      "coche": true
+    },
+    {
+      "participante": 15,
+      "dia": 4,
+      "entrada": 2,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 17,
+      "dia": 4,
+      "entrada": 3,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 8,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 4,
+      "coche": true
+    },
+    {
+      "participante": 9,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 10,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 11,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 12,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 4,
+      "coche": true
+    },
+    {
+      "participante": 13,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 14,
+      "dia": 5,
+      "entrada": 1,
+      "salida": 6,
+      "coche": true
+    },
+    {
+      "participante": 15,
+      "dia": 5,
+      "entrada": 2,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 16,
+      "dia": 5,
+      "entrada": 2,
+      "salida": 5,
+      "coche": true
+    },
+    {
+      "participante": 17,
+      "dia": 5,
+      "entrada": 2,
+      "salida": 6,
+      "coche": true
+    }
+  ],
+  "asignacion": [],
+  "costeAsignacion": 0
+}

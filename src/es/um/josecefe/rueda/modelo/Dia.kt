@@ -13,21 +13,20 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 
 /**
- * SQL: CREATE TABLE "dia" ( "id" INTEGER PRIMARY KEY NOT NULL, "descripcion"
- * TEXT );
- *
  * @author josecefe
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
-class Dia(descripcion: String = "Día Desconocido") : Comparable<Dia> {
+class Dia(descripcion: String = "Día Desconocido", val orden: Int = 1) : Comparable<Dia> {
     private val descriptionProperty: SimpleStringProperty = SimpleStringProperty(descripcion)
     var descripcion: String
         get() = descriptionProperty.get()
         set(value) = descriptionProperty.set(value)
 
+    fun setId(@Suppress("UNUSED_PARAMETER") i: Int) = Unit
+
     fun descriptionProperty(): StringProperty = descriptionProperty
 
-    override fun compareTo(other: Dia): Int = descripcion.compareTo(other.descripcion)
+    override fun compareTo(other: Dia): Int = orden.compareTo(other.orden)
 
     override fun toString(): String = descripcion
 }

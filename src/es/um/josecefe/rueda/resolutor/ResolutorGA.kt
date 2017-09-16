@@ -74,7 +74,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
             val conductoresDia = entradaConductor.keys.map { key ->
-                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size)
+                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size).toList()
             }
             val combinarConductoresDia = Combinador(conductoresDia)
 

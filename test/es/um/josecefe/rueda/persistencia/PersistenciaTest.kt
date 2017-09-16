@@ -15,7 +15,8 @@ import java.io.File
 internal class PersistenciaTest {
     @Test
     fun guardaDatosRueda() {
-        val dias = mutableListOf(Dia("Lunes"), Dia("Martes"), Dia("Miercoles"), Dia("Jueves"), Dia("Viernes"))
+        val dias = mutableListOf(Dia("Lunes", 1), Dia("Martes", 2), Dia("Miercoles", 3), Dia("Jueves", 4),
+                Dia("Viernes", 5))
         val lugares = mutableListOf(Lugar("LA"), Lugar("LB"))
         val participantes = mutableListOf(Participante("PA", 5, listOf(lugares[0])), Participante("PB", 5, listOf(lugares[0], lugares[1])))
         val datosRueda = DatosRueda(

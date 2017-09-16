@@ -324,7 +324,8 @@ class PrincipalController {
                 throw UnsupportedOperationException("Not supported yet.")
             }
         }
-        cbAlgoritmo.selectionModel.select(if (Runtime.getRuntime().availableProcessors() >= 4) 1 else 0)
+        //cbAlgoritmo.selectionModel.select(if (Runtime.getRuntime().availableProcessors() >= 4) 1 else 0)
+        cbAlgoritmo.selectionModel.select(0)
 
         cbEstrategia.items.addAll(*Resolutor.Estrategia.values())
         cbEstrategia.converter = object : StringConverter<Resolutor.Estrategia>() {
@@ -784,7 +785,11 @@ class PrincipalController {
         val result = alert.showAndWait()
         if (result.isPresent && result.get() == ButtonType.OK) {
             val nHorarios = HashSet(datosRuedaFX.horarios)
-            val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associate { Pair(it, Dia(it.descripcion + "Ex")) }
+            val diasOriginal = datosRuedaFX.horarios.map { it.dia }.distinct().filterNotNull()
+            val maxNOrden = diasOriginal.map { it.orden }.max() ?: 1
+            val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associate {
+                Pair(it, Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden))
+            }
             nHorarios.addAll(datosRuedaFX.horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
             datosRuedaFX.poblarDesdeHorarios(nHorarios)
             mainApp.lastFilePath = null // Eliminamos la referencia al último fichero guardado para evitar lios...
@@ -856,12 +861,12 @@ class PrincipalController {
             alert.showAndWait()
             return
         }
-        datosRuedaFX.dias.add(Dia(descripcion))
+        datosRuedaFX.dias.add(Dia(descripcion, (datosRuedaFX.dias.map { it.orden }.max() ?: 0) + 1))
         tfDescripcionDia.clear()
     }
 
-    private fun compruebaDia(nombreDia: String): Boolean = datosRuedaFX.dias.map { it.descripcion }.any {
-        it.equals(nombreDia, ignoreCase = true)
+    private fun compruebaDia(nombreDia: String): Boolean = datosRuedaFX.dias.any {
+        it.descripcion.equals(nombreDia, ignoreCase = true)
     }
 
     @FXML
@@ -874,7 +879,7 @@ class PrincipalController {
             while (compruebaDia(diaProp)) {
                 diaProp = dias[i] + ++intento
             }
-            datosRuedaFX.dias.add(Dia(diaProp))
+            datosRuedaFX.dias.add(Dia(diaProp, (datosRuedaFX.dias.map { it.orden }.max() ?: 0) + 1))
         }
     }
 
@@ -1087,10 +1092,11 @@ class PrincipalController {
 
     companion object {
 
-        private val RESOLUTORES = arrayOf("es.um.josecefe.rueda.resolutor.ResolutorV7",
+        private val RESOLUTORES = arrayOf("es.um.josecefe.rueda.resolutor.ResolutorExhaustivo",
+                "es.um.josecefe.rueda.resolutor.ResolutorV7",
                 "es.um.josecefe.rueda.resolutor.ResolutorV8", "es.um.josecefe.rueda.resolutor.ResolutorGA",
                 "es.um.josecefe.rueda.resolutor.ResolutorCombinado",
-                "es.um.josecefe.rueda.resolutor.ResolutorIterativo",
-                "es.um.josecefe.rueda.resolutor.ResolutorExhaustivo")
+                "es.um.josecefe.rueda.resolutor.ResolutorIterativo"
+        )
     }
 }

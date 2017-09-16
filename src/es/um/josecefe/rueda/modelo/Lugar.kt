@@ -45,6 +45,8 @@ class Lugar(nombre: String = "Lugar Desconocido") : Comparable<Lugar> {
      */
     fun nombreProperty(): SimpleStringProperty = nombreProperty
 
+    fun setId(@Suppress("UNUSED_PARAMETER") i: Int) = Unit
+
     override fun toString(): String = nombre
 
     override fun compareTo(other: Lugar): Int = nombre.compareTo(other.nombre)

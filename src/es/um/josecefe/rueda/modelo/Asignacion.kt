@@ -16,7 +16,8 @@ import javafx.collections.FXCollections
  * @author josec
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
-class Asignacion(d: Dia, asignacionDia: AsignacionDia) : Comparable<Asignacion> {
+class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<Pair<Participante, Lugar>>,
+                 peVuelta: List<Pair<Participante, Lugar>>, coste: Int) : Comparable<Asignacion> {
 
     private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty()
     private val conductoresProp: SimpleListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList<Participante>())
@@ -24,14 +25,17 @@ class Asignacion(d: Dia, asignacionDia: AsignacionDia) : Comparable<Asignacion> 
     private val pevueltaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList<Pair<Participante, Lugar>>())
     private val costeProp = SimpleIntegerProperty()
 
-
     init {
-        diaProp.set(d)
-        conductoresProp.addAll(asignacionDia.conductores)
-        peidaProp.addAll(asignacionDia.peIda.entries.map {Pair(it.key, it.value)})
-        pevueltaProp.addAll(asignacionDia.peVuelta.entries.map {Pair(it.key, it.value)})
-        costeProp.set(asignacionDia.coste)
+        diaProp.set(dia)
+        conductoresProp.addAll(conductores)
+        peidaProp.addAll(peIda)
+        pevueltaProp.addAll(peVuelta)
+        costeProp.set(coste)
     }
+
+    constructor(dia: Dia, asignacionDia: AsignacionDia) : this(dia, asignacionDia.conductores.toList(),
+            asignacionDia.peIda.entries.map { Pair(it.key, it.value) },
+            asignacionDia.peVuelta.entries.map { Pair(it.key, it.value) }, asignacionDia.coste)
 
     var dia: Dia
         get() = diaProp.get()

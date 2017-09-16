@@ -81,6 +81,8 @@ class Participante
             this.puntosEncuentroProp.addAll(puntosEncuentro)
         }
 
+    fun setId(@Suppress("UNUSED_PARAMETER") i: Int) = Unit
+
     fun nombreProperty(): StringProperty = nombreProperty
 
     fun plazasCocheProperty(): IntegerProperty = plazasCocheProperty

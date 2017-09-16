@@ -8,8 +8,31 @@
 
 package es.um.josecefe.rueda.util
 
+import java.util.*
+
+
 tailrec fun factorial(n: Long, a: Long = 1): Long = if (n <= 1) a else factorial(n - 1, a * n)
 
 fun permutations(n: Long, r: Long): Long = factorial(n) / factorial(n - r)
 
 fun combinations(n: Long, r: Long): Long = permutations(n, r) / factorial(r)
+
+fun <T> cartesianProduct(lists: List<List<T>>): List<List<T>> {
+    val resultLists = ArrayList<List<T>>()
+    if (lists.size == 0) {
+        resultLists.add(emptyList())
+        return resultLists
+    } else {
+        val firstList = lists[0]
+        val remainingLists = cartesianProduct(lists.subList(1, lists.size))
+        for (condition in firstList) {
+            for (remainingList in remainingLists) {
+                val resultList = ArrayList<T>()
+                resultList.add(condition)
+                resultList.addAll(remainingList)
+                resultLists.add(resultList)
+            }
+        }
+    }
+    return resultLists
+}

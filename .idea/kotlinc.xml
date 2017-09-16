@@ -8,6 +8,8 @@
     <option name="jvmTarget" value="1.8" />
   </component>
   <component name="KotlinCommonCompilerArguments">
+    <option name="languageVersion" value="1.1" />
+    <option name="apiVersion" value="1.1" />
     <option name="coroutinesState" value="enable" />
   </component>
   <component name="KotlinCompilerSettings">

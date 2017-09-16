@@ -14,11 +14,13 @@ import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.combinations
 import java.util.concurrent.atomic.AtomicStampedReference
 
-private const val DEBUG = true
-private const val ESTADISTICAS = true
-private const val CADA_EXPANDIDOS_EST = 1000000
-
 class ResolutorExhaustivo : Resolutor() {
+    companion object {
+        private const val DEBUG = false
+        private const val ESTADISTICAS = true
+        private const val CADA_EXPANDIDOS_EST = 1000000
+    }
+
     private val estGlobal = EstadisticasV7()
     override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
         private set
@@ -39,11 +41,12 @@ class ResolutorExhaustivo : Resolutor() {
 
         val contexto = ContextoResolucionSimple(horarios)
 
+        /* Averiguamos los días fijos de cada participantes (aquellos días que forzosamente tiene que llevarse el coche) */
         val diasFijos: HashMap<Participante, MutableSet<Dia>> = HashMap()
         for ((dia, solDia) in contexto.solucionesCandidatas) {
             val conductores: MutableSet<Participante> = contexto.participantes.toMutableSet()
             for (asignacion: AsignacionDia in solDia) conductores.retainAll(asignacion.conductores)
-            conductores.forEach { c ->
+            for (c in conductores) {
                 var d = diasFijos[c]
                 if (d == null) {
                     d = HashSet()
@@ -52,6 +55,7 @@ class ResolutorExhaustivo : Resolutor() {
                 d.add(dia)
             }
         }
+        /* Averiguamos cual es el minimo de veces que se debe llevar el coche cada uno a partir del máximo de dias fijos */
         val minCond = Math.max(1, diasFijos.values.map { it.size }.max()?.toInt() ?: 0)
 
         val mapParticipanteDias = LinkedHashMap<Participante, Set<Dia>>()
@@ -65,19 +69,22 @@ class ResolutorExhaustivo : Resolutor() {
 
         var totalPosiblesSoluciones = 0.0
         if (ESTADISTICAS) {
-            for (i in minCond..contexto.dias.size) {
+            for (nivel in minCond..contexto.dias.size) {
                 var comb = 1.0
-                if (DEBUG) print("Para $i veces conducir por participante tenemos ")
+                if (DEBUG) print("Para $nivel veces/conducir por participante tenemos ")
                 for ((key, value) in mapParticipanteDias) {
-                    val numVecesCond = Math.max(1, (i.toFloat() / contexto.coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el valor de i usando el coeficiente de conductor
+                    val numVecesCond = Math.max(1,
+                            (nivel.toFloat() / contexto.coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el nivel usando el coeficiente de conductor
                     val porDiasFijos = (diasFijos[key]?.size ?: 0).toLong()
                     //if (porDiasFijos >= numVecesCond) continue
-                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos), Math.max(1, numVecesCond - porDiasFijos))
+                    val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos),
+                            Math.max(0, numVecesCond - porDiasFijos))
                     if (DEBUG) print(" * $combinations")
                     comb *= combinations
                 }
                 if (DEBUG) println(" = $comb")
-                if (DEBUG && comb > Int.MAX_VALUE) print(" $comb es mayor que ${Int.MAX_VALUE}, lo cual es problematico!")
+                if (DEBUG && comb > Int.MAX_VALUE) println(
+                        " !!! $comb es mayor que ${Int.MAX_VALUE}, lo cual puede ser problematico!!!")
                 totalPosiblesSoluciones += comb
             }
             if (DEBUG) println("Nº total de posibles soluciones: $totalPosiblesSoluciones")
@@ -93,34 +100,39 @@ class ResolutorExhaustivo : Resolutor() {
         val solucionRef = AtomicStampedReference(solucionFinal, Int.MAX_VALUE)
 
         //Vamos a ir buscando soluciones de menos veces al tope de veces
-        bucledias@ for (i in minCond..contexto.dias.size) {
+        for (nivel in minCond..contexto.dias.size) {
             if (solucionRef.stamp < Int.MAX_VALUE) {
                 if (ESTADISTICAS) {
                     estGlobal.addTerminales(estGlobal.expandidos - estGlobal.terminales)
                     estGlobal.addDescartados(totalPosiblesSoluciones - estGlobal.expandidos)
                 }
-
+                if (DEBUG) println(
+                        "*** No vamos a examinar el nivel $nivel al tener ya una solución de un nivel anterior ***")
                 break
             } // Hemos terminado
 
-            if (!continuar) break
+            if (!continuar) {
+                if (DEBUG) println("*** No vamos a examinar el nivel $nivel al haberse interrumpido la resolución ***")
+                break
+            }
 
-            if (DEBUG) println("*** Probando soluciones de nivel $i...")
+            if (DEBUG) println("*** Probando soluciones de nivel $nivel...")
 
-            val listSubcon: MutableList<Iterable<Set<Dia>>> = ArrayList(mapParticipanteDias.size)
+            val listSubcon: MutableList<List<Set<Dia>>> = ArrayList(mapParticipanteDias.size)
             for ((key, value) in mapParticipanteDias) {
-                val numVecesCond = Math.max(1, Math.round(i.toDouble() / contexto.coefConduccion[key]!!).toInt()) - (diasFijos[key]?.size ?: 0)//Para minorar adecuadamente el valor de i usando el coeficiente de conductor
+                val numVecesCond = Math.max(1, Math.round(
+                        nivel.toDouble() / contexto.coefConduccion[key]!!).toInt()) - (diasFijos[key]?.size ?: 0)//Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                 val diasCambiantes: Set<Dia> = if (diasFijos[key] != null) value.minus(diasFijos[key]!!) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map { if (diasFijos[key] != null) diasFijos[key]!!.plus(it) else it }.toList())
             }
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
-
-            //TODO: Habría que ver las implicaciones del paralelismos, especialmente en las variables compartidas
-            //runBlocking {
+            if (DEBUG) println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}")
+            var contador = 0
+            var valida = 0
             for (c in combinaciones) {
+                if (DEBUG) contador++
                 if (!continuar) break
 
-                //launch(CommonPool) {
                 val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
                 val participaIt = mapParticipanteDias.keys.iterator()
@@ -138,24 +150,25 @@ class ResolutorExhaustivo : Resolutor() {
                 }
                 if (asignacion.size < contexto.solucionesCandidatas.size) {
                     if (ESTADISTICAS) estGlobal.incExpandidos()
-                    //return@launch
-                    break
+                    continue
                 }
                 val solCand = HashMap<Dia, AsignacionDiaSimple>()
-                for ((key, value) in asignacion) {
-                    val sol = contexto.mapaParticipantesSoluciones[key]?.get(value)
+                for ((dia, participantesDia) in asignacion) {
+                    val sol = contexto.mapaParticipantesSoluciones[dia]?.get(participantesDia)
 
                     if (sol == null) {
                         if (ESTADISTICAS) estGlobal.incExpandidos()
                         break // Aquí se queda en blanco, luego no sirve
                     }
 
-                    solCand[key] = sol
+                    solCand[dia] = sol
                 }
 
                 // Para ver si es valida bastaria con ver si hay solución en cada día
                 if (solCand.size == contexto.solucionesCandidatas.size) {
-                    val apt = calculaAptitud(solCand, i)
+
+                    if (DEBUG) valida++
+                    val apt = calculaAptitud(solCand, nivel)
                     var costeAnt: Int
                     var solAnt: Map<Dia, AsignacionDia>
                     do {
@@ -174,9 +187,9 @@ class ResolutorExhaustivo : Resolutor() {
                     estGlobal.actualizaProgreso()
                     if (DEBUG) println(estGlobal)
                 }
-                //}
             }
-            //}
+            if (DEBUG) println(
+                    "   ---> $contador combinaciones generadas en total para este nivel, de las cuales $valida han sido validas")
         }
 
         solucionFinal = solucionRef.reference
@@ -198,6 +211,7 @@ class ResolutorExhaustivo : Resolutor() {
         return solucionFinal
     }
 
+    /* TODO: Debemos tener en cuenta el balanceo entre participantes -- Problema: De un mismo dia, solo tenemos una solución seleccionada para un conjunto dado de conductores, la primera "mejor" encontrada */
     private fun calculaAptitud(sol: Map<Dia, AsignacionDia>, vecesCond: Int) = vecesCond * PESO_MAXIMO_VECES_CONDUCTOR + sol.values.map { it.coste }.sum()
 
     override val estadisticas: Estadisticas

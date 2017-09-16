@@ -84,7 +84,7 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
             val conductoresDia = entradaConductor.keys.map { key ->
-                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size)
+                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size).toList()
             }
             val combinarConductoresDia = Combinador(conductoresDia)
 
@@ -106,31 +106,34 @@ internal class ContextoResolucion (horarios: Set<Horario>) {
                     var mejorLugaresVuelta: Map<Participante, Lugar>? = null
 
                     for (selLugares in Combinador(posiblesLugares)) {
-                        val lugaresIda: MutableMap<Participante, Lugar>
-                        val lugaresVuelta: MutableMap<Participante, Lugar>
-                        lugaresIda = HashMap()
-                        lugaresVuelta = HashMap()
+                        val lugaresIda: MutableMap<Participante, Lugar> = HashMap()
+                        val lugaresVuelta: MutableMap<Participante, Lugar> = HashMap()
                         val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
                         for (i in participantesDia.indices) {
                             lugaresIda.put(participantesDia[i], selLugares[i])
-                            lugaresVuelta.put(participantesDia[i], if (selCond.contains(participantesDia[i]))
-                                il.next()
-                            else
-                                selLugares[i])
+                            lugaresVuelta.put(participantesDia[i],
+                                    if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
                         }
-
-                        val plazasDisponiblesIda: Map<Int, Map<Lugar, Int>> = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
-                                //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
+                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
 
                         val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
-                                //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
                         val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
                         val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= (plazasDisponiblesIda[e.key]!![ll.key] ?: 0) } }
-                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= (plazasDisponiblesVuelta[e.key]!![ll.key] ?: 0) } }) {
+                        if (plazasNecesariasIda.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesIda[e.key]?.get(ll.key) ?: 0
+                            }
+                        }
+                                && plazasNecesariasVuelta.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesVuelta[e.key]?.get(ll.key) ?: 0
+                            }
+                        }) {
                             // Calculamos coste
                             val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
 

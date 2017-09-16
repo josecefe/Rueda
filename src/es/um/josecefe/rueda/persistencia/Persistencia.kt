@@ -269,14 +269,6 @@ object Persistencia {
 
                 with(mapper) {
                     writeValue(f, datosRueda)
-/*
-                    writeValue(f, datosRueda.dias)
-                    writeValue(f, datosRueda.lugares)
-                    writeValue(f, datosRueda.participantes)
-                    writeValue(f, datosRueda.horarios)
-                    writeValue(f, datosRueda.asignacion)
-                    writeValue(f, datosRueda.costeAsignacion)
-*/
                 }
             }
         } catch (ex: Exception) {
@@ -293,19 +285,6 @@ object Persistencia {
 
                 with(mapper) {
                     return mapper.readValue(f)
-/*
-                    val ld = mapper.readValue<List<Dia>>(f)
-                    datosRuedaFX.dias = ld.toMutableList()
-                    val ll = mapper.readValue<List<Lugar>>(f)
-                    datosRuedaFX.lugares = ll.toMutableList()
-                    val lp = mapper.readValue<List<Participante>>(f)
-                    datosRuedaFX.participantes = lp.toMutableList()
-                    val lh = mapper.readValue<List<Horario>>(f)
-                    datosRuedaFX.horarios = lh.toMutableList()
-                    val la = mapper.readValue<List<Asignacion>>(f)
-                    datosRuedaFX.asignacion = la.toMutableList()
-                    datosRuedaFX.costeAsignacion = mapper.readValue<Int>(f)
-*/
                 }
             }
         } catch (ex: Exception) {
