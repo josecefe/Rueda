@@ -101,16 +101,16 @@ class ResolutorBalanceado : Resolutor() {
                     }
                 }
                 if (asignacion.size < contexto.solucionesCandidatas.size) {
-                    if (ESTADISTICAS) estGlobal.incExpandidos()
+                    if (ESTADISTICAS) {
+                        estGlobal.incExpandidos()
+                        estGlobal.addDescartados(1.0)
+                    }
                     continue
                 }
                 val solCand = mutableMapOf<Dia, AsignacionDiaSimple>()
                 for ((dia, participantesDia) in asignacion) {
-                    val sol = contexto.mapaParticipantesSoluciones[dia]?.get(participantesDia)
-                    if (sol == null) {
-                        if (ESTADISTICAS) estGlobal.addDescartados(1.0)
-                        break // Aquí se queda en blanco, luego no sirve
-                    }
+                    val sol = contexto.mapaParticipantesSoluciones[dia]?.get(
+                            participantesDia) ?: break // Aquí se queda en blanco, luego no sirve
                     solCand[dia] = sol
                 }
 
@@ -136,6 +136,8 @@ class ResolutorBalanceado : Resolutor() {
                         if (DEBUG) println(
                                 "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
                     }
+                } else {
+                    if (ESTADISTICAS) estGlobal.addDescartados(1.0)
                 }
                 if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L) {
                     estGlobal.actualizaProgreso()
