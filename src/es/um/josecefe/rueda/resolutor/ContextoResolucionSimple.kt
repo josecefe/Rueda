@@ -10,6 +10,7 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
+import es.um.josecefe.rueda.util.combinations
 import java.util.*
 
 /**
@@ -21,6 +22,11 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
     val solucionesCandidatas: MutableMap<Dia, List<AsignacionDiaSimple>>
     val mapaParticipantesSoluciones: MutableMap<Dia, Map<Set<Participante>, AsignacionDiaSimple>>
     val coefConduccion: Map<Participante, Double> //Que tanto por 1 supone que use el coche cada conductor
+    val diasFijos: Map<Participante, MutableSet<Dia>>
+    val minCond: Int
+    val mapParticipanteDias: Map<Participante, Set<Dia>>
+    val totalPosiblesSoluciones: Long
+    private val solucionesNivel: LongArray
 
     init {
         // Y aquí ajustamos el coeficiente que nos mide su grado de participación (gente que solo va parte de los días)
@@ -64,7 +70,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                         && nParticipantesVuelta.entries.all { e -> (plazasVuelta[e.key] ?: 0) >= e.value }) {
 
                     // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
-                    val posiblesLugares = participantesDia.map{ it.puntosEncuentro }.plus(selCond.map{ it.puntosEncuentro })
+                    val posiblesLugares = participantesDia.map { it.puntosEncuentro }.plus(
+                            selCond.map { it.puntosEncuentro })
 
                     var mejorCoste = Integer.MAX_VALUE
                     var mejorLugares: MutableList<Map<Participante, Pair<Lugar, Lugar>>> = mutableListOf()
@@ -76,7 +83,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                         val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
                         for (i in participantesDia.indices) {
                             lugaresIda.put(participantesDia[i], selLugares[i])
-                            lugaresVuelta.put(participantesDia[i], if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
+                            lugaresVuelta.put(participantesDia[i],
+                                    if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
                         }
                         val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
@@ -84,14 +92,24 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                         val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
-                        val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
+                        val plazasNecesariasIda = horariosDia.groupBy { it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
-                        val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
+                        val plazasNecesariasVuelta = horariosDia.groupBy { it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]?.get(ll.key) ?: 0 } }
-                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]?.get(ll.key) ?: 0 } }) {
+                        if (plazasNecesariasIda.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesIda[e.key]?.get(ll.key) ?: 0
+                            }
+                        }
+                                && plazasNecesariasVuelta.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesVuelta[e.key]?.get(ll.key) ?: 0
+                            }
+                        }) {
                             // Calculamos coste
-                            val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
+                            val coste = participantesDia.sumBy { e ->
+                                e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e])
+                            }
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste
@@ -108,7 +126,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                         // Tenemos una solución válida
                         val asignacionDiaSimple = AsignacionDiaSimple(selCond, mejorLugares, mejorCoste)
                         solucionesDia.add(asignacionDiaSimple)
-                        mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple) //Para acelerar la busqueda después
+                        mapaParticipantesAsignacionDia.put(selCond,
+                                asignacionDiaSimple) //Para acelerar la busqueda después
                     }
                 }
             }
@@ -116,5 +135,53 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
             solucionesCandidatas.put(d, solucionesDia)
             mapaParticipantesSoluciones.put(d, mapaParticipantesAsignacionDia)
         }
+
+        /* Averiguamos los días fijos de cada participantes (aquellos días que forzosamente tiene que llevarse el coche) */
+        val diasFijosl: MutableMap<Participante, MutableSet<Dia>> = mutableMapOf()
+        for ((dia, solDia) in solucionesCandidatas) {
+            val conductores: MutableSet<Participante> = participantes.toMutableSet()
+            for (asignacion: AsignacionDia in solDia) conductores.retainAll(asignacion.conductores)
+            for (c in conductores) {
+                var d = diasFijosl[c]
+                if (d == null) {
+                    d = HashSet()
+                    diasFijosl[c] = d
+                }
+                d.add(dia)
+            }
+        }
+
+        diasFijos = diasFijosl.toMap()
+        /* Averiguamos cual es el minimo de veces que se debe llevar el coche cada uno a partir del máximo de dias fijos */
+        minCond = Math.max(1, diasFijos.values.map { it.size }.max()?.toInt() ?: 0)
+
+        mapParticipanteDias = LinkedHashMap<Participante, Set<Dia>>()
+        for (i in participantes.indices) {
+            if (participantes[i].plazasCoche > 0) {
+                val p: Participante = participantes[i]
+                val setDias = horarios.filter { h -> h.coche && h.participante == p }.map { h -> h.dia }.filterNotNull().toSet()
+                mapParticipanteDias[p] = setDias
+            }
+        }
+
+        var posiblesSoluciones = 0L
+        solucionesNivel = LongArray(dias.size - minCond + 1)
+
+        for (nivel in minCond..dias.size) {
+            var comb: Long = 1
+            for ((key, value) in mapParticipanteDias) {
+                val numVecesCond = Math.max(1,
+                        (nivel.toFloat() / coefConduccion[key]!! + 0.5f).toInt()) //Para minorar adecuadamente el nivel usando el coeficiente de conductor
+                val porDiasFijos = (diasFijos[key]?.size ?: 0).toLong()
+                val combinations = combinations(Math.max(1, value.size.toLong() - porDiasFijos),
+                        Math.max(0, numVecesCond - porDiasFijos))
+                comb *= combinations
+            }
+            solucionesNivel[nivel - minCond] = comb
+            posiblesSoluciones += comb
+        }
+        totalPosiblesSoluciones = posiblesSoluciones
     }
+
+    fun getSolucionesNivel(nivel: Int) = solucionesNivel[nivel - minCond]
 }
