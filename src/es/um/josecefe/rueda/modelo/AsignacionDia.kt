@@ -19,5 +19,4 @@ interface AsignacionDia {
     val peIda: Map<Participante, Lugar>
 
     val peVuelta: Map<Participante, Lugar>
-
 }

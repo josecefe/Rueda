@@ -11,11 +11,16 @@ package es.um.josecefe.rueda.modelo
  * @author josecefe
  */
 data class AsignacionDiaSimple(
-        override var conductores: Set<Participante> = emptySet(),
-        override var peIda: Map<Participante, Lugar> = emptyMap(),
-        override var peVuelta: Map<Participante, Lugar> = emptyMap(),
-        override var coste: Int = 0
+        override val conductores: Set<Participante> = emptySet(),
+        val otrosPosiblesLugares: List<Map<Participante, Pair<Lugar, Lugar>>> = emptyList(),
+        override val coste: Int = 0
 ) : Comparable<AsignacionDiaSimple>, AsignacionDia {
+
+    override val peIda: Map<Participante, Lugar>
+        get() = otrosPosiblesLugares[0].mapValues { (_, par) -> par.first }
+
+    override val peVuelta: Map<Participante, Lugar>
+        get() = otrosPosiblesLugares[0].mapValues { (_, par) -> par.second }
 
     override fun compareTo(other: AsignacionDiaSimple) = Integer.compare(conductores.size * 1000 + coste, other.conductores.size * 1000 + other.coste)
 }

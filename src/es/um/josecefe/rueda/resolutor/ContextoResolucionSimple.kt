@@ -11,7 +11,6 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * @author josecefe
@@ -35,8 +34,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
         solucionesCandidatas = LinkedHashMap()
         mapaParticipantesSoluciones = HashMap()
         for (d: Dia in dias) {
-            val solucionesDia = ArrayList<AsignacionDiaSimple>() //Para paralelizar usar Vector en luar de ArrayList
-            val mapaParticipantesAsignacionDia = HashMap<Set<Participante>, AsignacionDiaSimple>() //Para paralelizar usar ConcurrentHashMap
+            val solucionesDia = mutableListOf<AsignacionDiaSimple>() //Para paralelizar usar Vector en luar de ArrayList
+            val mapaParticipantesAsignacionDia = mutableMapOf<Set<Participante>, AsignacionDiaSimple>() //Para paralelizar usar ConcurrentHashMap
             val horariosDia = horarios.filter { it.dia == d }.toSet()
             val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
             val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
@@ -68,8 +67,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                     val posiblesLugares = participantesDia.map{ it.puntosEncuentro }.plus(selCond.map{ it.puntosEncuentro })
 
                     var mejorCoste = Integer.MAX_VALUE
-                    var mejorLugaresIda: Map<Participante, Lugar> = emptyMap()
-                    var mejorLugaresVuelta: Map<Participante, Lugar> = emptyMap()
+                    var mejorLugares: MutableList<Map<Participante, Pair<Lugar, Lugar>>> = mutableListOf()
+
 
                     for (selLugares in Combinador(posiblesLugares)) {
                         val lugaresIda: MutableMap<Participante, Lugar> = HashMap()
@@ -96,14 +95,18 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste
-                                mejorLugaresIda = lugaresIda
-                                mejorLugaresVuelta = lugaresVuelta
+                                mejorLugares.clear()
+                            }
+                            if (coste == mejorCoste) {
+                                // Tenemos una nueva solución igual de costosa (la primera también entra, ya que arriba solo borramos
+                                mejorLugares.add(
+                                        lugaresIda.mapValues { (key, value) -> Pair(value, lugaresVuelta[key]!!) })
                             }
                         }
                     }
                     if (mejorCoste < Integer.MAX_VALUE) {
                         // Tenemos una solución válida
-                        val asignacionDiaSimple = AsignacionDiaSimple(selCond, mejorLugaresIda, mejorLugaresVuelta, mejorCoste)
+                        val asignacionDiaSimple = AsignacionDiaSimple(selCond, mejorLugares, mejorCoste)
                         solucionesDia.add(asignacionDiaSimple)
                         mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple) //Para acelerar la busqueda después
                     }

@@ -42,7 +42,7 @@ class ResolutorExhaustivo : Resolutor() {
         val contexto = ContextoResolucionSimple(horarios)
 
         /* Averiguamos los días fijos de cada participantes (aquellos días que forzosamente tiene que llevarse el coche) */
-        val diasFijos: HashMap<Participante, MutableSet<Dia>> = HashMap()
+        val diasFijos: MutableMap<Participante, MutableSet<Dia>> = mutableMapOf()
         for ((dia, solDia) in contexto.solucionesCandidatas) {
             val conductores: MutableSet<Participante> = contexto.participantes.toMutableSet()
             for (asignacion: AsignacionDia in solDia) conductores.retainAll(asignacion.conductores)

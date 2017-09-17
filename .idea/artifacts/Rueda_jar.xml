@@ -1,15 +1,26 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Rueda:jar">
+  <artifact type="javafx" name="Rueda:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Rueda_jar</output-path>
-    <root id="archive" name="Rueda.jar">
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="es.um.josecefe.rueda.RuedaApp" />
+        <option name="description" value="Resolutor de optimización de Rueda" />
+        <option name="height" value="600" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="Rueda" />
+        <option name="vendor" value="josecefe" />
+        <option name="version" value="1.10" />
+        <option name="width" value="800" />
+      </options>
+    </properties>
+    <root id="root">
       <element id="module-output" name="Rueda" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-reflect.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-test.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib-jre7.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib-jre8.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/htmlflow-1.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang3-3.6.jar" path-in-jar="/" />
+      <element id="library" level="project" name="com.fasterxml.jackson.module" />
+      <element id="library" level="project" name="com.github.fmcarvalho:htmlflow:1.1" />
+      <element id="library" level="project" name="KotlinJavaRuntime" />
+      <element id="library" level="project" name="kotlinx-coroutines-core-0.17" />
+      <element id="library" level="project" name="org.apache.commons.lang-3" />
+      <element id="library" level="project" name="org.apache.commons.text-1" />
     </root>
   </artifact>
 </component>
