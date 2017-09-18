@@ -21,12 +21,17 @@ Librerias
 ---------
 Commons Lang (https://commons.apache.org/proper/commons-lang/): Licencia Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
 
-HtmlFlow (https://github.com/fmcarvalho/HtmlFlow):  GNU GENERAL PUBLIC LICENSE 3: https://github.com/fmcarvalho/HtmlFlow/blob/master/LICENSE
+Commons Text (https://commons.apache.org/proper/commons-text/): Licencia Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
+
+HtmlFlow (https://github.com/fmcarvalho/HtmlFlow):  MIT License: https://github.com/fmcarvalho/HtmlFlow/blob/master/LICENSE
+
+Jackson Project (https://github.com/FasterXML/jackson): Licencia Apache License 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
 
 
 Sistema
 =======
-Java: Versión = %java-version% - Fabricante: %java-vendor% 
+Kotlin: Versión = 1.1 - Fabricante: JetBrains
+Java: Versión = %java-version% - Fabricante: %java-vendor%
 S.O.: Nombre = %os-name% - Versión = %os-version%
 
 

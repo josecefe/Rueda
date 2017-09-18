@@ -14,5 +14,5 @@ package es.um.josecefe.rueda
  */
 const val COPYRIGHT = "(C)2016-17 Jose Ceferino Ortega Carretero"
 const val TITLE = "Optimizador de la Rueda"
-const val VERSION = "1.09"
-const val DATE = "20170724"
+const val VERSION = "1.10"
+const val DATE = "20170918"

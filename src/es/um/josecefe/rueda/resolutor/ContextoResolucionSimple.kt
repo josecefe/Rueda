@@ -113,9 +113,9 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
 
                             if (coste < mejorCoste) {
                                 mejorCoste = coste
-                                mejorLugares.clear()
-                            }
-                            if (coste == mejorCoste) {
+                                mejorLugares.add(0,
+                                        lugaresIda.mapValues { (key, value) -> Pair(value, lugaresVuelta[key]!!) })
+                            } else if (coste == mejorCoste) {
                                 // Tenemos una nueva solución igual de costosa (la primera también entra, ya que arriba solo borramos
                                 mejorLugares.add(
                                         lugaresIda.mapValues { (key, value) -> Pair(value, lugaresVuelta[key]!!) })

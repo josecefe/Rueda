@@ -11,11 +11,11 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
-import java.util.concurrent.atomic.AtomicStampedReference
+import es.um.josecefe.rueda.util.summarizingInt
 
 class ResolutorBalanceado : Resolutor() {
     companion object {
-        private const val DEBUG = true
+        private const val DEBUG = false
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS_EST = 1000000
     }
@@ -48,11 +48,13 @@ class ResolutorBalanceado : Resolutor() {
             if (DEBUG) println("Tiempo inicializar = ${estGlobal.tiempoString}")
         }
 
-        val solucionRef = AtomicStampedReference(solucionFinal, Int.MAX_VALUE)
+        // PARALELO: val solucionRef = AtomicStampedReference(solucionFinal, Int.MAX_VALUE)
+        var mejorCoste = Double.POSITIVE_INFINITY
 
         //Vamos a ir buscando soluciones de menos veces al tope de veces
         for (nivel in contexto.minCond..contexto.dias.size) {
-            if (solucionRef.stamp < Int.MAX_VALUE) {
+            //PARALELO: if (solucionRef.stamp < Int.MAX_VALUE) {
+            if (!mejorCoste.isInfinite()) {
                 if (ESTADISTICAS) estGlobal.actualizaProgreso()
                 if (DEBUG) println("** No examinamos el nivel $nivel al tener ya una solución de un nivel anterior **")
                 break
@@ -119,8 +121,42 @@ class ResolutorBalanceado : Resolutor() {
                     if (DEBUG) valida++
                     if (ESTADISTICAS) estGlobal.addTerminales(1.0)
 
-                    // TODO: Aquí habría que empezar a combinar todas las posibles variaciones de lugares con balanceo
-
+                    val posibilidades = Combinador(solCand.map { (dia, asignaciones) ->
+                        asignaciones.otrosPosiblesLugares.map {
+                            Pair(dia, it)
+                        }
+                    })
+                    for (posible in posibilidades) {
+                        val t = contexto.participantes.associate { participaIt1 ->
+                            Pair(participaIt1, posible.map {
+                                if (it.second[participaIt1] != null) Triple(it.first, it.second[participaIt1]?.first,
+                                        it.second[participaIt1]?.second) else null
+                            }.filterNotNull())
+                        }
+                        val tp = t.mapValues { (participante, value) ->
+                            value.sumBy { (dia, ida, vuelta) ->
+                                (participante.puntosEncuentro.indexOf(ida) + participante.puntosEncuentro.indexOf(
+                                        vuelta)) * (if (solCand[dia]!!.conductores.contains(
+                                        participante)) PESO_LUGAR_CONDUCTOR else PESO_LUGAR_PASAJERO)
+                            }
+                        }
+                        val dif = tp.values.summarizingInt()
+                        if (dif.avg + dif.max < mejorCoste) {
+                            val iteradorPosible = posible.iterator()
+                            solucionFinal = solCand.mapValues { (_, asignacionCompleta) ->
+                                AsignacionDiaSimple(asignacionCompleta.conductores,
+                                        listOf(iteradorPosible.next().second), dif.sum)
+                            }
+                            if (DEBUG) println(
+                                    "---> Encontrada mejora: Coste anterior = $mejorCoste, nuevo coste = ${dif.avg + dif.max}, sol = ${solucionFinal}")
+                            mejorCoste = dif.avg + dif.max
+                            if (ESTADISTICAS) {
+                                estGlobal.fitness = mejorCoste.toInt() + nivel * PESO_MAXIMO_VECES_CONDUCTOR
+                                estGlobal.actualizaProgreso()
+                            }
+                        }
+                    }
+                    /*
                     val apt = calculaAptitud(solCand, nivel)
                     var costeAnt: Int
                     var solAnt: Map<Dia, AsignacionDia>
@@ -135,7 +171,7 @@ class ResolutorBalanceado : Resolutor() {
                         }
                         if (DEBUG) println(
                                 "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
-                    }
+                    }*/
                 } else {
                     if (ESTADISTICAS) estGlobal.addDescartados(1.0)
                 }
@@ -148,11 +184,10 @@ class ResolutorBalanceado : Resolutor() {
                     "   ---> $contador combinaciones generadas en este nivel, de las cuales $valida han sido validas")
         }
 
-        solucionFinal = solucionRef.reference
+        //PARALELO: solucionFinal = solucionRef.reference
 
         //Estadisticas finales
         if (ESTADISTICAS) {
-            estGlobal.fitness = solucionRef.stamp
             estGlobal.actualizaProgreso()
             if (DEBUG) {
                 println("====================")
@@ -166,10 +201,6 @@ class ResolutorBalanceado : Resolutor() {
 
         return solucionFinal
     }
-
-    /* TODO: Debemos tener en cuenta el balanceo entre participantes -- Problema: De un mismo dia, solo tenemos una solución seleccionada para un conjunto dado de conductores, la primera "mejor" encontrada */
-    private fun calculaAptitud(sol: Map<Dia, AsignacionDia>,
-                               vecesCond: Int) = vecesCond * PESO_MAXIMO_VECES_CONDUCTOR + sol.values.map { it.coste }.sum()
 
     override val estadisticas: Estadisticas
         get() = estGlobal
