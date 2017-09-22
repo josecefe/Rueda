@@ -22,8 +22,8 @@ class Combinador<out T>(private val conjuntos: List<List<T>>) : Iterable<List<T>
         return CombinadorIterator()
     }
 
-    public val size: Int
-        get() = conjuntos.map { it.size }.reduce { a, b -> a * b }
+    public val size: Long
+        get() = conjuntos.map { it.size.toLong() }.reduce { a, b -> a * b }
 
     private inner class CombinadorIterator : Iterator<List<T>> {
         private val actual = conjuntos.map { it.iterator() }.toMutableList()
