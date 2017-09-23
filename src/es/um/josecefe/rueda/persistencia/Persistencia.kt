@@ -143,11 +143,11 @@ object Persistencia {
                         .table().classAttr("table table-bordered")
                 val headerRow = table.tr()
                 headerRow.th().text("Hora")
-                datosRueda.dias.forEach { d -> headerRow.th().text(escapeHtml4(d.toString())) }
+                datosRueda.dias.sorted().forEach { d -> headerRow.th().text(escapeHtml4(d.toString())) }
                 horasActivas.sorted().forEach { hora ->
                     val tr = table.tr()
                     tr.td().text(hora.toString()) //Hora
-                    datosRueda.dias.forEach { dia ->
+                    datosRueda.dias.sorted().forEach { dia ->
                         val dd = datosTabla[dia]
                         val t = if (dd != null) dd[hora] else null
                         var valor = ""
