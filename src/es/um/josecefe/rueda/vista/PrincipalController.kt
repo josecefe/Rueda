@@ -393,7 +393,7 @@ class PrincipalController {
         }
         // Set extension filter
         val extFilter = FileChooser.ExtensionFilter(
-                "Archivos de horarios (*,json;*.xml)", "*.json", "*.xml")
+                "Archivos de horarios (*.drj;*.json;*.xml)", "*.drj", "*.json", "*.xml")
         fileChooser.extensionFilters.add(extFilter)
 
         // Show save file dialog
@@ -430,7 +430,7 @@ class PrincipalController {
             fileChooser.initialDirectory = mainApp.lastFilePath!!.parentFile
         }
         val extFilter = FileChooser.ExtensionFilter(
-                "Archivos de horario (*.json)", "*.json")
+                "Archivos de horario (*.drj)", "*.drj")
         fileChooser.extensionFilters.add(extFilter)
 
         // Show save file dialog
@@ -438,8 +438,8 @@ class PrincipalController {
 
         if (file != null) {
             // Make sure it has the correct extension
-            if (!file.path.endsWith(".json")) {
-                file = File(file.path + ".json")
+            if (!file.path.endsWith(".drj")) {
+                file = File(file.path + ".drj")
             }
             mainApp.guardaHorarios(file, datosRuedaFX.toDatosRueda())
         }
