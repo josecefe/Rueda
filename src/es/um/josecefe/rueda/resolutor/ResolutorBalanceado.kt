@@ -12,12 +12,18 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.summarizingInt
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.runBlocking
+import java.util.concurrent.atomic.AtomicLong
 
 class ResolutorBalanceado : Resolutor() {
     companion object {
-        private const val DEBUG = false
+        private const val DEBUG = true
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS_EST = 1000000
+        private const val UMBRAL_PARALELO = 1000
     }
 
     private val estGlobal = EstadisticasV7()
@@ -81,82 +87,87 @@ class ResolutorBalanceado : Resolutor() {
             }
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
             if (DEBUG) println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}")
-            var contador = 0
-            var valida = 0
-            for (c in combinaciones) {
-                if (DEBUG) contador++
-                if (!continuar) break
+            var contador = 0L
+            var valida = AtomicLong()
 
-                val asignacion: MutableMap<Dia, MutableSet<Participante>> = mutableMapOf()
+            runBlocking {
+                val deferreds: MutableList<Deferred<Unit>> = mutableListOf()
+                for (c in combinaciones) {
+                    if (DEBUG) contador++
+                    if (!continuar) break
+                    deferreds.add(async(CommonPool) {
 
-                val participaIt = contexto.mapParticipanteDias.keys.iterator()
-                for (e: Set<Dia> in c) {
-                    val p = participaIt.next()
+                        val asignacion: MutableMap<Dia, MutableSet<Participante>> = mutableMapOf()
 
-                    for (dia in e) {
-                        var participantesSet = asignacion[dia]
-                        if (participantesSet == null) {
-                            participantesSet = HashSet()
-                            asignacion[dia] = participantesSet
-                        }
-                        participantesSet.add(p)
-                    }
-                }
-                if (asignacion.size < contexto.solucionesCandidatas.size) {
-                    if (ESTADISTICAS) {
-                        estGlobal.incExpandidos()
-                        estGlobal.addDescartados(1.0)
-                    }
-                    continue
-                }
-                val solCand = mutableMapOf<Dia, AsignacionDiaSimple>()
-                for ((dia, participantesDia) in asignacion) {
-                    val sol = contexto.mapaParticipantesSoluciones[dia]?.get(
-                            participantesDia) ?: break // Aquí se queda en blanco, luego no sirve
-                    solCand[dia] = sol
-                }
+                        val participaIt = contexto.mapParticipanteDias.keys.iterator()
+                        for (e: Set<Dia> in c) {
+                            val p = participaIt.next()
 
-                // Para ver si es valida bastaria con ver si hay solución en cada día
-                if (solCand.size == contexto.solucionesCandidatas.size) {
-                    if (DEBUG) valida++
-                    if (ESTADISTICAS) estGlobal.addTerminales(1.0)
-
-                    val posibilidades = Combinador(solCand.map { (dia, asignaciones) ->
-                        asignaciones.otrosPosiblesLugares.map {
-                            Pair(dia, it)
-                        }
-                    })
-                    for (posible in posibilidades) {
-                        val t = contexto.participantes.associate { participaIt1 ->
-                            Pair(participaIt1, posible.map {
-                                if (it.second[participaIt1] != null) Triple(it.first, it.second[participaIt1]?.first,
-                                        it.second[participaIt1]?.second) else null
-                            }.filterNotNull())
-                        }
-                        val tp = t.mapValues { (participante, value) ->
-                            value.sumBy { (dia, ida, vuelta) ->
-                                (participante.puntosEncuentro.indexOf(ida) + participante.puntosEncuentro.indexOf(
-                                        vuelta)) * (if (solCand[dia]!!.conductores.contains(
-                                        participante)) PESO_LUGAR_CONDUCTOR else PESO_LUGAR_PASAJERO)
+                            for (dia in e) {
+                                var participantesSet = asignacion[dia]
+                                if (participantesSet == null) {
+                                    participantesSet = HashSet()
+                                    asignacion[dia] = participantesSet
+                                }
+                                participantesSet.add(p)
                             }
                         }
-                        val dif = tp.values.summarizingInt()
-                        if (dif.avg + dif.max < mejorCoste) {
-                            val iteradorPosible = posible.iterator()
-                            solucionFinal = solCand.mapValues { (_, asignacionCompleta) ->
-                                AsignacionDiaSimple(asignacionCompleta.conductores,
-                                        listOf(iteradorPosible.next().second), dif.sum)
-                            }
-                            if (DEBUG) println(
-                                    "---> Encontrada mejora: Coste anterior = $mejorCoste, nuevo coste = ${dif.avg + dif.max}, sol = ${solucionFinal}")
-                            mejorCoste = dif.avg + dif.max
+                        if (asignacion.size < contexto.solucionesCandidatas.size) {
                             if (ESTADISTICAS) {
-                                estGlobal.fitness = mejorCoste.toInt() + nivel * PESO_MAXIMO_VECES_CONDUCTOR
-                                estGlobal.actualizaProgreso()
+                                estGlobal.incExpandidos()
+                                estGlobal.addDescartados(1.0)
                             }
+                            return@async //continue
                         }
-                    }
-                    /*
+                        val solCand = mutableMapOf<Dia, AsignacionDiaSimple>()
+                        for ((dia, participantesDia) in asignacion) {
+                            val sol = contexto.mapaParticipantesSoluciones[dia]?.get(
+                                    participantesDia) ?: break // Aquí se queda en blanco, luego no sirve
+                            solCand[dia] = sol
+                        }
+
+                        // Para ver si es valida bastaria con ver si hay solución en cada día
+                        if (solCand.size == contexto.solucionesCandidatas.size) {
+                            if (DEBUG) valida.incrementAndGet()
+                            if (ESTADISTICAS) estGlobal.addTerminales(1.0)
+
+                            val posibilidades = Combinador(solCand.map { (dia, asignaciones) ->
+                                asignaciones.otrosPosiblesLugares.map {
+                                    Pair(dia, it)
+                                }
+                            })
+                            for (posible in posibilidades) {
+                                val t = contexto.participantes.associate { participaIt1 ->
+                                    Pair(participaIt1, posible.map {
+                                        if (it.second[participaIt1] != null) Triple(it.first, it.second[participaIt1]?.first,
+                                                it.second[participaIt1]?.second) else null
+                                    }.filterNotNull())
+                                }
+                                val tp = t.mapValues { (participante, value) ->
+                                    value.sumBy { (dia, ida, vuelta) ->
+                                        (participante.puntosEncuentro.indexOf(ida) + participante.puntosEncuentro.indexOf(
+                                                vuelta)) * (if (solCand[dia]!!.conductores.contains(
+                                                participante)) PESO_LUGAR_CONDUCTOR else PESO_LUGAR_PASAJERO)
+                                    }
+                                }
+                                val dif = tp.values.summarizingInt()
+                                // TODO: Corrigir problemas de concurrencia al acceder a estas variables compartidas
+                                if (dif.avg + dif.max < mejorCoste) {
+                                    val iteradorPosible = posible.iterator()
+                                    solucionFinal = solCand.mapValues { (_, asignacionCompleta) ->
+                                        AsignacionDiaSimple(asignacionCompleta.conductores,
+                                                listOf(iteradorPosible.next().second), dif.sum)
+                                    }
+                                    if (DEBUG) println(
+                                            "---> Encontrada mejora: Coste anterior = $mejorCoste, nuevo coste = ${dif.avg + dif.max}, sol = ${solucionFinal}")
+                                    mejorCoste = dif.avg + dif.max
+                                    if (ESTADISTICAS) {
+                                        estGlobal.fitness = mejorCoste.toInt() + nivel * PESO_MAXIMO_VECES_CONDUCTOR
+                                        estGlobal.actualizaProgreso()
+                                    }
+                                }
+                            }
+                            /*
                     val apt = calculaAptitud(solCand, nivel)
                     var costeAnt: Int
                     var solAnt: Map<Dia, AsignacionDia>
@@ -172,12 +183,22 @@ class ResolutorBalanceado : Resolutor() {
                         if (DEBUG) println(
                                 "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
                     }*/
-                } else {
-                    if (ESTADISTICAS) estGlobal.addDescartados(1.0)
+                        } else {
+                            if (ESTADISTICAS) estGlobal.addDescartados(1.0)
+                        }
+                        if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L) {
+                            estGlobal.actualizaProgreso()
+                            if (DEBUG) println(estGlobal)
+                        }
+                    })
+                    if (deferreds.size > UMBRAL_PARALELO) {
+                        deferreds.forEach { it.await() }
+                        deferreds.clear()
+                    }
                 }
-                if (ESTADISTICAS && estGlobal.incExpandidos() % CADA_EXPANDIDOS_EST == 0L) {
-                    estGlobal.actualizaProgreso()
-                    if (DEBUG) println(estGlobal)
+                if (deferreds.isNotEmpty()) {
+                    deferreds.forEach { it.await() }
+                    deferreds.clear()
                 }
             }
             if (DEBUG) println(
