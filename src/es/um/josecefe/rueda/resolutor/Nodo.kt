@@ -29,11 +29,11 @@ internal class Nodo : Comparable<Nodo> {
     private val costeAcumulado: Int
     val cotaInferior: Int
     val cotaSuperior: Int
-    private val contexto: ContextoResolucion
+    private val contexto: ContextoResolucionHeuristico
     var costeEstimado: Int = 0
         private set
 
-    constructor(contexto: ContextoResolucion) {
+    constructor(contexto: ContextoResolucionHeuristico) {
         this.contexto = contexto
         padre = null
         eleccion = null
@@ -45,7 +45,7 @@ internal class Nodo : Comparable<Nodo> {
         nivel = -1
     }
 
-    private constructor(padre: Nodo, nuevaAsignacion: AsignacionDiaV5, contexto: ContextoResolucion) {
+    private constructor(padre: Nodo, nuevaAsignacion: AsignacionDiaV5, contexto: ContextoResolucionHeuristico) {
         this.contexto = contexto
         this.padre = padre
         nivel = padre.nivel + 1

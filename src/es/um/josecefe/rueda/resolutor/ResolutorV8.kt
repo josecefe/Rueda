@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author josecefe
  */
 class ResolutorV8 : ResolutorAcotado() {
-    private var contexto: ContextoResolucion? = null
+    private var contexto: ContextoResolucionHeuristico? = null
     private var tamanosNivel: IntArray? = null
     private var nPosiblesSoluciones: DoubleArray? = null
     private val estGlobal = EstadisticasV7()
@@ -50,7 +50,7 @@ class ResolutorV8 : ResolutorAcotado() {
 
         continuar = true
 
-        val contexto1 = ContextoResolucion(horarios)
+        val contexto1 = ContextoResolucionHeuristico(horarios)
         contexto = contexto1
         contexto1.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF
         contexto1.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF

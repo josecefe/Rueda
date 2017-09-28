@@ -45,7 +45,7 @@ class ResolutorBalanceado : Resolutor() {
         /* Inicialización */
         continuar = true
 
-        val contexto = ContextoResolucionSimple(horarios)
+        val contexto = ContextoResolucionExahustivo(horarios)
 
         /* Fin inicialización */
 
@@ -120,7 +120,7 @@ class ResolutorBalanceado : Resolutor() {
                             }
                             return@async //continue
                         }
-                        val solCand = mutableMapOf<Dia, AsignacionDiaSimple>()
+                        val solCand = mutableMapOf<Dia, AsignacionDiaExahustiva>()
                         for ((dia, participantesDia) in asignacion) {
                             val sol = contexto.mapaParticipantesSoluciones[dia]?.get(
                                     participantesDia) ?: break // Aquí se queda en blanco, luego no sirve
@@ -160,7 +160,7 @@ class ResolutorBalanceado : Resolutor() {
                                 if (apt < costeAnt) {
                                     val iteradorPosible = posible.iterator()
                                     val solNueva = solCand.mapValues { (_, asignacionCompleta) ->
-                                        AsignacionDiaSimple(asignacionCompleta.conductores,
+                                        AsignacionDiaExahustiva(asignacionCompleta.conductores,
                                                 listOf(iteradorPosible.next().second), dif.sum)
                                     }
                                     var solAnt: Map<Dia, AsignacionDia>

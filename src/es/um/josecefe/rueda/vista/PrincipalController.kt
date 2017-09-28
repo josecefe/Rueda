@@ -1094,6 +1094,7 @@ class PrincipalController {
 
         private val RESOLUTORES = arrayOf("es.um.josecefe.rueda.resolutor.ResolutorBalanceado",
                 "es.um.josecefe.rueda.resolutor.ResolutorExhaustivo",
+                "es.um.josecefe.rueda.resolutor.ResolutorSimple",
                 "es.um.josecefe.rueda.resolutor.ResolutorV7",
                 "es.um.josecefe.rueda.resolutor.ResolutorV8",
                 "es.um.josecefe.rueda.resolutor.ResolutorGA",

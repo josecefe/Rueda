@@ -18,12 +18,12 @@ import kotlinx.coroutines.experimental.runBlocking
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicStampedReference
 
-class ResolutorExhaustivo : Resolutor() {
+class ResolutorSimple : Resolutor() {
     companion object {
         private const val DEBUG = true
         private const val ESTADISTICAS = true
         private const val CADA_EXPANDIDOS_EST = 1000000
-        private const val UMBRAL_PARALELO = 1000
+        private const val UMBRAL_PARALELO = 100
     }
 
     private val estGlobal = EstadisticasV8()
@@ -44,7 +44,7 @@ class ResolutorExhaustivo : Resolutor() {
         /* Inicialización */
         continuar = true
 
-        val contexto = ContextoResolucionExahustivo(horarios)
+        val contexto = ContextoResolucionSimple(horarios)
 
         /* Fin inicialización */
 
@@ -118,7 +118,7 @@ class ResolutorExhaustivo : Resolutor() {
                             }
                             return@launch
                         }
-                        val solCand = HashMap<Dia, AsignacionDiaExahustiva>()
+                        val solCand = HashMap<Dia, AsignacionDiaSimple>()
                         for ((dia, participantesDia) in asignacion) {
                             val sol = contexto.mapaParticipantesSoluciones[dia]?.get(
                                     participantesDia) ?: break // Aquí se queda en blanco, luego no sirve
@@ -130,7 +130,7 @@ class ResolutorExhaustivo : Resolutor() {
                         if (solCand.size == contexto.solucionesCandidatas.size) {
                             if (DEBUG) valida.incrementAndGet()
                             if (ESTADISTICAS) estGlobal.addTerminales(1.0)
-                            val apt = calculaAptitud(solCand, nivel)
+                            val apt = nivel * PESO_MAXIMO_VECES_CONDUCTOR
                             var costeAnt: Int
                             var solAnt: Map<Dia, AsignacionDia>
                             do {
@@ -138,14 +138,14 @@ class ResolutorExhaustivo : Resolutor() {
                                 solAnt = solucionRef.reference
                             } while (apt < costeAnt && !solucionRef.compareAndSet(solAnt, solCand, costeAnt, apt))
                             if (apt < costeAnt) {
-                                if (DEBUG) println("---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
+                                if (DEBUG) println(
+                                        "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
                                 if (ESTADISTICAS) {
                                     estGlobal.fitness = solucionRef.stamp
                                     estGlobal.actualizaProgreso()
                                 }
-                            } /*else {
-                                if (DEBUG) println("---> Descartada una mejora por concurrencia: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
-                            }*/
+                            }
+                            continuar = false // No necesitamos seguir
                         } else {
                             if (ESTADISTICAS) estGlobal.addDescartados(1.0)
                         }
@@ -164,7 +164,8 @@ class ResolutorExhaustivo : Resolutor() {
                     jobs.clear()
                 }
             }
-            if (DEBUG) println("   ---> $contador combinaciones generadas en total para este nivel, de las cuales $valida han sido validas")
+            if (DEBUG) println(
+                    "   ---> $contador combinaciones generadas en total para este nivel, de las cuales $valida han sido validas")
         }
 
         solucionFinal = solucionRef.reference
@@ -186,14 +187,13 @@ class ResolutorExhaustivo : Resolutor() {
         return solucionFinal
     }
 
-    private fun calculaAptitud(sol: Map<Dia, AsignacionDia>,
-                               vecesCond: Int) = vecesCond * PESO_MAXIMO_VECES_CONDUCTOR + sol.values.sumBy { it.coste }
+    //private fun calculaAptitud(sol: Map<Dia, AsignacionDia>, vecesCond: Int) = vecesCond * PESO_MAXIMO_VECES_CONDUCTOR
 
     override val estadisticas: Estadisticas
         get() = estGlobal
 
     override var estrategia
-        get() = Resolutor.Estrategia.EQUILIBRADO
+        get() = Estrategia.EQUILIBRADO
         set(value) { /* Nada */
         }
 }

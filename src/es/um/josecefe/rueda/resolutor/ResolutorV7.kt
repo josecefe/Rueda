@@ -42,7 +42,7 @@ class ResolutorV7 : ResolutorAcotado() {
 
         continuar = true
 
-        val contex = ContextoResolucion(horarios)
+        val contex = ContextoResolucionHeuristico(horarios)
         contex.estrategia = estrategia
 
         solucionFinal = emptyMap()

@@ -5,22 +5,23 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package es.um.josecefe.rueda.modelo
 
 /**
  * @author josecefe
  */
-data class AsignacionDiaSimple(
+data class AsignacionDiaExahustiva(
         override val conductores: Set<Participante> = emptySet(),
+        val otrosPosiblesLugares: List<Map<Participante, Pair<Lugar, Lugar>>> = emptyList(),
         override val coste: Int = 0
-) : Comparable<AsignacionDiaSimple>, AsignacionDia {
+) : Comparable<AsignacionDiaExahustiva>, AsignacionDia {
 
     override val peIda: Map<Participante, Lugar>
-        get() = conductores.associate { Pair(it, it.puntosEncuentro[0]) }
+        get() = otrosPosiblesLugares[0].mapValues { (_, par) -> par.first }
 
     override val peVuelta: Map<Participante, Lugar>
-        get() = peIda
+        get() = otrosPosiblesLugares[0].mapValues { (_, par) -> par.second }
 
-    override fun compareTo(other: AsignacionDiaSimple) = Integer.compare(conductores.size * 1000 + coste, other.conductores.size * 1000 + other.coste)
+    override fun compareTo(other: AsignacionDiaExahustiva) = Integer.compare(conductores.size * 1000 + coste,
+            other.conductores.size * 1000 + other.coste)
 }

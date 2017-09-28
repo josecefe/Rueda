@@ -15,7 +15,7 @@ import java.util.*
 /**
  * @author josec
  */
-internal class ContextoResolucion (horarios: Set<Horario>) {
+internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
     val dias: List<Dia>
     //Map<Dia, Integer> diasIndex;
     val participantes: List<Participante>

@@ -5,7 +5,6 @@
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package es.um.josecefe.rueda.resolutor
 
 import es.um.josecefe.rueda.modelo.*
@@ -17,11 +16,11 @@ import java.util.*
 /**
  * @author josecefe
  */
-internal class ContextoResolucionSimple(horarios: Set<Horario>) {
+internal class ContextoResolucionExahustivo(horarios: Set<Horario>) {
     val dias: List<Dia> = horarios.map { it.dia }.distinct().sorted()
     val participantes: List<Participante> = horarios.map { it.participante }.distinct().sorted()
-    val solucionesCandidatas: MutableMap<Dia, List<AsignacionDiaSimple>>
-    val mapaParticipantesSoluciones: MutableMap<Dia, Map<Set<Participante>, AsignacionDiaSimple>>
+    val solucionesCandidatas: MutableMap<Dia, List<AsignacionDiaExahustiva>>
+    val mapaParticipantesSoluciones: MutableMap<Dia, Map<Set<Participante>, AsignacionDiaExahustiva>>
     val coefConduccion: Map<Participante, Double> //Que tanto por 1 supone que use el coche cada conductor
     val diasFijos: Map<Participante, MutableSet<Dia>>
     val minCond: Int
@@ -41,8 +40,8 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
         solucionesCandidatas = LinkedHashMap()
         mapaParticipantesSoluciones = HashMap()
         for (d: Dia in dias) {
-            val solucionesDia = mutableListOf<AsignacionDiaSimple>() //Para paralelizar usar Vector en luar de ArrayList
-            val mapaParticipantesAsignacionDia = mutableMapOf<Set<Participante>, AsignacionDiaSimple>() //Para paralelizar usar ConcurrentHashMap
+            val solucionesDia = mutableListOf<AsignacionDiaExahustiva>() //Para paralelizar usar Vector en luar de ArrayList
+            val mapaParticipantesAsignacionDia = mutableMapOf<Set<Participante>, AsignacionDiaExahustiva>() //Para paralelizar usar ConcurrentHashMap
             val horariosDia = horarios.filter { it.dia == d }.toSet()
             val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
             val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
@@ -70,9 +69,66 @@ internal class ContextoResolucionSimple(horarios: Set<Horario>) {
                 if (nParticipantesIda.entries.all { e -> plazasIda[e.key] ?: 0 >= e.value }
                         && nParticipantesVuelta.entries.all { e -> (plazasVuelta[e.key] ?: 0) >= e.value }) {
 
-                    val asignacionDiaSimple = AsignacionDiaSimple(selCond)
-                    solucionesDia.add(asignacionDiaSimple)
-                    mapaParticipantesAsignacionDia.put(selCond, asignacionDiaSimple) //Para acelerar la busqueda después
+                    // Obtenemos la lista de posibles lugares teniendo en cuenta quien es el conductor
+                    val posiblesLugares = participantesDia.map { it.puntosEncuentro }.plus(
+                            selCond.map { it.puntosEncuentro })
+
+                    var mejorCoste = Integer.MAX_VALUE
+                    var mejorLugares: MutableList<Map<Participante, Pair<Lugar, Lugar>>> = mutableListOf()
+
+
+                    for (selLugares in Combinador(posiblesLugares)) {
+                        val lugaresIda: MutableMap<Participante, Lugar> = HashMap()
+                        val lugaresVuelta: MutableMap<Participante, Lugar> = HashMap()
+                        val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
+                        for (i in participantesDia.indices) {
+                            lugaresIda.put(participantesDia[i], selLugares[i])
+                            lugaresVuelta.put(participantesDia[i],
+                                    if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
+                        }
+                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
+
+                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
+                        // Para comprobar, vemos los participantes, sus entradas y salidas
+                        val plazasNecesariasIda = horariosDia.groupBy { it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
+
+                        val plazasNecesariasVuelta = horariosDia.groupBy { it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
+
+                        if (plazasNecesariasIda.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesIda[e.key]?.get(ll.key) ?: 0
+                            }
+                        }
+                                && plazasNecesariasVuelta.entries.all { e ->
+                            e.value.entries.all { ll ->
+                                ll.value <= plazasDisponiblesVuelta[e.key]?.get(ll.key) ?: 0
+                            }
+                        }) {
+                            // Calculamos coste
+                            val coste = participantesDia.sumBy { e ->
+                                e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e])
+                            }
+
+                            if (coste < mejorCoste) {
+                                mejorCoste = coste
+                                mejorLugares.add(0,
+                                        lugaresIda.mapValues { (key, value) -> Pair(value, lugaresVuelta[key]!!) })
+                            } else if (coste == mejorCoste) {
+                                // Tenemos una nueva solución igual de costosa (la primera también entra, ya que arriba solo borramos
+                                mejorLugares.add(
+                                        lugaresIda.mapValues { (key, value) -> Pair(value, lugaresVuelta[key]!!) })
+                            }
+                        }
+                    }
+                    if (mejorCoste < Integer.MAX_VALUE) {
+                        // Tenemos una solución válida
+                        val asignacionDiaSimple = AsignacionDiaExahustiva(selCond, mejorLugares, mejorCoste)
+                        solucionesDia.add(asignacionDiaSimple)
+                        mapaParticipantesAsignacionDia.put(selCond,
+                                asignacionDiaSimple) //Para acelerar la busqueda después
+                    }
                 }
             }
             Collections.sort(solucionesDia)
