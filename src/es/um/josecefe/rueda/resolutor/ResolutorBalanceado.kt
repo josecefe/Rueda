@@ -17,6 +17,7 @@ import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicStampedReference
 
 class ResolutorBalanceado : Resolutor() {
     companion object {
@@ -26,7 +27,7 @@ class ResolutorBalanceado : Resolutor() {
         private const val UMBRAL_PARALELO = 1000
     }
 
-    private val estGlobal = EstadisticasV7()
+    private val estGlobal = EstadisticasV8()
     override var solucionFinal: Map<Dia, AsignacionDia> = emptyMap()
         private set
 
@@ -54,13 +55,13 @@ class ResolutorBalanceado : Resolutor() {
             if (DEBUG) println("Tiempo inicializar = ${estGlobal.tiempoString}")
         }
 
-        // PARALELO: val solucionRef = AtomicStampedReference(solucionFinal, Int.MAX_VALUE)
-        var mejorCoste = Double.POSITIVE_INFINITY
+        val solucionRef = AtomicStampedReference(solucionFinal, Int.MAX_VALUE)
+        // SECUENCIAL: var mejorCoste = Double.POSITIVE_INFINITY
 
         //Vamos a ir buscando soluciones de menos veces al tope de veces
         for (nivel in contexto.minCond..contexto.dias.size) {
-            //PARALELO: if (solucionRef.stamp < Int.MAX_VALUE) {
-            if (!mejorCoste.isInfinite()) {
+            if (solucionRef.stamp < Int.MAX_VALUE) {
+                //SECUENCIAL: if (!mejorCoste.isInfinite()) {
                 if (ESTADISTICAS) estGlobal.actualizaProgreso()
                 if (DEBUG) println("** No examinamos el nivel $nivel al tener ya una solución de un nivel anterior **")
                 break
@@ -139,50 +140,49 @@ class ResolutorBalanceado : Resolutor() {
                             for (posible in posibilidades) {
                                 val t = contexto.participantes.associate { participaIt1 ->
                                     Pair(participaIt1, posible.map {
-                                        if (it.second[participaIt1] != null) Triple(it.first, it.second[participaIt1]?.first,
+                                        if (it.second[participaIt1] != null) Triple(it.first,
+                                                it.second[participaIt1]?.first,
                                                 it.second[participaIt1]?.second) else null
                                     }.filterNotNull())
                                 }
                                 val tp = t.mapValues { (participante, value) ->
                                     value.sumBy { (dia, ida, vuelta) ->
-                                        (participante.puntosEncuentro.indexOf(ida) + participante.puntosEncuentro.indexOf(
+                                        (participante.puntosEncuentro.indexOf(
+                                                ida) + participante.puntosEncuentro.indexOf(
                                                 vuelta)) * (if (solCand[dia]!!.conductores.contains(
                                                 participante)) PESO_LUGAR_CONDUCTOR else PESO_LUGAR_PASAJERO)
                                     }
                                 }
                                 val dif = tp.values.summarizingInt()
-                                // TODO: Corrigir problemas de concurrencia al acceder a estas variables compartidas
-                                if (dif.avg + dif.max < mejorCoste) {
+                                val apt = ((dif.avg + dif.max) * 1000.0).toInt()
+                                var costeAnt = solucionRef.stamp
+
+                                if (apt < costeAnt) {
                                     val iteradorPosible = posible.iterator()
-                                    solucionFinal = solCand.mapValues { (_, asignacionCompleta) ->
+                                    val solNueva = solCand.mapValues { (_, asignacionCompleta) ->
                                         AsignacionDiaSimple(asignacionCompleta.conductores,
                                                 listOf(iteradorPosible.next().second), dif.sum)
                                     }
-                                    if (DEBUG) println(
-                                            "---> Encontrada mejora: Coste anterior = $mejorCoste, nuevo coste = ${dif.avg + dif.max}, sol = ${solucionFinal}")
-                                    mejorCoste = dif.avg + dif.max
-                                    if (ESTADISTICAS) {
-                                        estGlobal.fitness = mejorCoste.toInt() + nivel * PESO_MAXIMO_VECES_CONDUCTOR
-                                        estGlobal.actualizaProgreso()
+                                    var solAnt: Map<Dia, AsignacionDia>
+                                    do {
+                                        costeAnt = solucionRef.stamp
+                                        solAnt = solucionRef.reference
+                                    } while (apt < costeAnt && !solucionRef.compareAndSet(solAnt, solNueva, costeAnt,
+                                            apt))
+                                    if (apt < costeAnt) {
+                                        if (DEBUG) println(
+                                                "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
+                                        if (ESTADISTICAS) {
+                                            estGlobal.fitness = solucionRef.stamp
+                                            estGlobal.actualizaProgreso()
+                                        }
+                                    } else {
+                                        if (DEBUG) println(
+                                                "---> Descartada una mejora por concurrencia: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
                                     }
                                 }
                             }
-                            /*
-                    val apt = calculaAptitud(solCand, nivel)
-                    var costeAnt: Int
-                    var solAnt: Map<Dia, AsignacionDia>
-                    do {
-                        costeAnt = solucionRef.stamp
-                        solAnt = solucionRef.reference
-                    } while (apt < costeAnt && !solucionRef.compareAndSet(solAnt, solCand, costeAnt, apt))
-                    if (apt < costeAnt) {
-                        if (ESTADISTICAS) {
-                            estGlobal.fitness = solucionRef.stamp
-                            estGlobal.actualizaProgreso()
-                        }
-                        if (DEBUG) println(
-                                "---> Encontrada una mejora: Coste anterior = $costeAnt, nuevo coste = ${solucionRef.stamp}, sol = ${solucionRef.reference}")
-                    }*/
+
                         } else {
                             if (ESTADISTICAS) estGlobal.addDescartados(1.0)
                         }
@@ -205,7 +205,7 @@ class ResolutorBalanceado : Resolutor() {
                     "   ---> $contador combinaciones generadas en este nivel, de las cuales $valida han sido validas")
         }
 
-        //PARALELO: solucionFinal = solucionRef.reference
+        solucionFinal = solucionRef.reference
 
         //Estadisticas finales
         if (ESTADISTICAS) {
