@@ -11,12 +11,12 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicStampedReference
+import kotlin.system.measureTimeMillis
 
 class ResolutorSimple : Resolutor() {
     companion object {
@@ -83,19 +83,47 @@ class ResolutorSimple : Resolutor() {
                         contexto.diasFijos[key]!!) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map {
                     if (contexto.diasFijos[key] != null) contexto.diasFijos[key]!!.plus(it) else it
-                }.toList())
+                })
             }
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
-            if (DEBUG) println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}")
             var contador = 0L
-            var valida = AtomicLong()
+            val valida = AtomicLong()
+
+            if (DEBUG) {
+                println("Contando (sin generar nada):")
+                val tiempo = measureTimeMillis {
+                    val solucionesNivel = contexto.getSolucionesNivel(nivel)
+                    for (c in 1..solucionesNivel) {
+                        if (++contador % 10000000L == 0L) {
+                            print(".")
+                            if (contador % 1000000000L == 0L) println("#$contador")
+                        }
+                    }
+                }
+                println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}, tiempo base $tiempo ms")
+            }
+
+            if (DEBUG) {
+                println("Contando (generando):")
+                contador = 0L
+                val tiempo = measureTimeMillis {
+                    for (c in combinaciones) {
+                        if (++contador % 10000000L == 0L) {
+                            print(".")
+                            if (contador % 1000000000L == 0L) println("#$contador")
+                        }
+                    }
+                }
+                println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}, tiempo base $tiempo ms")
+
+            }
 
             runBlocking {
                 val jobs: MutableList<Job> = mutableListOf()
                 for (c in combinaciones) {
                     if (DEBUG) contador++
                     if (!continuar) break
-                    jobs.add(launch(CommonPool) {
+                    jobs.add(launch {
                         val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
                         val participaIt = contexto.mapParticipanteDias.keys.iterator()
@@ -194,6 +222,6 @@ class ResolutorSimple : Resolutor() {
 
     override var estrategia
         get() = Estrategia.EQUILIBRADO
-        set(value) { /* Nada */
+        set(@Suppress("UNUSED_PARAMETER") value) { /* Nada */
         }
 }

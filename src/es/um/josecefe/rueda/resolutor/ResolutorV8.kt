@@ -10,10 +10,7 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.AsignacionDia
 import es.um.josecefe.rueda.modelo.Dia
 import es.um.josecefe.rueda.modelo.Horario
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -86,7 +83,7 @@ class ResolutorV8 : ResolutorAcotado() {
         val actual = Nodo(contexto1)
         cotaInferiorCorte = AtomicInteger(cotaInfCorte + 1) //Lo tomamos como cota superior
 
-        var mejor = runBlocking { branchAndBound(actual, actual) }
+        val mejor = runBlocking { branchAndBound(actual, actual) }
 
         //Estadisticas finales
         if (ESTADISTICAS) {
@@ -172,12 +169,12 @@ class ResolutorV8 : ResolutorAcotado() {
                 if (ESTADISTICAS) {
                     estGlobal.addDescartados((tamanosNivel!![actual.nivel + 1] - lNF.size) * nPosiblesSoluciones!![actual.nivel + 1])
                 }
-                lNF.sort();
-                var mejorHijo = if (lNF.size > 1 && actual.nivel + 3 < contexto!!.dias.size) { // Los hijos estan lejos de ser terminales)
+                lNF.sort()
+                val mejorHijo = if (lNF.size > 1 && actual.nivel + 3 < contexto!!.dias.size) { // Los hijos estan lejos de ser terminales)
                     val mejorHijoDef: MutableList<Deferred<Nodo>> = ArrayList<Deferred<Nodo>>(lNF.size)
                     //println("Lanzando una corutina en nivel ${actual.nivel} con ${lNF.size} hilos")
                     for (n in lNF) {
-                        mejorHijoDef.add(async(CommonPool) { branchAndBound(n, mejor) })
+                        mejorHijoDef.add(GlobalScope.async{ branchAndBound(n, mejor) })
                     }
 
                     mejorHijoDef.map { it.await() }.min()

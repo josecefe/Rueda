@@ -11,10 +11,9 @@ package es.um.josecefe.rueda.resolutor
 import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicStampedReference
 
@@ -88,14 +87,14 @@ class ResolutorExhaustivo : Resolutor() {
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
             if (DEBUG) println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}")
             var contador = 0L
-            var valida = AtomicLong()
+            val valida = AtomicLong()
 
             runBlocking {
                 val jobs: MutableList<Job> = mutableListOf()
                 for (c in combinaciones) {
                     if (DEBUG) contador++
                     if (!continuar) break
-                    jobs.add(launch(CommonPool) {
+                    jobs.add(launch {
                         val asignacion: MutableMap<Dia, MutableSet<Participante>> = HashMap()
 
                         val participaIt = contexto.mapParticipanteDias.keys.iterator()
@@ -193,7 +192,7 @@ class ResolutorExhaustivo : Resolutor() {
         get() = estGlobal
 
     override var estrategia
-        get() = Resolutor.Estrategia.EQUILIBRADO
-        set(value) { /* Nada */
+        get() = Estrategia.EQUILIBRADO
+        set(@Suppress("UNUSED_PARAMETER") value) { /* Nada */
         }
 }

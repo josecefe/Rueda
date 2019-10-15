@@ -12,10 +12,9 @@ import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.util.Combinador
 import es.um.josecefe.rueda.util.SubSets
 import es.um.josecefe.rueda.util.summarizingInt
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicStampedReference
 
@@ -89,14 +88,14 @@ class ResolutorBalanceado : Resolutor() {
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
             if (DEBUG) println("   ---> Soluciones a generar del nivel $nivel: ${combinaciones.size}")
             var contador = 0L
-            var valida = AtomicLong()
+            val valida = AtomicLong()
 
             runBlocking {
                 val deferreds: MutableList<Deferred<Unit>> = mutableListOf()
                 for (c in combinaciones) {
                     if (DEBUG) contador++
                     if (!continuar) break
-                    deferreds.add(async(CommonPool) {
+                    deferreds.add(async {
 
                         val asignacion: MutableMap<Dia, MutableSet<Participante>> = mutableMapOf()
 
@@ -228,6 +227,6 @@ class ResolutorBalanceado : Resolutor() {
 
     override var estrategia
         get() = Estrategia.EQUILIBRADO
-        set(value) { /* Nada */
+        set(@Suppress("UNUSED_PARAMETER") value) { /* Nada */
         }
 }

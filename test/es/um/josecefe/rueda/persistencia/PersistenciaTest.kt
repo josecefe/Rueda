@@ -41,7 +41,6 @@ internal class PersistenciaTest {
 
     @Test
     fun cargaDatosRueda() {
-        //val fichero = File("datosRuedaTest.xml")
         val fichero = File("datosRuedaTest.json")
         if (fichero.exists()) {
             val datosRueda = Persistencia.cargaDatosRuedaJSON(fichero)
@@ -49,7 +48,7 @@ internal class PersistenciaTest {
             println(datosRueda.lugares)
             println(datosRueda.participantes)
             println(datosRueda.horarios)
-            Persistencia.guardaDatosRuedaJSON(File("datosRuedaTest.xml"), datosRueda) //Reguardado
+            Persistencia.guardaDatosRuedaJSON(File("datosRuedaTest.json"), datosRueda) //Reguardado
         } else {
             println("No ha fichero con datos, prueba a ejecutar el test de guardado")
         }

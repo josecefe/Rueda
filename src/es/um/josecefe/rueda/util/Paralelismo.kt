@@ -8,14 +8,14 @@
 
 package es.um.josecefe.rueda.util
 
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.runBlocking
+
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 fun <A, B> List<A>.pmap(f: suspend (A) -> B): List<B> = runBlocking {
-    map { async(CommonPool) { f(it) } }.map { it.await() }
+    map { async { f(it) } }.map { it.await() }
 }
 
 fun <A> Collection<A>.forEachParallel(f: suspend (A) -> Unit): Unit = runBlocking {
-    map { async(CommonPool) { f(it) } }.forEach { it.await() }
+    map { async { f(it) } }.forEach { it.await() }
 }
