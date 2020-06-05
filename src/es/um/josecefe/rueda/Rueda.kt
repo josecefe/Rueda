@@ -31,11 +31,9 @@ private const val AMPLIADO = false
 
 private fun duplicarHorario(horarios: Set<Horario>): Set<Horario> {
     val nHorarios: HashSet<Horario> = HashSet(horarios)
-    val diasOriginal = horarios.map { it.dia }.distinct().filterNotNull()
+    val diasOriginal = horarios.map { it.dia }.distinct()
     val maxNOrden = diasOriginal.map { it.orden }.max() ?: 1
-    val dias: Map<Dia, Dia> = diasOriginal.associate {
-        Pair(it, Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden))
-    }
+    val dias: Map<Dia, Dia> = diasOriginal.associateWith { Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden) }
     nHorarios.addAll(horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
 
     return nHorarios
@@ -48,7 +46,7 @@ fun pruebaResolutor() {
     // Vamos a guardarlo en XML
     //Persistencia.guardaDatosRuedaXML(new File(RUEDAXML_HORARIOS), datos);
 
-    val resolutores: List<Resolutor> = Arrays.asList(
+    val resolutores: List<Resolutor> = listOf(
             ResolutorV8(),
             ResolutorV7(),
             ResolutorExhaustivo()
@@ -88,6 +86,6 @@ fun pruebaResolutor() {
 }
 
 
-fun main(args: Array<String>) {
+fun main() {
     pruebaResolutor()
 }

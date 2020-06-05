@@ -17,6 +17,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicStampedReference
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 class ResolutorBalanceado : Resolutor() {
     companion object {
@@ -77,12 +79,11 @@ class ResolutorBalanceado : Resolutor() {
 
             val listSubcon: MutableList<List<Set<Dia>>> = ArrayList(contexto.mapParticipanteDias.size)
             for ((key, value) in contexto.mapParticipanteDias) {
-                val numVecesCond = Math.max(1, Math.round(
-                        nivel.toDouble() / contexto.coefConduccion[key]!!).toInt()) - (contexto.diasFijos[key]?.size ?: 0)//Para minorar adecuadamente el valor de i usando el coeficiente de conductor
+                val numVecesCond = max(1, (nivel.toDouble() / contexto.coefConduccion.getValue(key)).roundToInt()) - (contexto.diasFijos[key]?.size ?: 0)//Para minorar adecuadamente el valor de i usando el coeficiente de conductor
                 val diasCambiantes: Set<Dia> = if (contexto.diasFijos[key] != null) value.minus(
-                        contexto.diasFijos[key]!!) else value
+                        contexto.diasFijos.getValue(key)) else value
                 listSubcon.add(SubSets(diasCambiantes, numVecesCond, numVecesCond).map {
-                    if (contexto.diasFijos[key] != null) contexto.diasFijos[key]!!.plus(it) else it
+                    if (contexto.diasFijos[key] != null) contexto.diasFijos.getValue(key).plus(it) else it
                 }.toList())
             }
             val combinaciones: Combinador<Set<Dia>> = Combinador(listSubcon)
@@ -137,12 +138,12 @@ class ResolutorBalanceado : Resolutor() {
                                 }
                             })
                             for (posible in posibilidades) {
-                                val t = contexto.participantes.associate { participaIt1 ->
-                                    Pair(participaIt1, posible.map {
+                                val t = contexto.participantes.associateWith { participaIt1 ->
+                                    posible.mapNotNull {
                                         if (it.second[participaIt1] != null) Triple(it.first,
                                                 it.second[participaIt1]?.first,
                                                 it.second[participaIt1]?.second) else null
-                                    }.filterNotNull())
+                                    }
                                 }
                                 val tp = t.mapValues { (participante, value) ->
                                     value.sumBy { (dia, ida, vuelta) ->

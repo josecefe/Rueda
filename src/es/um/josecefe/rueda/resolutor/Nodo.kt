@@ -51,7 +51,7 @@ internal class Nodo : Comparable<Nodo> {
         nivel = padre.nivel + 1
         eleccion = nuevaAsignacion
         costeAcumulado = padre.costeAcumulado + nuevaAsignacion.coste
-        vecesConductor = Arrays.copyOf(padre.vecesConductor, padre.vecesConductor.size)
+        vecesConductor = padre.vecesConductor.copyOf(padre.vecesConductor.size)
         val conductores = nuevaAsignacion.conductoresArray
         var maximo = 0
         var maxCS = 0
@@ -136,7 +136,7 @@ internal class Nodo : Comparable<Nodo> {
         get() {
             val solucion: MutableMap<Dia, AsignacionDiaV5> = padre?.solucion ?: HashMap()
             if (nivel >= 0) {
-                solucion.put(dia!!, eleccion!!)
+                solucion[dia!!] = eleccion!!
             }
             return solucion
         }

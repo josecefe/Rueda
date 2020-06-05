@@ -102,7 +102,7 @@ object Persistencia {
                         var horasDia = datosTabla[d]
                         if (horasDia == null) {
                             horasDia = HashMap(horasActivas.size)
-                            datosTabla.put(d, horasDia)
+                            datosTabla[d] = horasDia
                         }
                         val celdaIda = horasDia.computeIfAbsent(h.entrada) { ArrayList() }
 
@@ -279,9 +279,7 @@ object Persistencia {
                     FileInputStream(file)).use { f ->
                 val mapper = jacksonObjectMapper()
 
-                with(mapper) {
-                    return mapper.readValue(f)
-                }
+                return mapper.readValue(f)
             }
         } catch (ex: Exception) {
             Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)

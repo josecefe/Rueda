@@ -59,7 +59,7 @@ class ResolutorIterativo : ResolutorAcotado {
     override val solucionFinal: Map<Dia, AsignacionDia>
         get() = solucion
 
-    override var estrategia: Resolutor.Estrategia
+    override var estrategia: Estrategia
         get() = resolutor.estrategia
         set(estrategia) {
             resolutor.estrategia = estrategia

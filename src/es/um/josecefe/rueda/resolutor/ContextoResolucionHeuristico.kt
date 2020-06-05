@@ -73,7 +73,7 @@ internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
             val solucionesDia = Vector<AsignacionDiaV5>()
             val mapaParticipantesAsignacionDia = HashMap<Set<Participante>, AsignacionDiaV5>() //ConcurrentHashMap
             val horariosDia = horarios.filter { it.dia == d }.toSet()
-            val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
+            val participanteHorario = horariosDia.associateBy { it.participante }
             val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
 
             // Para cada hora de entrada, obtenemos los conductores disponibles
@@ -84,16 +84,16 @@ internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
             val conductoresDia = entradaConductor.keys.map { key ->
-                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size).toList()
+                SubSets(entradaConductor.getValue(key), 1, entradaConductor.getValue(key).size).toList()
             }
             val combinarConductoresDia = Combinador(conductoresDia)
 
             for (condDia in combinarConductoresDia) {
-                val selCond = condDia.flatMap { it }.toSet()
+                val selCond = condDia.flatten().toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
-                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
-                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
+                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it.value.sumBy { horario -> horario!!.participante.plazasCoche } }
+                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { horario -> horario!!.participante.plazasCoche } }
 
                 if (nParticipantesIda.entries.all { e -> (plazasIda[e.key] ?: 0) >= e.value }
                         && nParticipantesVuelta.entries.all { e -> (plazasVuelta[e.key] ?: 0) >= e.value }) {
@@ -110,19 +110,18 @@ internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
                         val lugaresVuelta: MutableMap<Participante, Lugar> = HashMap()
                         val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
                         for (i in participantesDia.indices) {
-                            lugaresIda.put(participantesDia[i], selLugares[i])
-                            lugaresVuelta.put(participantesDia[i],
-                                    if (selCond.contains(participantesDia[i])) il.next() else selLugares[i])
+                            lugaresIda[participantesDia[i]] = selLugares[i]
+                            lugaresVuelta[participantesDia[i]] = if (selCond.contains(participantesDia[i])) il.next() else selLugares[i]
                         }
-                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario.getValue(it).entrada }.mapValues { it -> it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { participante -> participante.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
 
-                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario.getValue(it).salida }.mapValues { it -> it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { participante -> participante.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
-                        val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
+                        val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it -> it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
-                        val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
+                        val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it -> it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
                         if (plazasNecesariasIda.entries.all { e ->
                             e.value.entries.all { ll ->
@@ -165,17 +164,17 @@ internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
                     }
                 }
             }
-            Collections.shuffle(solucionesDia) //Barajamos las soluciones parciales para dar cierta aleatoridad a igualdad de coste
-            Collections.sort(solucionesDia) //Ordenamos la soluciones parciales tras el barajado
-            solucionesCandidatas.put(d, ArrayList(solucionesDia))
-            mapaParticipantesSoluciones.put(d, HashMap(mapaParticipantesAsignacionDia))
+            solucionesDia.shuffle() //Barajamos las soluciones parciales para dar cierta aleatoridad a igualdad de coste
+            solucionesDia.sort() //Ordenamos la soluciones parciales tras el barajado
+            solucionesCandidatas[d] = ArrayList(solucionesDia)
+            mapaParticipantesSoluciones[d] = HashMap(mapaParticipantesAsignacionDia)
         }
 
         //Vamos a ver cual sería el mejor orden para ir explorando los días, empezando por el que menos soluciones posibles ofrece
-        if (ORDEN_IMPORTA) {
-            ordenExploracionDias = solucionesCandidatas.entries.sortedByDescending { it.value.size }.map { e -> dias.indexOf(e.key) }.toTypedArray().toIntArray()
+        ordenExploracionDias = if (ORDEN_IMPORTA) {
+            solucionesCandidatas.entries.sortedByDescending { it.value.size }.map { e -> dias.indexOf(e.key) }.toTypedArray().toIntArray()
         } else {
-            ordenExploracionDias = (0 until solucionesCandidatas.size).toList().toIntArray()
+            (0 until solucionesCandidatas.size).toList().toIntArray()
         }
 
 
@@ -183,7 +182,7 @@ internal class ContextoResolucionHeuristico(horarios: Set<Horario>) {
         for (i in peorCosteDia.size - 2 downTo 0) {
             peorCosteDia[ordenExploracionDias[i]] += peorCosteDia[ordenExploracionDias[i + 1]]
             mejorCosteDia[ordenExploracionDias[i]] += mejorCosteDia[ordenExploracionDias[i + 1]]
-            for (j in 0 until minVecesCondDia[ordenExploracionDias[i]].size) {
+            for (j in minVecesCondDia[ordenExploracionDias[i]].indices) {
                 minVecesCondDia[ordenExploracionDias[i]][j] += minVecesCondDia[ordenExploracionDias[i + 1]][j]
                 maxVecesCondDia[ordenExploracionDias[i]][j] += maxVecesCondDia[ordenExploracionDias[i + 1]][j]
             }

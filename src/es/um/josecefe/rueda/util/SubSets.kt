@@ -8,6 +8,7 @@
 package es.um.josecefe.rueda.util
 
 import java.util.*
+import kotlin.math.min
 
 /**
  * Esta clase contiene un generador de subconjuntos a partir de uno dado
@@ -22,7 +23,7 @@ class SubSets<out T>(conjunto: Collection<T>, minSize: Int, maxSize: Int) : Iter
     private val maxSize: Int
 
     init {
-        this.minSize = Math.min(this.size, minSize)
+        this.minSize = min(this.size, minSize)
         this.maxSize = if (maxSize > this.size) this.size else maxSize
     }
 

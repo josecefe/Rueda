@@ -18,11 +18,11 @@ import javafx.collections.FXCollections
  * @author josec
  */
 class DatosRuedaFX {
-    val diasProperty: ListProperty<Dia> = SimpleListProperty(FXCollections.observableArrayList<Dia>())
-    val lugaresProperty: ListProperty<Lugar> = SimpleListProperty(FXCollections.observableArrayList<Lugar>())
-    val participantesProperty: ListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList<Participante>())
-    val horariosProperty: ListProperty<Horario> = SimpleListProperty(FXCollections.observableArrayList<Horario>())
-    val asignacionProperty: ListProperty<Asignacion> = SimpleListProperty(FXCollections.observableArrayList<Asignacion>())
+    val diasProperty: ListProperty<Dia> = SimpleListProperty(FXCollections.observableArrayList())
+    val lugaresProperty: ListProperty<Lugar> = SimpleListProperty(FXCollections.observableArrayList())
+    val participantesProperty: ListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList())
+    val horariosProperty: ListProperty<Horario> = SimpleListProperty(FXCollections.observableArrayList())
+    val asignacionProperty: ListProperty<Asignacion> = SimpleListProperty(FXCollections.observableArrayList())
     val costeAsignacionProperty: IntegerProperty = SimpleIntegerProperty()
     /**
      * Obtiene el último mensaje de validación producido por la última llamada a validar
@@ -100,7 +100,7 @@ class DatosRuedaFX {
         // Participantes
         horariosProperty.map { it.participante }.distinct().mapTo(participantesProperty) { it }
         // Y a partir de los participantes, los Lugares
-        participantesProperty.map { it.puntosEncuentro }.flatMap { it }.distinct().mapTo(lugaresProperty) { it }
+        participantesProperty.map { it.puntosEncuentro }.flatten().distinct().mapTo(lugaresProperty) { it }
     }
 
     fun setSolucion(resolver: Map<Dia, AsignacionDia>, costeTotal: Int) {

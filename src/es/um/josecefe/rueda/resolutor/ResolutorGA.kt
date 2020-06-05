@@ -27,8 +27,8 @@ import java.util.stream.Stream
  */
 class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: Double = PROB_MUTACION_DEF, var numGeneraciones: Int = N_GENERACIONES_DEF, var tiempoMaximo: Long = TIEMPO_MAXIMO_DEF.toLong(), val objAptitud: Int = OBJ_APTITUD_DEF, val tournamentSize: Int = TAM_TORNEO_DEF, val tamElite: Int = TAM_ELITE_DEF, val tamExtranjero: Int = TAM_EXTRANJERO_DEF, var maxEstancado: Int = MAX_ESTANCADO_DEF) : Resolutor() {
     override var estrategia
-        get() = Resolutor.Estrategia.EQUILIBRADO
-        set(value) { /* Nada */}
+        get() = Estrategia.EQUILIBRADO
+        set(@Suppress("UNUSED_PARAMETER") value) { /* Nada */}
 
     private var horarios: Set<Horario>? = null
     private var dias: List<Dia>? = null
@@ -41,8 +41,8 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
 
     private fun inicializa() {
         continuar = true
-        dias = horarios!!.map{ it.dia }.filterNotNull().toSet().toList()
-        participantes = horarios!!.map{ it.participante }.filterNotNull().toSet().toList()
+        dias = horarios!!.map{ it.dia }.toSet().toList()
+        participantes = horarios!!.map{ it.participante }.toSet().toList()
         participantesConCoche = BooleanArray(participantes!!.size)
         for (i in participantes!!.indices) {
             participantesConCoche!![i] = participantes!![i].plazasCoche > 0
@@ -53,7 +53,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
 
         coefConduccion = FloatArray(participantes!!.size)
         for (i in coefConduccion!!.indices) {
-            coefConduccion!![i] = maxVecesParticipa.toFloat() / vecesParticipa[participantes!![i]]!!.toFloat() - 0.001f // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
+            coefConduccion!![i] = maxVecesParticipa.toFloat() / vecesParticipa.getValue(participantes!![i]).toFloat() - 0.001f // Restamos 0.001 para evitar que al redondear ciertos casos se desmadren
         }
         solucionFinal = emptyMap()
 
@@ -63,7 +63,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             val d = dias!![indDia]
             val solucionesDia = ArrayList<AsignacionDiaV5>()
             val horariosDia = horarios!!.filter { it.dia == d }.toSet()
-            val participanteHorario = horariosDia.associate { Pair(it.participante, it) }
+            val participanteHorario = horariosDia.associateBy { it.participante }
             val participantesDia = horariosDia.map { it.participante }.sortedBy { it.nombre }
 
             // Para cada hora de entrada, obtenemos los conductores disponibles
@@ -74,16 +74,16 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             val nParticipantesVuelta = horariosDia.groupingBy { it.salida }.eachCount()
             // Generamos todas las posibilidades y a ver cuales sirven...
             val conductoresDia = entradaConductor.keys.map { key ->
-                SubSets(entradaConductor[key]!!, 1, entradaConductor[key]!!.size).toList()
+                SubSets(entradaConductor.getValue(key), 1, entradaConductor.getValue(key).size).toList()
             }
             val combinarConductoresDia = Combinador(conductoresDia)
 
             for (condDia in combinarConductoresDia) {
-                val selCond = condDia.flatMap { it }.filterNotNull().toSet()
+                val selCond = condDia.flatten().toSet()
                 // Validando que hay plazas suficientes sin tener en cuenta puntos de encuentro
 
-                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
-                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it.value.sumBy { it!!.participante.plazasCoche } }
+                val plazasIda = selCond.map { participanteHorario[it] }.groupBy { it!!.entrada }.mapValues { it -> it.value.sumBy { it!!.participante.plazasCoche } }
+                val plazasVuelta = selCond.map { participanteHorario[it] }.groupBy { it!!.salida }.mapValues { it -> it.value.sumBy { it!!.participante.plazasCoche } }
 
                 if (nParticipantesIda.entries.all{ e -> plazasIda.getOrDefault(e.key, 0) >= e.value }
                         && nParticipantesVuelta.entries.all { e -> plazasVuelta.getOrDefault(e.key, 0) >= e.value }) {
@@ -102,24 +102,24 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
                         lugaresVuelta = HashMap()
                         val il = selLugares.subList(participantesDia.size, selLugares.size).iterator()
                         for (i in participantesDia.indices) {
-                            lugaresIda.put(participantesDia[i], selLugares[i])
-                            lugaresVuelta.put(participantesDia[i], if (selCond.contains(participantesDia[i]))
+                            lugaresIda[participantesDia[i]] = selLugares[i]
+                            lugaresVuelta[participantesDia[i]] = if (selCond.contains(participantesDia[i]))
                                 il.next()
                             else
-                                selLugares[i])
+                                selLugares[i]
                         }
-                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario[it]!!.entrada }.mapValues { it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        val plazasDisponiblesIda = selCond.groupBy { participanteHorario.getValue(it).entrada }.mapValues { it -> it.value.groupBy { lugaresIda[it]!! }.mapValues { it.value.sumBy { participante -> participante.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.entrada }, groupingBy({ lugaresIda[it] }, summingInt({ it.plazasCoche }))))
 
-                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario[it]!!.salida }.mapValues { it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { it.plazasCoche } } }
+                        val plazasDisponiblesVuelta = selCond.groupBy { participanteHorario.getValue(it).salida }.mapValues { it -> it.value.groupBy { lugaresVuelta[it]!! }.mapValues { it.value.sumBy { participante -> participante.plazasCoche } } }
                         //.stream().collect(groupingBy({ p -> participanteHorario[p]!!.salida }, groupingBy({ lugaresVuelta[it]!! }, summingInt({ it.plazasCoche }))))
                         // Para comprobar, vemos los participantes, sus entradas y salidas
-                        val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
+                        val plazasNecesariasIda = horariosDia.groupBy{ it.entrada }.mapValues { it -> it.value.groupingBy { lugaresIda[it.participante]!! }.eachCount() }
 
-                        val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
+                        val plazasNecesariasVuelta = horariosDia.groupBy{ it.salida }.mapValues { it -> it.value.groupingBy { lugaresVuelta[it.participante]!! }.eachCount() }
 
-                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda[e.key]!!.getOrDefault(ll.key, 0) } }
-                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta[e.key]!!.getOrDefault(ll.key, 0) } }) {
+                        if (plazasNecesariasIda.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesIda.getValue(e.key).getOrDefault(ll.key, 0) } }
+                                && plazasNecesariasVuelta.entries.all { e -> e.value.entries.all { ll -> ll.value <= plazasDisponiblesVuelta.getValue(e.key).getOrDefault(ll.key, 0) } }) {
                             // Calculamos coste
                             val coste = participantesDia.sumBy { e -> e.puntosEncuentro.indexOf(lugaresIda[e]) + e.puntosEncuentro.indexOf(lugaresVuelta[e]) }
 
@@ -140,10 +140,10 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
         })
 
         if (ESTADISTICAS) {
-            val tamanosNivel = solCandidatasDiarias!!.keys.map { k -> solCandidatasDiarias!![k]!!.size }.toList().toIntArray()
+            val tamanosNivel = solCandidatasDiarias!!.keys.map { k -> solCandidatasDiarias!!.getValue(k).size }.toList().toIntArray()
             val totalPosiblesSoluciones = IntStream.of(*tamanosNivel).mapToDouble { i -> i.toDouble() }.reduce(1.0) { a, b -> a * b }
             if (DEBUG) {
-                println("Nº de posibles soluciones: " + IntStream.of(*tamanosNivel).mapToObj{ java.lang.Double.toString(it.toDouble()) }.collect(Collectors.joining(" * ")) + " = "
+                println("Nº de posibles soluciones: " + IntStream.of(*tamanosNivel).mapToObj{ it.toDouble().toString() }.collect(Collectors.joining(" * ")) + " = "
                         + totalPosiblesSoluciones)
             }
         }
@@ -190,7 +190,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
         var mejor = poblacion.min() ?: Individuo()
 
         if (DEBUG) {
-            println("Mejor Población Inicial: " + mejor)
+            println("Mejor Población Inicial: $mejor")
             println("Est. Población Inicial: " + poblacion.summarizingInt { it.aptitud })
         }
         var nGen = 0
@@ -201,7 +201,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
             // Paso 1 y 2: Seleccionar padres, combinar y después mutar...
             var elite: List<Individuo>? = null
             if (tamElite > 1) {
-                Collections.sort(poblacion) // Ordenacion natural
+                poblacion.sort() // Ordenacion natural
                 elite = poblacion.subList(0, tamElite) // Creamos el grupo de elite
             }
             val antPoblacion = poblacion
@@ -255,7 +255,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
                 if (DEBUG) {
                     System.out.format("Generación %d -> mejor=%s\n", nGen, mejor)
                     println(" - Est. población: " + poblacion.summarizingInt{ it.aptitud })
-                    println(" - Est. algoritmo:" + estGlobal)
+                    println(" - Est. algoritmo:$estGlobal")
                 }
             }
         }
@@ -269,7 +269,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
                 println("Estadísticas finales")
                 println("====================")
                 println(estGlobal)
-                println("Solución final=" + mejor)
+                println("Solución final=$mejor")
                 println("-----------------------------------------------")
             }
         }
@@ -285,7 +285,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
         internal val aptitud: Int
 
         internal constructor() {
-            genes = dias!!.groupBy { it }.mapValues { solCandidatasDiarias!![it.key]!![ThreadLocalRandom.current().nextInt(solCandidatasDiarias!![it.key]!!.size)] }
+            genes = dias!!.groupBy { it }.mapValues { solCandidatasDiarias!!.getValue(it.key)[ThreadLocalRandom.current().nextInt(solCandidatasDiarias!!.getValue(it.key).size)] }
             aptitud = calculaAptitud(genes)
         }
 
@@ -297,9 +297,9 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
 
         private fun calculaAptitud(genes: Map<Dia, AsignacionDia>): Int {
             val vecesCoche = genes.values.flatMap { it.conductores}.groupingBy { it }.eachCount()
-            val est = (0 until participantes!!.size).filter { i -> participantesConCoche!![i] }.map { i -> (vecesCoche.getOrDefault(participantes!![i], 0) * coefConduccion!![i] + 0.5f).toInt() }.summarizingInt()
+            val est = (participantes!!.indices).filter { i -> participantesConCoche!![i] }.map { i -> (vecesCoche.getOrDefault(participantes!![i], 0) * coefConduccion!![i] + 0.5f).toInt() }.summarizingInt()
             var apt = est.max * PESO_MAXIMO_VECES_CONDUCTOR + (est.max - est.min) * PESO_DIF_MAX_MIN_VECES_CONDUCTOR + genes.values.sumBy { it.coste }
-            if (estrategia === Resolutor.Estrategia.MINCONDUCTORES)
+            if (estrategia === Estrategia.MINCONDUCTORES)
                 apt += est.sum * PESO_TOTAL_CONDUCTORES
 
             return apt
@@ -315,7 +315,7 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
          * progenitores
          */
         internal fun cruze(otroPadre: Individuo?): Individuo {
-            val genesHijo = dias!!.groupBy { it }.mapValues { if (ThreadLocalRandom.current().nextBoolean()) genes[it.key]!! else otroPadre!!.genes[it.key]!! }
+            val genesHijo = dias!!.groupBy { it }.mapValues { if (ThreadLocalRandom.current().nextBoolean()) genes.getValue(it.key) else otroPadre!!.genes.getValue(it.key) }
 
             return Individuo(genesHijo)
         }
@@ -330,15 +330,15 @@ class ResolutorGA(var tamPoblacion: Int = TAM_POBLACION_DEF, var probMutacion: D
         internal fun mutacion(probMutacionGen: Double): Individuo {
             val genesHijo = dias!!.groupBy { it }.mapValues {
                 if (ThreadLocalRandom.current().nextDouble() < probMutacionGen)
-                    solCandidatasDiarias!![it.key]!![ThreadLocalRandom.current().nextInt(solCandidatasDiarias!![it.key]!!.size)]
+                    solCandidatasDiarias!!.getValue(it.key)[ThreadLocalRandom.current().nextInt(solCandidatasDiarias!!.getValue(it.key).size)]
                 else
-                    genes[it.key]!!
+                    genes.getValue(it.key)
             }
 
             return Individuo(genesHijo)
         }
 
-        override fun compareTo(other: Individuo) = Integer.compare(aptitud, other.aptitud)
+        override fun compareTo(other: Individuo) = aptitud.compareTo(other.aptitud)
 
         override fun hashCode() = 7 * 23  + Objects.hashCode(this.genes)
 

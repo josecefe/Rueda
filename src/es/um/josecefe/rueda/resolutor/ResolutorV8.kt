@@ -59,7 +59,7 @@ class ResolutorV8 : ResolutorAcotado() {
         nPosiblesSoluciones = DoubleArray(tamanosNivel!!.size)
         if (ESTADISTICAS) {
             if (DEBUG) {
-                println("Nº de posibles soluciones: " + tamanosNivel!!.map { it.toDouble().toString() }.joinToString(" * ") + " = "
+                println("Nº de posibles soluciones: " + tamanosNivel!!.joinToString(" * ") { it.toDouble().toString() } + " = "
                         + totalPosiblesSoluciones)
             }
             var acum = 1.0
@@ -94,15 +94,15 @@ class ResolutorV8 : ResolutorAcotado() {
                 println("Estadísticas finales")
                 println("====================")
                 println(estGlobal)
-                println("Solución final=" + mejor)
+                println("Solución final=$mejor")
                 println("-----------------------------------------------")
             }
         }
         // Construimos la solución final
-        if (mejor.costeEstimado < cotaInfCorte) {
-            solucionFinal = mejor.solucion
+        solucionFinal = if (mejor.costeEstimado < cotaInfCorte) {
+            mejor.solucion
         } else {
-            solucionFinal = emptyMap()
+            emptyMap()
         }
 
         return solucionFinal
@@ -116,7 +116,7 @@ class ResolutorV8 : ResolutorAcotado() {
             estGlobal.actualizaProgreso()
             if (DEBUG) {
                 println(estGlobal)
-                println("-- Trabajando con " + actual)
+                println("-- Trabajando con $actual")
             }
         }
         if (actual.cotaInferior < cotaInferiorCorte!!.get() && continuar) { //Estrategia de poda: si la cotaInferior >= C no seguimos
@@ -171,7 +171,7 @@ class ResolutorV8 : ResolutorAcotado() {
                 }
                 lNF.sort()
                 val mejorHijo = if (lNF.size > 1 && actual.nivel + 3 < contexto!!.dias.size) { // Los hijos estan lejos de ser terminales)
-                    val mejorHijoDef: MutableList<Deferred<Nodo>> = ArrayList<Deferred<Nodo>>(lNF.size)
+                    val mejorHijoDef: MutableList<Deferred<Nodo>> = ArrayList(lNF.size)
                     //println("Lanzando una corutina en nivel ${actual.nivel} con ${lNF.size} hilos")
                     for (n in lNF) {
                         mejorHijoDef.add(GlobalScope.async{ branchAndBound(n, mejor) })

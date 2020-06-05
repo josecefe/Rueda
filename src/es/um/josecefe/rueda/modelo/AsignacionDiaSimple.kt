@@ -17,10 +17,10 @@ data class AsignacionDiaSimple(
 ) : Comparable<AsignacionDiaSimple>, AsignacionDia {
 
     override val peIda: Map<Participante, Lugar>
-        get() = conductores.associate { Pair(it, it.puntosEncuentro[0]) }
+        get() = conductores.associateWith { it.puntosEncuentro[0] }
 
     override val peVuelta: Map<Participante, Lugar>
         get() = peIda
 
-    override fun compareTo(other: AsignacionDiaSimple) = Integer.compare(conductores.size * 1000 + coste, other.conductores.size * 1000 + other.coste)
+    override fun compareTo(other: AsignacionDiaSimple) = (conductores.size * 1000 + coste).compareTo(other.conductores.size * 1000 + other.coste)
 }

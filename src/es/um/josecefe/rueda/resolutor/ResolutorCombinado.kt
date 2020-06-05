@@ -79,7 +79,7 @@ class ResolutorCombinado : Resolutor {
         estadisticas.actualizaProgreso()
         val solucion2 = segundo.resolver(horarios, estadisticas1.fitness)
         val estadisticas2 = segundo.estadisticas
-        if (!solucion2.isEmpty() && estadisticas2.fitness < estadisticas1.fitness) {
+        if (solucion2.isNotEmpty() && estadisticas2.fitness < estadisticas1.fitness) {
             solucion = solucion2
             estadisticas.fitness = estadisticas2.fitness
         }
@@ -95,7 +95,7 @@ class ResolutorCombinado : Resolutor {
     override val solucionFinal: Map<Dia, AsignacionDia>
         get() = solucion
 
-    override var estrategia: Resolutor.Estrategia
+    override var estrategia: Estrategia
         get() = primero.estrategia
         set(value) {
             primero.estrategia = value

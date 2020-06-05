@@ -87,10 +87,10 @@ class RuedaApp : javafx.application.Application() {
             val prefs = Preferences.userNodeForPackage(javaClass)
             if (file != null) {
                 prefs.put("lastSave", file.path)
-                primaryStage.title = TITLE + " [" + file.name + "] - " + COPYRIGHT
+                primaryStage.title = "$TITLE [${file.name}] - $COPYRIGHT"
             } else {
                 prefs.remove("filePath")
-                primaryStage.title = TITLE + " - " + COPYRIGHT
+                primaryStage.title = "$TITLE - $COPYRIGHT"
             }
         }
 

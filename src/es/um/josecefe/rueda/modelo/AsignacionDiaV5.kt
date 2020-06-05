@@ -25,15 +25,14 @@ class AsignacionDiaV5(
     override val conductores: Set<Participante>
         get() = (0..conductoresArray.lastIndex).filter { conductoresArray[it] }.map { participantes[it] }.toSet()
 
-    override fun compareTo(other: AsignacionDiaV5): Int = Integer.compare(numConductores * 1000 + coste,
-            other.numConductores * 1000 + other.coste)
+    override fun compareTo(other: AsignacionDiaV5): Int = (numConductores * 1000 + coste).compareTo(other.numConductores * 1000 + other.coste)
 
     override fun hashCode(): Int = ((3 * 67 + Objects.hashCode(this.conductoresArray)) * 67 + Objects.hashCode(
             this.peIda)) * 67 + Objects.hashCode(this.peVuelta)
 
     override fun equals(other: Any?): Boolean {
         return this === other || (other != null && other is AsignacionDiaV5 && coste == other.coste
-                 && Arrays.equals(conductoresArray, other.conductoresArray) && this.peIda == other.peIda && this.peVuelta == other.peVuelta)
+                 && conductoresArray.contentEquals(other.conductoresArray) && this.peIda == other.peIda && this.peVuelta == other.peVuelta)
     }
 
     override fun toString(): String = "AsignacionDia{ coste=$coste, conductores=$conductores, peIda=$peIda, peVuelta=$peVuelta}"

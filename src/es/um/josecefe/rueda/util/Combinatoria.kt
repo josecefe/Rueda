@@ -19,7 +19,7 @@ fun combinations(n: Long, r: Long): Long = permutations(n, r) / factorial(r)
 
 fun <T> cartesianProduct(lists: List<List<T>>): List<List<T>> {
     val resultLists = ArrayList<List<T>>()
-    if (lists.size == 0) {
+    if (lists.isEmpty()) {
         resultLists.add(emptyList())
         return resultLists
     } else {

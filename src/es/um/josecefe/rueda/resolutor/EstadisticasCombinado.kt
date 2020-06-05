@@ -8,6 +8,7 @@
 package es.um.josecefe.rueda.resolutor
 
 import org.apache.commons.lang3.time.DurationFormatUtils
+import kotlin.math.min
 
 /**
  * @author josec
@@ -46,7 +47,7 @@ class EstadisticasCombinado(primera: Estadisticas, segunda: Estadisticas) : Esta
         }
 
     override var fitness: Int = 0
-        get() = Math.min(primera.fitness, segunda.fitness)
+        get() = min(primera.fitness, segunda.fitness)
 
     override fun inicia(): Estadisticas {
         primera.inicia()

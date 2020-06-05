@@ -22,7 +22,6 @@ import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.concurrent.Service
 import javafx.concurrent.Task
-import javafx.concurrent.WorkerStateEvent
 import javafx.fxml.FXML
 import javafx.geometry.VPos
 import javafx.scene.Cursor
@@ -53,6 +52,8 @@ import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.stream.Collectors
+import kotlin.math.max
+import kotlin.system.exitProcess
 
 /**
  * FXML Controller class
@@ -193,7 +194,7 @@ class PrincipalController {
                     val a = AsignacionParticipante()
                     a.participante = p.toString()
                     a.isConductor = true
-                    mapa.put(p, a)
+                    mapa[p] = a
                 }
                 for (e in n.peIda) {
                     val a = mapa.getOrDefault(e.first, AsignacionParticipante())
@@ -311,7 +312,7 @@ class PrincipalController {
                 val resolutorIns = resolutorCls.getDeclaredConstructor().newInstance() as Resolutor
                 cbAlgoritmo.items.add(resolutorIns)
             } catch (e: Exception) {
-                Logger.getLogger(javaClass.name).log(Level.SEVERE, "Imposible instanciar el resolutor " + resolutor, e)
+                Logger.getLogger(javaClass.name).log(Level.SEVERE, "Imposible instanciar el resolutor $resolutor", e)
             }
 
         }
@@ -473,7 +474,7 @@ class PrincipalController {
                 try {
                     Runtime.getRuntime().exec(comando)
                 } catch (e: Exception) {
-                    System.err.println("Fallo al intentar ejecutar el comando " + comando)
+                    System.err.println("Fallo al intentar ejecutar el comando $comando")
                     e.printStackTrace(System.err)
                 }
 
@@ -588,14 +589,14 @@ class PrincipalController {
         entradaTextoAutor.toY = acercadeRoot.height - 20
 
         textoCreditos.textOrigin = VPos.TOP
-        textoCreditos.wrappingWidth = Math.max(textoAutorBounds.width, textoSolidosBounds.width)
+        textoCreditos.wrappingWidth = max(textoAutorBounds.width, textoSolidosBounds.width)
         val textoCreditosBounds = textoCreditos.boundsInLocal
         textoCreditos.x = (acercadeRoot.width - textoCreditosBounds.width) / 2
         textoCreditos.y = acercadeRoot.height
 
         val scrollTextoCreditos = TranslateTransition(Duration.millis(30000.0), textoCreditos)
         //scrollTextoCreditos.setFromY(acercadeRoot.getHeight());
-        scrollTextoCreditos.toY = -Math.max(
+        scrollTextoCreditos.toY = -max(
                 textoCreditosBounds.height + (acercadeRoot.height - textoCreditosBounds.height) / 2,
                 textoCreditosBounds.height)
         scrollTextoCreditos.delay = Duration.seconds(3.0)
@@ -616,7 +617,7 @@ class PrincipalController {
             fadeMusica = Timeline(
                     KeyFrame(Duration.ZERO, KeyValue(audioMediaPlayer.volumeProperty(), 0.0)),
                     KeyFrame(Duration.seconds(3.0), KeyValue(audioMediaPlayer.volumeProperty(), 1.0)))
-            fadeMusica.setOnFinished { _ ->
+            fadeMusica.setOnFinished {
                 audioMediaPlayer.setAudioSpectrumListener { _: Double, _: Double, magnitudes: FloatArray, _: FloatArray ->
                     if (!cerrandoAcercade) {
                         textoSolidos.translateY = textoSolidosBounds.height + (60 + magnitudes[0])
@@ -634,13 +635,13 @@ class PrincipalController {
                 ParallelTransition(fadeMusica, entradaTextoSolidos, entradaTextoAutor)
         )
 
-        acercadeRoot.addEventHandler(MouseEvent.MOUSE_CLICKED) { _: MouseEvent ->
+        acercadeRoot.addEventHandler(MouseEvent.MOUSE_CLICKED) {
             if (!cerrandoAcercade) {
                 cerrandoAcercade = true
                 scrollTextoCreditos.stop()
                 transiciones.rate = -2.0
                 transiciones.play()
-                transiciones.setOnFinished { _ -> acercadeStage.close() }
+                transiciones.setOnFinished { acercadeStage.close() }
             }
         }
 
@@ -655,7 +656,7 @@ class PrincipalController {
      */
     @FXML
     fun handleExit() {
-        System.exit(0)
+        exitProcess(0)
     }
 
     @FXML
@@ -677,7 +678,7 @@ class PrincipalController {
             setResolutor(cbAlgoritmo.value)
             setHorarios(HashSet(datosRuedaFX.horarios))
         }
-        service.setOnSucceeded { _: WorkerStateEvent ->
+        service.setOnSucceeded {
             barraEstado.textProperty().unbind()
             if (service.value == null || service.value.isEmpty()) {
                 barraEstado.text = "Optimización finalizada, NO HAY SOLUCIÓN"
@@ -696,7 +697,7 @@ class PrincipalController {
             bCancelarCalculo.isDisable = true
             mCancelarCalculo.isDisable = true
         }
-        service.setOnFailed { _: WorkerStateEvent ->
+        service.setOnFailed {
             barraEstado.textProperty().unbind()
             if (service.exception != null) {
 
@@ -785,11 +786,9 @@ class PrincipalController {
         val result = alert.showAndWait()
         if (result.isPresent && result.get() == ButtonType.OK) {
             val nHorarios = HashSet(datosRuedaFX.horarios)
-            val diasOriginal = datosRuedaFX.horarios.map { it.dia }.distinct().filterNotNull()
+            val diasOriginal = datosRuedaFX.horarios.map { it.dia }.distinct()
             val maxNOrden = diasOriginal.map { it.orden }.max() ?: 1
-            val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associate {
-                Pair(it, Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden))
-            }
+            val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associateWith { Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden) }
             nHorarios.addAll(datosRuedaFX.horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
             datosRuedaFX.poblarDesdeHorarios(nHorarios)
             mainApp.lastFilePath = null // Eliminamos la referencia al último fichero guardado para evitar lios...
@@ -805,8 +804,8 @@ class PrincipalController {
             if (d == null || p == null) {
                 mensaje = "Debe seleccionar un día y un participante"
             } else {
-                val entrada = Integer.decode(tfEntrada.text)!!
-                val salida = Integer.decode(tfSalida.text)!!
+                val entrada = Integer.decode(tfEntrada.text)
+                val salida = Integer.decode(tfSalida.text)
                 if (entrada >= salida) {
                     mensaje = "La hora de entrada debe ser anterior a la de salida"
                 } else {
@@ -936,7 +935,7 @@ class PrincipalController {
 
         if (selectedIndex >= 0) {
             val ds = tablaLugares.items[selectedIndex]
-            if (datosRuedaFX.participantes.map { it.puntosEncuentro }.flatMap { it }.any { it == ds }) {
+            if (datosRuedaFX.participantes.map { it.puntosEncuentro }.flatten().any { it == ds }) {
                 val alert = Alert(AlertType.CONFIRMATION)
                 alert.initOwner(stage)
                 alert.title = "Lugar en uso"

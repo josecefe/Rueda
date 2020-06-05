@@ -54,7 +54,7 @@ class ResolutorV7 : ResolutorAcotado() {
         if (ESTADISTICAS) {
 
             if (DEBUG) {
-                println("Nº de posibles soluciones: " + tamanosNivel.map { it.toDouble().toString() }.joinToString(separator = " * ") + " = "
+                println("Nº de posibles soluciones: " + tamanosNivel.joinToString(separator = " * ") { it.toDouble().toString() } + " = "
                         + totalPosiblesSoluciones)
             }
             var acum = 1.0
@@ -70,24 +70,24 @@ class ResolutorV7 : ResolutorAcotado() {
             }
         }
         // Preparamos el algoritmo
-        val RAIZ = Nodo(contex)
-        var actual = RAIZ
+        val raiz = Nodo(contex)
+        var actual = raiz
         var mejor = actual
         var cotaInferiorCorte = if (cotaInfCorte < Integer.MAX_VALUE) cotaInfCorte + 1 else cotaInfCorte
-        var LNV: MutableCollection<Nodo>
+        var lnv: MutableCollection<Nodo>
         var opPull: () -> Nodo
         contex.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_INI //Primero buscamos en profundidad
         contex.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_INI //Primero buscamos en profundidad
         if (CON_CAMBIO_DE_ESTRATEGIA) {
             val pilaNodosVivos = ArrayDeque<Nodo>() // Inicialmente es una cola LIFO (pila)
-            LNV = pilaNodosVivos
+            lnv = pilaNodosVivos
             opPull = { pilaNodosVivos.removeLast() } //Para controlar si es pila o cola, inicialmente pila
         } else {
             val colaNodosVivos = PriorityQueue<Nodo>()
-            LNV = colaNodosVivos
+            lnv = colaNodosVivos
             opPull = { colaNodosVivos.poll() }
         }
-        LNV.add(actual)
+        lnv.add(actual)
 
         // Bucle principal
         do {
@@ -97,9 +97,9 @@ class ResolutorV7 : ResolutorAcotado() {
                 estGlobal.fitness = cotaInferiorCorte
                 estGlobal.actualizaProgreso()
                 if (DEBUG) {
-                    System.out.format("> LNV=%,d, ", LNV.size)
+                    System.out.format("> LNV=%,d, ", lnv.size)
                     println(estGlobal)
-                    println("-- Trabajando con " + actual)
+                    println("-- Trabajando con $actual")
                 }
             }
             if (actual.cotaInferior < cotaInferiorCorte) { //Estrategia de poda: si la cotaInferior >= C no seguimos
@@ -112,18 +112,18 @@ class ResolutorV7 : ResolutorAcotado() {
                     }
                     val mejorHijo = actual.generaHijos().min()
                     if (mejorHijo!=null && mejorHijo < mejor) {
-                        if (mejor === RAIZ) {
+                        if (mejor === raiz) {
                             // Cambiamos los pesos
                             contex.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_FIN //Después buscamos más equilibrado
                             contex.pesoCotaInferiorDen = PESO_COTA_INFERIOR_DEN_DEF_FIN //Después buscamos más equilibrado
-                            LNV.forEach{ it.calculaCosteEstimado() }// Hay que forzar el calculo de nuevo de los costes de los nodos
-                            val colaNodosVivos: PriorityQueue<Nodo> = PriorityQueue(LNV.size)
-                            colaNodosVivos.addAll(LNV)
+                            lnv.forEach{ it.calculaCosteEstimado() }// Hay que forzar el calculo de nuevo de los costes de los nodos
+                            val colaNodosVivos: PriorityQueue<Nodo> = PriorityQueue(lnv.size)
+                            colaNodosVivos.addAll(lnv)
                             if (DEBUG) {
                                 println("---- ACTUALIZANDO LA LNV POR CAMBIO DE PESOS")
                             }
                             opPull = { colaNodosVivos.poll() }
-                            LNV = colaNodosVivos
+                            lnv = colaNodosVivos
                         }
 
                         mejor = mejorHijo
@@ -138,21 +138,21 @@ class ResolutorV7 : ResolutorAcotado() {
                             val fC = cotaInferiorCorte
 
                             // Limpiamos la lista de nodos vivos de los que no cumplan...
-                            val antes = LNV.size
+                            val antes = lnv.size
                             if (ESTADISTICAS) {
-                                estGlobal.addDescartados(LNV.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                                estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
                                 estGlobal.fitness = cotaInferiorCorte
                                 estGlobal.actualizaProgreso()
                             }
-                            val removeIf = LNV.removeAll { n -> n.cotaInferior >= fC }
+                            val removeIf = lnv.removeAll { n -> n.cotaInferior >= fC }
                             if (ESTADISTICAS && DEBUG && removeIf) {
-                                System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size)
+                                System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - lnv.size)
                             }
                         }
                     }
                 } else { // Es un nodo intermedio
-                    val Corte = cotaInferiorCorte
-                    val lNF = actual.generaHijos().filter { n -> n.cotaInferior < Corte }.toMutableList()
+                    val corte = cotaInferiorCorte
+                    val lNF = actual.generaHijos().filter { n -> n.cotaInferior < corte }.toMutableList()
                     val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
                     if (menorCotaSuperior!=null && menorCotaSuperior < cotaInferiorCorte) { // Mejora de C
                         if (DEBUG) {
@@ -162,26 +162,26 @@ class ResolutorV7 : ResolutorAcotado() {
                         val fC = cotaInferiorCorte
                         lNF.removeAll { n -> n.cotaInferior >= fC } //Recalculamos lNF
                         // Limpiamos la LNV
-                        val antes = LNV.size
+                        val antes = lnv.size
                         if (ESTADISTICAS) {
-                            estGlobal.addDescartados(LNV.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                            estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
                             estGlobal.fitness = cotaInferiorCorte
                             estGlobal.actualizaProgreso()
                         }
-                        val removeIf = LNV.removeAll { n -> n.cotaInferior >= fC }
+                        val removeIf = lnv.removeAll { n -> n.cotaInferior >= fC }
                         if (ESTADISTICAS && DEBUG && removeIf) {
-                            System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - LNV.size)
+                            System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - lnv.size)
                         }
                     }
                     if (ESTADISTICAS) {
                         estGlobal.addDescartados((tamanosNivel[actual.nivel + 1] - lNF.size) * nPosiblesSoluciones[actual.nivel + 1])
                     }
-                    LNV.addAll(lNF)
+                    lnv.addAll(lNF)
                 }
             } else if (ESTADISTICAS) {
                 estGlobal.addDescartados(nPosiblesSoluciones[actual.nivel])
             }
-        } while (!LNV.isEmpty() && continuar)
+        } while (!lnv.isEmpty() && continuar)
 
         //Estadisticas finales
         if (ESTADISTICAS) {
@@ -192,15 +192,15 @@ class ResolutorV7 : ResolutorAcotado() {
                 println("Estadísticas finales")
                 println("====================")
                 println(estGlobal)
-                println("Solución final=" + mejor)
+                println("Solución final=$mejor")
                 println("-----------------------------------------------")
             }
         }
         // Construimos la solución final
-        if (mejor.costeEstimado < cotaInfCorte) {
-            solucionFinal = mejor.solucion
+        solucionFinal = if (mejor.costeEstimado < cotaInfCorte) {
+            mejor.solucion
         } else {
-            solucionFinal = emptyMap()
+            emptyMap()
         }
 
         return solucionFinal

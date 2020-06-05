@@ -22,7 +22,7 @@ class Combinador<out T>(private val conjuntos: List<List<T>>) : Iterable<List<T>
         return CombinadorIterator()
     }
 
-    public val size: Long
+    val size: Long
         get() = conjuntos.map { it.size.toLong() }.reduce { a, b -> a * b }
 
     private inner class CombinadorIterator : Iterator<List<T>> {

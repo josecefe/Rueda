@@ -22,6 +22,5 @@ data class AsignacionDiaExahustiva(
     override val peVuelta: Map<Participante, Lugar>
         get() = otrosPosiblesLugares[0].mapValues { (_, par) -> par.second }
 
-    override fun compareTo(other: AsignacionDiaExahustiva) = Integer.compare(conductores.size * 1000 + coste,
-            other.conductores.size * 1000 + other.coste)
+    override fun compareTo(other: AsignacionDiaExahustiva) = (conductores.size * 1000 + coste).compareTo(other.conductores.size * 1000 + other.coste)
 }

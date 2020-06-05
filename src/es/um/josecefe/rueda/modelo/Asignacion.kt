@@ -20,9 +20,9 @@ class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<Pair<Par
                  peVuelta: List<Pair<Participante, Lugar>>, coste: Int) : Comparable<Asignacion> {
 
     private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty()
-    private val conductoresProp: SimpleListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList<Participante>())
-    private val peidaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList<Pair<Participante, Lugar>>())
-    private val pevueltaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList<Pair<Participante, Lugar>>())
+    private val conductoresProp: SimpleListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList())
+    private val peidaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList())
+    private val pevueltaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList())
     private val costeProp = SimpleIntegerProperty()
 
     init {
