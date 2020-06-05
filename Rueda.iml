@@ -8,27 +8,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="com.github.fmcarvalho:htmlflow:1.1" level="project" />
-    <orderEntry type="library" name="org.apache.commons.lang-3" level="project" />
-    <orderEntry type="library" name="org.apache.commons.text-1" level="project" />
-    <orderEntry type="library" name="com.fasterxml.jackson.module" level="project" />
-    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
-    <orderEntry type="module-library" scope="TEST">
-      <library name="JUnit5.4">
-        <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter/5.4.2/junit-jupiter-5.4.2.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-api/5.4.2/junit-jupiter-api-5.4.2.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.0.0/apiguardian-api-1.0.0.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/opentest4j/opentest4j/1.1.1/opentest4j-1.1.1.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-commons/1.4.2/junit-platform-commons-1.4.2.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-params/5.4.2/junit-jupiter-params-5.4.2.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-engine/5.4.2/junit-jupiter-engine-5.4.2.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/junit/platform/junit-platform-engine/1.4.2/junit-platform-engine-1.4.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2" level="project" />
+    <orderEntry type="library" name="com.github.fmcarvalho:htmlflow:Release" level="project" />
+    <orderEntry type="library" name="org.openjfx:javafx-fxml" level="project" />
+    <orderEntry type="library" name="org.openjfx:javafx-media" level="project" />
+    <orderEntry type="library" scope="TEST" name="org.junit.jupiter:junit-jupiter-api:Release" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlinx:kotlinx-coroutines-core" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib:Release" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-stdlib-jdk8:Release" level="project" />
+    <orderEntry type="library" name="com.fasterxml.jackson.module:jackson-module-kotlin:Release" level="project" />
+    <orderEntry type="library" name="org.jetbrains.kotlin:kotlin-reflect:Release" level="project" />
+    <orderEntry type="library" name="org.apache.commons:commons-text:Release" level="project" />
   </component>
 </module>

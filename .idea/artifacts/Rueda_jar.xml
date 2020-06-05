@@ -3,11 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Rueda_jar</output-path>
     <root id="archive" name="Rueda.jar">
       <element id="module-output" name="Rueda" />
-      <element id="library" level="project" name="com.fasterxml.jackson.module" />
-      <element id="library" level="project" name="com.github.fmcarvalho:htmlflow:1.1" />
-      <element id="library" level="project" name="KotlinJavaRuntime" />
-      <element id="library" level="project" name="org.apache.commons.lang-3" />
-      <element id="library" level="project" name="org.apache.commons.text-1" />
+      <element id="library" level="project" name="com.github.fmcarvalho:htmlflow:Release" />
     </root>
   </artifact>
 </component>

@@ -1,0 +1,22 @@
+<component name="libraryTable">
+  <library name="org.openjfx:javafx-fxml" type="repository">
+    <properties maven-id="org.openjfx:javafx-fxml:14.0.1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/javafx-fxml-14.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-fxml-14.0.1-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-controls-14.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-controls-14.0.1-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1-win.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/javafx-fxml-14.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-controls-14.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="org.apache.commons:commons-text:Release" type="repository">
+    <properties maven-id="org.apache.commons:commons-text:RELEASE" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/commons-text-1.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/commons-text-1.8-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

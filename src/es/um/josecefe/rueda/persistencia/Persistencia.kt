@@ -31,9 +31,7 @@ object Persistencia {
 
     fun guardaDatosRuedaXML(xmlfile: File, datosRueda: DatosRueda) {
         try {
-            XMLEncoder(
-                    BufferedOutputStream(
-                            FileOutputStream(xmlfile))).use { encoder ->
+            XMLEncoder(BufferedOutputStream(FileOutputStream(xmlfile))).use { encoder ->
 
                 with(encoder) {
                     exceptionListener = ExceptionListener { it.printStackTrace() }
@@ -79,9 +77,7 @@ object Persistencia {
 
     fun guardaAsignacionRuedaXML(xmlfile: String, solucionFinal: Map<Dia, AsignacionDia>) {
         try {
-            XMLEncoder(
-                    BufferedOutputStream(
-                            FileOutputStream(xmlfile))).use { encoder -> encoder.writeObject(solucionFinal) }
+            XMLEncoder(BufferedOutputStream(FileOutputStream(xmlfile))).use { encoder -> encoder.writeObject(solucionFinal) }
         } catch (ex: FileNotFoundException) {
             Logger.getLogger(Persistencia::class.java.name).log(Level.SEVERE, null, ex)
         }
