@@ -1,10 +1,3 @@
-/*
- * Copyright (c) 2016-2017. Jose Ceferino Ortega Carretero
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package es.um.josecefe.rueda.modelo
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo
@@ -12,17 +5,20 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 
-/**
- * @author josec
- */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator::class, property = "@id")
-class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<Pair<Participante, Lugar>>,
-                 peVuelta: List<Pair<Participante, Lugar>>, coste: Int) : Comparable<Asignacion> {
+class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<ParticipanteLugar>,
+                 peVuelta: List<ParticipanteLugar>, coste: Int) : Comparable<Asignacion> {
+
+    // Clase interna para reemplazar Pair
+    data class ParticipanteLugar(
+        val participante: Participante,
+        val lugar: Lugar
+    )
 
     private val diaProp: SimpleObjectProperty<Dia> = SimpleObjectProperty()
     private val conductoresProp: SimpleListProperty<Participante> = SimpleListProperty(FXCollections.observableArrayList())
-    private val peidaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList())
-    private val pevueltaProp: SimpleListProperty<Pair<Participante, Lugar>> = SimpleListProperty(FXCollections.observableArrayList())
+    private val peidaProp: SimpleListProperty<ParticipanteLugar> = SimpleListProperty(FXCollections.observableArrayList())
+    private val pevueltaProp: SimpleListProperty<ParticipanteLugar> = SimpleListProperty(FXCollections.observableArrayList())
     private val costeProp = SimpleIntegerProperty()
 
     init {
@@ -34,8 +30,8 @@ class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<Pair<Par
     }
 
     constructor(dia: Dia, asignacionDia: AsignacionDia) : this(dia, asignacionDia.conductores.toList(),
-            asignacionDia.peIda.entries.map { Pair(it.key, it.value) },
-            asignacionDia.peVuelta.entries.map { Pair(it.key, it.value) }, asignacionDia.coste)
+            asignacionDia.peIda.entries.map { ParticipanteLugar(it.key, it.value) },
+            asignacionDia.peVuelta.entries.map { ParticipanteLugar(it.key, it.value) }, asignacionDia.coste)
 
     var dia: Dia
         get() = diaProp.get()
@@ -52,23 +48,23 @@ class Asignacion(dia: Dia, conductores: List<Participante>, peIda: List<Pair<Par
 
     fun participantesProperty(): ListProperty<Participante> = conductoresProp
 
-    var peIda: List<Pair<Participante, Lugar>>
+    var peIda: List<ParticipanteLugar>
         get() = peidaProp.get()
         set(value) {
             peidaProp.clear()
             peidaProp.addAll(value)
         }
 
-    fun peIdaProperty(): ListProperty<Pair<Participante, Lugar>> = peidaProp
+    fun peIdaProperty(): ListProperty<ParticipanteLugar> = peidaProp
 
-    var peVuelta: List<Pair<Participante, Lugar>>
+    var peVuelta: List<ParticipanteLugar>
         get() = pevueltaProp.get()
         set(value) {
             pevueltaProp.clear()
             pevueltaProp.addAll(value)
         }
 
-    fun peVueltaProperty(): ListProperty<Pair<Participante, Lugar>> = pevueltaProp
+    fun peVueltaProperty(): ListProperty<ParticipanteLugar> = pevueltaProp
 
     var coste: Int
         get() = costeProp.get()

@@ -1,18 +1,21 @@
 <component name="libraryTable">
   <library name="org.openjfx:javafx-media" type="repository">
-    <properties maven-id="org.openjfx:javafx-media:14.0.1" />
+    <properties maven-id="org.openjfx:javafx-media:LATEST" />
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/javafx-media-14.0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-media-14.0.1-win.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1-win.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-media-25-ea+23.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-media-25-ea+23-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-25-ea+23.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-25-ea+23-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-25-ea+23.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-25-ea+23-win.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$PROJECT_DIR$/lib/javafx-media-14.0.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-14.0.1-javadoc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/javafx-base-14.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-media-25-ea+23-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-media-25-ea+23-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-25-ea+23-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-graphics-25-ea+23-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-25-ea+23-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javafx-base-25-ea+23-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES />
   </library>

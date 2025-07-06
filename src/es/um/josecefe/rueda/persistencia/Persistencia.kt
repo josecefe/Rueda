@@ -88,7 +88,7 @@ object Persistencia {
 
         try {
             PrintStream(htmlfile).use { out ->
-                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda }.map { it.second }.distinct().count() > 1
+                val conLugar = datosRueda.asignacion.flatMap { a -> a.peIda }.map { it.lugar }.distinct().count() > 1
 
                 // Todas las horas con actividad:
                 val horasActivas = datosRueda.horarios.map { it.entrada }.toMutableSet()
@@ -117,12 +117,12 @@ object Persistencia {
                         pIda.participante = pVuelta.participante
                         pVuelta.conduce = a.conductores.contains(pIda.participante)
                         pIda.conduce = pVuelta.conduce
-                        a.peIda.find { it.first == pIda.participante }?.let {
-                            pIda.lugar = it.second
+                        a.peIda.find { it.participante == pIda.participante }?.let {
+                            pIda.lugar = it.lugar
                             celdaIda.add(pIda)
                         }
-                        a.peVuelta.find { p -> p.first == pVuelta.participante }?.let {
-                            pVuelta.lugar = it.second
+                        a.peVuelta.find { p -> p.participante == pVuelta.participante }?.let {
+                            pVuelta.lugar = it.lugar
                             celdaVuelta.add(pVuelta)
                         }
                     }

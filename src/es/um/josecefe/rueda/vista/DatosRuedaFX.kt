@@ -96,11 +96,11 @@ class DatosRuedaFX {
         // Creamos las demas cosas a partir de solo los horarios de entrada
         horariosProperty.addAll(FXCollections.observableArrayList(horariosBase))
         // Dias
-        horariosProperty.map { it.dia }.distinct().mapTo(diasProperty) { it }
+        horariosProperty.asIterable().map { it.dia }.distinct().mapTo(diasProperty) { it }
         // Participantes
-        horariosProperty.map { it.participante }.distinct().mapTo(participantesProperty) { it }
+        horariosProperty.asIterable().map { it.participante }.distinct().mapTo(participantesProperty) { it }
         // Y a partir de los participantes, los Lugares
-        participantesProperty.map { it.puntosEncuentro }.flatten().distinct().mapTo(lugaresProperty) { it }
+        participantesProperty.asIterable().map { it.puntosEncuentro }.flatten().distinct().mapTo(lugaresProperty) { it }
     }
 
     fun setSolucion(resolver: Map<Dia, AsignacionDia>, costeTotal: Int) {
