@@ -111,7 +111,7 @@ class ResolutorV7 : ResolutorAcotado() {
                         estGlobal.addTerminales(tamanosNivel[actual.nivel + 1].toDouble())
                     }
                     val mejorHijo = actual.generaHijos().min()
-                    if (mejorHijo!=null && mejorHijo < mejor) {
+                    if (mejorHijo < mejor) {
                         if (mejor === raiz) {
                             // Cambiamos los pesos
                             contex.pesoCotaInferiorNum = PESO_COTA_INFERIOR_NUM_DEF_FIN //Después buscamos más equilibrado
@@ -140,11 +140,13 @@ class ResolutorV7 : ResolutorAcotado() {
                             // Limpiamos la lista de nodos vivos de los que no cumplan...
                             val antes = lnv.size
                             if (ESTADISTICAS) {
-                                estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                                estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }
+                                    .sumOf { n -> nPosiblesSoluciones[n.nivel] })
                                 estGlobal.fitness = cotaInferiorCorte
                                 estGlobal.actualizaProgreso()
                             }
                             val removeIf = lnv.removeAll { n -> n.cotaInferior >= fC }
+                            @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
                             if (ESTADISTICAS && DEBUG && removeIf) {
                                 System.out.format("** Hemos eliminado %,d nodos de la LNV\n", antes - lnv.size)
                             }
@@ -153,7 +155,7 @@ class ResolutorV7 : ResolutorAcotado() {
                 } else { // Es un nodo intermedio
                     val corte = cotaInferiorCorte
                     val lNF = actual.generaHijos().filter { n -> n.cotaInferior < corte }.toMutableList()
-                    val menorCotaSuperior = lNF.map{ it.cotaSuperior }.min()
+                    val menorCotaSuperior = lNF.minOfOrNull { it.cotaSuperior }
                     if (menorCotaSuperior!=null && menorCotaSuperior < cotaInferiorCorte) { // Mejora de C
                         if (DEBUG) {
                             System.out.format("** Nuevo C: Anterior=%,d, Nuevo=%,d\n", cotaInferiorCorte, menorCotaSuperior)
@@ -164,11 +166,13 @@ class ResolutorV7 : ResolutorAcotado() {
                         // Limpiamos la LNV
                         val antes = lnv.size
                         if (ESTADISTICAS) {
-                            estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }.map { n -> nPosiblesSoluciones[n.nivel] }.sum())
+                            estGlobal.addDescartados(lnv.filter { n -> n.cotaInferior >= fC }
+                                .sumOf { n -> nPosiblesSoluciones[n.nivel] })
                             estGlobal.fitness = cotaInferiorCorte
                             estGlobal.actualizaProgreso()
                         }
                         val removeIf = lnv.removeAll { n -> n.cotaInferior >= fC }
+                        @Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
                         if (ESTADISTICAS && DEBUG && removeIf) {
                             System.out.format("## Hemos eliminado %,d nodos de la LNV\n", antes - lnv.size)
                         }

@@ -129,7 +129,7 @@ class ResolutorV8 : ResolutorAcotado() {
                 }
                 val mejorHijo = actual.generaHijos().min()
 
-                if (mejorHijo != null && mejorHijo < mejor) {
+                if (mejorHijo < mejor) {
                     mejor = mejorHijo
                     var cota: Int
                     do {
@@ -148,7 +148,7 @@ class ResolutorV8 : ResolutorAcotado() {
                 }
             } else { // Es un nodo intermedio
                 val lNF = actual.generaHijos().filter { n -> n.cotaInferior < cotaInferiorCorte!!.get() }.toMutableList()
-                val menorCotaSuperior = lNF.map { it.cotaSuperior }.min()
+                val menorCotaSuperior = lNF.minOfOrNull { it.cotaSuperior }
                 if (menorCotaSuperior != null) {
                     var cota: Int
                     do {
@@ -177,9 +177,9 @@ class ResolutorV8 : ResolutorAcotado() {
                         mejorHijoDef.add(GlobalScope.async{ branchAndBound(n, mejor) })
                     }
 
-                    mejorHijoDef.map { it.await() }.min()
+                    mejorHijoDef.minOfOrNull { it.await() }
                 } else {
-                    lNF.map { branchAndBound(it, mejor) }.min()
+                    lNF.minOfOrNull { branchAndBound(it, mejor) }
                 }
                 if (mejorHijo != null && mejorHijo < mejor) { // Tenemos un hijo que mejora
                     mejor = mejorHijo

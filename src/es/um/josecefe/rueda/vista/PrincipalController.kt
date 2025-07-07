@@ -13,6 +13,7 @@ import es.um.josecefe.rueda.TITLE
 import es.um.josecefe.rueda.VERSION
 import es.um.josecefe.rueda.modelo.*
 import es.um.josecefe.rueda.resolutor.Resolutor
+import es.um.josecefe.rueda.resolutor.Resolutor.*
 import javafx.animation.*
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SetProperty
@@ -150,7 +151,7 @@ class PrincipalController {
     @FXML
     internal lateinit var cbAlgoritmo: ChoiceBox<Resolutor>
     @FXML
-    internal lateinit var cbEstrategia: ChoiceBox<Resolutor.Estrategia>
+    internal lateinit var cbEstrategia: ChoiceBox<Estrategia>
     @FXML
     private lateinit var mCalcular: MenuItem
     @FXML
@@ -328,14 +329,14 @@ class PrincipalController {
         //cbAlgoritmo.selectionModel.select(if (Runtime.getRuntime().availableProcessors() >= 4) 1 else 0)
         cbAlgoritmo.selectionModel.select(0)
 
-        cbEstrategia.items.addAll(*Resolutor.Estrategia.values())
-        cbEstrategia.converter = object : StringConverter<Resolutor.Estrategia>() {
-            override fun toString(e: Resolutor.Estrategia): String {
+        cbEstrategia.items.addAll(*Estrategia.entries.toTypedArray())
+        cbEstrategia.converter = object : StringConverter<Estrategia>() {
+            override fun toString(e: Estrategia): String {
                 return e.toString()
             }
 
-            override fun fromString(string: String): Resolutor.Estrategia {
-                return Resolutor.Estrategia.valueOf(string)
+            override fun fromString(string: String): Estrategia {
+                return Estrategia.valueOf(string)
             }
         }
 
@@ -470,11 +471,11 @@ class PrincipalController {
             }
             if (mainApp.exportaAsignacion(file, datosRuedaFX.toDatosRueda())) {
                 barraEstado.text = "Exportación completada con éxito"
-                val comando = (if (SystemUtils.IS_OS_WINDOWS) "explorer" else "xdg-open") + " \"" + file.path + "\""
+                val comando = (if (SystemUtils.IS_OS_WINDOWS) "explorer" else "xdg-open")
                 try {
-                    Runtime.getRuntime().exec(comando)
+                    ProcessBuilder(comando, file.path).inheritIO().start()
                 } catch (e: Exception) {
-                    System.err.println("Fallo al intentar ejecutar el comando $comando")
+                    System.err.println("Fallo al intentar abrir el archivo: ${file.path}")
                     e.printStackTrace(System.err)
                 }
 
@@ -547,6 +548,7 @@ class PrincipalController {
         var creditosString = String.format("%s %s - %s\n=====================================\n\n", TITLE, VERSION,
                 COPYRIGHT)
         try {
+            @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
             BufferedReader(InputStreamReader(mainApp.javaClass.getResourceAsStream("res/creditos.txt"),
                     StandardCharsets.UTF_8)).use { recursoCreditos ->
                 creditosString += recursoCreditos.lines().collect(Collectors.joining("\n"))
@@ -604,6 +606,7 @@ class PrincipalController {
         var fadeMusica: Animation
         try {
             // La musica
+            @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
             val audioMedia = Media(mainApp.javaClass.getResource("res/musica_acercade.mp3").toURI().toString())
 
             val audioSpectrumNumBands = 2
@@ -787,7 +790,7 @@ class PrincipalController {
         if (result.isPresent && result.get() == ButtonType.OK) {
             val nHorarios = HashSet(datosRuedaFX.horarios)
             val diasOriginal = datosRuedaFX.horarios.map { it.dia }.distinct()
-            val maxNOrden = diasOriginal.map { it.orden }.max() ?: 1
+            val maxNOrden = diasOriginal.maxOfOrNull { it.orden } ?: 1
             val dias = datosRuedaFX.horarios.sorted().map { it.dia }.distinct().associateWith { Dia(descripcion = it.descripcion + "Ex", orden = maxNOrden + it.orden) }
             nHorarios.addAll(datosRuedaFX.horarios.map { Horario(it.participante, dias[it.dia], it.entrada, it.salida, it.coche) })
             datosRuedaFX.poblarDesdeHorarios(nHorarios)
@@ -817,7 +820,7 @@ class PrincipalController {
                     }
                 }
             }
-        } catch (ne: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             mensaje = "Entrada y salida deben ser números enteros que indiquen, en forma de cardinal, la hora de entrada/salida, ej. primera hora = 1"
         } catch (e: Exception) {
             mensaje = "Imposible añadir la entrada: " + e.localizedMessage
@@ -860,7 +863,7 @@ class PrincipalController {
             alert.showAndWait()
             return
         }
-        datosRuedaFX.dias.add(Dia(descripcion, (datosRuedaFX.dias.map { it.orden }.max() ?: 0) + 1))
+        datosRuedaFX.dias.add(Dia(descripcion, (datosRuedaFX.dias.maxOfOrNull { it.orden } ?: 0) + 1))
         tfDescripcionDia.clear()
     }
 
@@ -878,7 +881,7 @@ class PrincipalController {
             while (compruebaDia(diaProp)) {
                 diaProp = dias[i] + ++intento
             }
-            datosRuedaFX.dias.add(Dia(diaProp, (datosRuedaFX.dias.map { it.orden }.max() ?: 0) + 1))
+            datosRuedaFX.dias.add(Dia(diaProp, (datosRuedaFX.dias.maxOfOrNull { it.orden } ?: 0) + 1))
         }
     }
 
@@ -1046,7 +1049,7 @@ class PrincipalController {
         this.datosRuedaFX.reemplazar(datosRueda)
     }
 
-    private class ResolutorService internal constructor() : Service<Map<Dia, AsignacionDia>>() {
+    private class ResolutorService : Service<Map<Dia, AsignacionDia>>() {
 
         private val resolutor = SimpleObjectProperty<Resolutor>()
         private val horarios = SimpleSetProperty<Horario>()
@@ -1059,6 +1062,7 @@ class PrincipalController {
             resolutor.set(value)
         }
 
+        @Suppress("unused")
         fun resolutorProperty(): ObjectProperty<Resolutor> = resolutor
 
         fun getHorarios(): Set<Horario> {
@@ -1069,6 +1073,7 @@ class PrincipalController {
             horarios.set(FXCollections.observableSet(value))
         }
 
+        @Suppress("unused")
         fun horariosProperty(): SetProperty<Horario> = horarios
 
         override fun createTask(): Task<Map<Dia, AsignacionDia>> {
